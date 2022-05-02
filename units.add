@@ -1,0 +1,19 @@
+# seperate columns with blancs  
+# if you have more than one word in some columns you must insert these between >'< 
+# for example: breed raw_herdbook 2  02  8724 DL 'German Landrace' ' another kind of Landrace'
+# for undefined TARGET-CODE use NULL
+# CATEGORY  TABLE                 COLUMN CONTENT                                                 NUMBER  
+#-----------------------------------------------------------------------------
+zuchtstamm   ''   '0'    ''                                                       1 'SYS' 
+pruefort     ''   '0'    ''                                                       1 'Zwönitz' 
+pruefort     ''   '0'    ''                                                       1 'K-dorf' 
+pruefort     ''   '0'    ''                                                       1 'Weißbach' 
+pruefer     ''   '0'    ''                                                       1 'Tassilo Neubert' 
+ortsverein          ''   '0'    ''                                                       1 'RGZV Krostitz & Umgebung e.V.' 
+ortsverein          ''   '0'    ''                                                       1 'RGZV Colmnitz & Umgebung 1906 e.V.' 
+ortsverein          ''   '0'    ''                                                       1 'RGZV "Robert Oettel" Oelde 01 e.V.' 
+ortsverein          ''   '0'    ''                                                       1 'Rassegeflügel- & Rassekaninchenzüchter Großwig e.V.'
+ortsverein          ''   '0'    ''                                                       1 'Leipziger Rassegeflügelzüchterverein 1869 e.V.'
+landesverband       ''   '0'    ''                                                       1 'LV Sachsen' 
+bundesverband       ''   '0'    ''                                                       1 'BDRG' 
+sonderzuchtverein   ''   '0'    ''                                                       1 'Sonderverein zur Zucht und Erhaltung der Vorwerk- und Zwerg-Vorwerkhühner' 

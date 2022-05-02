@@ -1,0 +1,71 @@
+#-- federvieh.local
+#-- Anmeldung => Menue -------------------------------
+
+http://federvieh.local/cgi-bin/GUI?user=tneubert&pwd=agrum1&action=login&project=federvieh
+
+Response:
+{"sessionID":"50ead1d2751ec56ef77d3c3a024460bd","Menu":[{"menuForms":[],"menuID":"__M0","menuSubDirs":[{"menuID":"M1","menuSubDirs":[{"menuForms":{"__forms":[{"formID":"Codes","formDifficulty":"a","formName":"Eingabe/Ändern von Schlüsseln"},{"formID":"Adressen","formDifficulty":"b","formName":"Eingabe/Ändern von Adressdaten"},{"formName":"Eingabe/Ändern von Adressdaten","formID":"Adressen","formDifficulty":"b"}]},"menuSubDirs":[],"menuID":"M11","menuName":"Schlüssel"}],"menuName":"Formulare","menuForms":{"__forms":[{"formName":"File Upload","formDifficulty":"b","formID":"FileUpload_General"}]}},{"menuForms":{},"menuName":"Berichte","menuSubDirs":[{"menuName":"Schlüssel","menuSubDirs":[],"menuID":"M21","menuForms":{}}],"menuID":"M2"},{"menuID":"M3","menuSubDirs":[],"menuName":"Administration","menuForms":{}}],"menuName":"Hauptmenu"}]}
+
+#-- Favicon -------------------------------------------------------------------------------------------
+
+http://federvieh.local/cgi-bin/GUI?sid=8d3dad7cd6a49fb6360fa3a07972887a&action=configuration
+
+
+Response:
+"Logo":"etc/logo.png" ,"Favicon":"etc/favicon.ico"
+
+#-- Formular-Adressen -------------------------------------------------------------------------------
+
+http://federvieh.local/cgi-bin/GUI?sid=8d3dad7cd6a49fb6360fa3a07972887a&formtype=evonta&formid=Adressen
+
+Response:
+{"Form":{"General":{"-AR":"user","-Help":"/doc/AdressenFrm.html","-StyleSheet":"/etc/apiis.css","-Difficulty":"basic","-MenuID":"M11","-Name":"Adressen","-Content":"Eingabe/Ändern von Adressdaten","-Description":"Form","-ToolTip":"Eingabe/Ändern von Adressen"},"-Name":"F4","Block":{"Format":{"-MarginTop":"12px","-BorderColor":"#f0f0f0","-BorderStyle":"ridge"},"Label":[{"Text":{"-TextDecoration":"underline","-FontSize":"24px"},"Position":{"-Position":"absolute","-Column":"0","-...
+
+#-- Formular-Adressen-Default --------------------------------------------------------------------------------------------
+
+http://federvieh.local/cgi-bin/GUI?json={"sid":"8d3dad7cd6a49fb6360fa3a07972887a","command":"do_query_block_default","form":"/home/b08mueul/apiis/federvieh/etc/forms/Schluessel/Adressen.frm"}
+
+
+
+Response:
+{"data":[{"F916":["0123-456789","",""],"F898":["Ort","",""],"F982a":["25335","",""],"F880":["Vorname_öäß~","",""],"F922":["email@email.de","",""],"F895":["99999","",""],"F892":["Straße Nr. 1","",""],"F883":["имя","",""],"F886":["debug","",""]}],"result":{"error":"","update":"","insert":""},"sid":"8d3dad7cd6a49fb6360fa3a07972887a","form":"/home/b08mueul/apiis/federvieh/etc/forms/Schluessel/Adressen.frm","info":"Ok.","command":""}
+
+#-- Query for Apiis1 -------------------------------------------------------------------
+
+http://federvieh.local/cgi-bin/GUI?json={"form":"/home/b08mueul/apiis/federvieh/etc/forms/Schluessel/Adressen.frm","data":[{"F886":["debug","",""]}],"errors":[],"sid":"8d3dad7cd6a49fb6360fa3a07972887a","info":"","command":"do_query_block"}
+
+Response
+{"info":"Ok.","command":"","errors":[],"data":[{"F895":["99999","",""],"F883":["имя","",""],"F916":["0123-456789","",""],"F922":["email@email.de","",""],"F880":["Vorname_öäß~","",""],"F892":["Straße Nr. 1","",""],"F886":["debug","",""],"F898":["Ort","",""],"F982a":["25335","",""]}],"sid":"8d3dad7cd6a49fb6360fa3a07972887a","form":"/home/b08mueul/apiis/federvieh/etc/forms/Schluessel/Adressen.frm"}
+
+http://federvieh.local/cgi-bin/GUI?json={"form":"/home/b08mueul/apiis/federvieh/etc/forms/Schluessel/Adressen.frm","data":[{"F883":["имя","",""],"F982a":["25335","",""]}],"errors":[],"sid":"8d3dad7cd6a49fb6360fa3a07972887a","info":"","command":"do_query_block"}
+
+Response
+{"command":"","sid":"8d3dad7cd6a49fb6360fa3a07972887a","info":"Ok.","data":[{"F892":["Straße Nr. 1","",""],"F895":["99999","",""],"F880":["Vorname_öäß~","",""],"F886":["debug","",""],"F982a":["25335","",""],"F916":["0123-456789","",""],"F883":["имя","",""],"F898":["Ort","",""],"F922":["email@email.de","",""]}],"errors":[],"form":"/home/b08mueul/apiis/federvieh/etc/forms/Schluessel/Adressen.frm"}
+
+#-- Update Record email: um@zwisss.de -> ulf.mueller@smeku.sachsen.de--------------------------------------------------------
+
+http://federvieh.local/cgi-bin/GUI?json={"form":"/home/b08mueul/apiis/federvieh/etc/forms/Schluessel/Adressen.frm","data":[{"F982a":["25335","",""],"F922":["電子郵件@電子郵件Überfall.de","",""]}],"errors":[],"sid":"8d3dad7cd6a49fb6360fa3a07972887a","info":"","command":"do_save_block"}
+
+Response
+{"result":{"update":"1","insert":"0","errors":"0"},"command":"","info":"1 update 0 insert 0 errors","errors":[],"data":[{"F922":["","",""],"F982a":["","",""]}],"sid":"8d3dad7cd6a49fb6360fa3a07972887a","form":"/home/b08mueul/apiis/federvieh/etc/forms/Schluessel/Adressen.frm"}
+
+http://federvieh.local/cgi-bin/GUI?json={"form":"/home/b08mueul/apiis/federvieh/etc/forms/Schluessel/Adressen.frm","data":[{"F886":["debug","",""]}],"errors":[],"sid":"8d3dad7cd6a49fb6360fa3a07972887a","info":"","command":"do_query_block"}
+
+Response
+{"command":"","sid":"8d3dad7cd6a49fb6360fa3a07972887a","data":[{"F895":["99999","",""],"F922":["電子郵件@電子郵件.de","",""],"F982a":["25335","",""],"F916":["0123-456789","",""],"F880":["Vorname_öäß~","",""],"F898":["Ort","",""],"F886":["debug","",""],"F892":["Straße Nr. 1","",""],"F883":["имя","",""]}],"errors":[],"info":"Ok.","form":"/home/b08mueul/apiis/federvieh/etc/forms/Schluessel/Adressen.frm"}
+
+#-- Insert ----------------------------------------------------------------------------------------------------------------
+
+http://federvieh.local/cgi-bin/GUI?json={"command":"do_save_block","sid":"8d3dad7cd6a49fb6360fa3a07972887a","info":"Ok.","data":[{"F892":["Straße Nr. 2","",""],"F895":["11111","",""],"F880":["Test","",""],"F886":["Apiis3","",""],"F982a":["","",""],"F916":["99-99999","",""],"F883":["nachname","",""],"F898":["Ort2","",""],"F922":["email2@email2.de","",""]}],"errors":[],"form":"/home/b08mueul/apiis/federvieh/etc/forms/Schluessel/Adressen.frm"}
+
+Response
+{"data":[{"F922":["","",""],"F982a":["","",""],"F895":["","",""],"F892":["","",""],"F898":["","",""],"F883":["","",""],"F886":["","",""],"F916":["","",""],"F880":["","",""]}],"command":"","form":"/home/b08mueul/apiis/federvieh/etc/forms/Schluessel/Adressen.frm","sid":"8d3dad7cd6a49fb6360fa3a07972887a","result":{"insert":"1","errors":"0","update":"0"},"info":"0 update 1 insert 0 errors","errors":[]}
+
+Test
+http://federvieh.local/cgi-bin/GUI?json={"form":"/home/b08mueul/apiis/federvieh/etc/forms/Schluessel/Adressen.frm","data":[{"F886":["Apiis3","",""]}],"errors":[],"sid":"8d3dad7cd6a49fb6360fa3a07972887a","info":"","command":"do_query_block"}
+
+
+#-----------------------------
+http://federvieh.local/cgi-bin/GUI?sid=8d3dad7cd6a49fb6360fa3a07972887a&action=do_execute_sql&function=ScrollinglistLoadingstreams
+
+

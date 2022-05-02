@@ -1,0 +1,70 @@
+###Checking out / Installation of APIIS:
+cd      $HOME;
+export  DATABASE_STUFF=$HOME/apiis;
+cd      $DATABASE_STUFF;
+
+### Generating the environment variables in a terminal:
+
+export   APIIS_HOME=$HOME/apiis;
+export   APIIS_LOCAL=$HOME/apiis/federvieh;
+export   QS_HOME=$APIIS_HOME/qs;
+export   REFERENCE_HOME=$APIIS_HOME/reference;
+
+#---------------------------------------------------------------------------------------
+export PROJECT=federvieh;
+cd $DATABASE_STUFF/$PROJECT;
+export PROJECT_HOME=$DATABASE_STUFF/$PROJECT;
+sed  -i "s|localpath\s*=\s*".*">|localpath=\"$PROJECT_HOME/load\">|g" load/federvieh.xml;
+sed  -i "s|SYSTEM\s*".*">|SYSTEM \"$PROJECT_HOME/load/load.dtd\">|g" load/federvieh.xml;
+$QS_HOME/sub/Load/LoadProject -a -p federvieh -l 3 -s 1;
+$QS_HOME/sub/Load/LoadProject -a -p federvieh -l 3 -s 2;
+cd $PROJECT_HOME/load;
+cat $PROJECT_HOME/codes.add >>1/codes.ok;
+cat $PROJECT_HOME/units.add >>1/units.ok;
+$QS_HOME/sub/Load/LoadProject -a -p federvieh -l 3 -s 3;
+$QS_HOME/sub/Load/LoadProject -a -p federvieh -l 3 -s 4;
+
+psql federvieh -U apiis_admin -c "update unit set ext_unit='bundesring' where ext_id='ID';"
+psql federvieh -U apiis_admin -c "create view entry_locations as (select * from locations where exit_dt isnull);"
+psql federvieh -U apiis_admin -c "create index db_animal_null on locations (db_animal) where exit_dt isnull;"
+psql federvieh -U apiis_admin -c "DROP SEQUENCE seq_address__db_address;";
+psql federvieh -U apiis_admin -c "CREATE  SEQUENCE seq_address__db_address START WITH 200;";
+psql federvieh -U apiis_admin -c "CREATE EXTENSION tablefunc;";
+
+psql federvieh -U apiis_admin -c 'update unit set db_address=(select db_address from address where ext_address=ext_id);';
+psql federvieh -U apiis_admin -c 'create unique index idx_eggs_per_month_2 on eggs_per_month (db_animal, year, month);';
+
+psql federvieh -U apiis_admin <$PROJECT_HOME/etc/functions.sql;
+
+psql federvieh -U apiis_admin -c "insert into configurations (user_login, db_key, value) Values ('SYS', user_get_db_code('CONFIG','1'),'');";
+psql federvieh -U apiis_admin -c "insert into configurations (user_login, db_key, value) Values ('SYS', user_get_db_code('CONFIG','2'),'');";
+psql federvieh -U apiis_admin -c "insert into configurations (user_login, db_key, value) Values ('SYS', user_get_db_code('CONFIG','3'),'');";
+psql federvieh -U apiis_admin -c "insert into configurations (user_login, db_key, value) Values ('SYS', user_get_db_code('CONFIG','4'),'');";
+psql federvieh -U apiis_admin -c "update configurations set guid=nextval('seq_database__guid'), owner='Mariensee';";
+psql federvieh -U apiis_admin -c "insert into configurations (user_login, key, value) values ('SYS', 'favicon', 'etc/favicon.ico');";
+psql federvieh -U apiis_admin -c "insert into configurations (user_login, key, value) values ('SYS', 'logo', 'etc/logo.png');";
+
+#-- debug mit Daten versehen
+psql federvieh -U apiis_admin -c "update ar_users set user_session_id='8d3dad7cd6a49fb6360fa3a07972887a' where user_login='debug';";
+psql federvieh -U apiis_admin -c "update address set first_name='Vorname_öäß~', second_name='имя',street='Straße Nr. 1', zip='99999', town='Ort', phone_mobil='0123-456789', email='email@email.de' where ext_address='debug';";
+psql federvieh -U apiis_admin -c "update unit set user_id=(select user_id from ar_users where user_login='debug') where ext_id='VWH1';;";
+
+cd $APIIS_LOCAL;
+#neue Nutzer anlegen
+#perl bin/Auth.pl;
+
+#-- alle Züchter Sachsen zuordnen 
+psql federvieh -U apiis_admin -c "update unit set db_member=(select db_unit from unit where ext_id='Sachsen') where ext_unit='breeder' or ext_unit='owner' or ext_unit='bezirksverband';";
+
+perl lib/test.LO Vereine;
+perl lib/test.LO LO_ReorgMenuStructure;
+
+perl  lib/test.LO LO_LS12_Merkmale load/data/Merkmale_VWH.xlsx off;
+
+bash load_excel.bsh;
+
+#perl $FEDERVIEH/lib/load.DS LO_LS01  $FEDERVIEH/doc/Beispiel_LS01.xlsx off ;
+#perl $FEDERVIEH/lib/load.DS LO_LS11  $FEDERVIEH/load/data/LS11_Events_2019.csv off ;
+
+firefox federvieh.local;
+

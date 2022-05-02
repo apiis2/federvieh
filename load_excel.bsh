@@ -1,0 +1,59 @@
+#!/bin/bash
+
+cd $FEDERVIEH/load/data/LS10_NeuerNutzer;
+
+#-- Nutzerdaten
+for FILE in *; do 
+    echo "${FILE}";
+    perl $FEDERVIEH/lib/load.DS LO_LS10  "${FILE}" off ;
+done
+
+cd $FEDERVIEH/load/data/Zuchtstammmeldungen_2021;
+
+#-- Zuchtstammmeldung
+for FILE in *; do 
+    echo "${FILE}";
+    perl $FEDERVIEH/lib/load.DS LO_LS01  ${FILE} off ;
+done
+
+cd $FEDERVIEH/load/data/Zuchtstammmeldungen_2020;
+
+#-- Zuchtstammmeldung
+for FILE in *; do 
+    echo "${FILE}";
+    perl $FEDERVIEH/lib/load.DS LO_LS01  ${FILE} off ;
+done
+
+cd $FEDERVIEH/load/data/Zuchtstammmeldungen_2019;
+
+#-- Zuchtstammmeldung
+for FILE in *; do 
+    echo "${FILE}";
+    perl $FEDERVIEH/lib/load.DS LO_LS01  ${FILE} off ;
+done
+
+exit;
+
+cd $FEDERVIEH/load/data/Brut-_und_Kükenlisten_2019;
+
+#-- Brut-_und_Kükenlisten
+for FILE in *; do 
+    echo "${FILE}";
+    perl $FEDERVIEH/lib/load.DS LO_LS02  "${FILE}" off ;
+done
+
+cd $FEDERVIEH/load/data/Legeliste-Züchter_2019;
+
+#-- Legeliste-Züchter
+for FILE in *; do 
+    echo "${FILE}";
+    perl $FEDERVIEH/lib/load.DS LO_LS05  "${FILE}" off >Legeliste-Züchter_2019.log;
+done
+
+cd $FEDERVIEH/load/data/Bewertungsliste_2019;
+
+#-- Bewertungsliste
+for FILE in *; do 
+    echo "${FILE}";
+    perl $FEDERVIEH/lib/load.DS LO_LS03  "${FILE}" off ;
+done
