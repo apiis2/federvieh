@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE report SYSTEM "report.dtd">
+<Report>
+  <General
+    DataSource="Bestand({bestand_von},{bestand_bis},{zu_ab})"
+    CreatePDF="pdf()"
+    UseForm="/etc/forms/Bestand.pfrm"
+    StrictParameter="no"
+    Name="Bestand (allgemein)" StyleSheet="etc/apiis.css" PageFooter="All_Pages" PageHeader="All_Pages"/>
+  <Detail Name="Detail_0">
+    <Lines Column="1" Name="Lines_11" Row="1" LineType="solid" LineWidth="thin"/>
+  </Detail>
+</Report>

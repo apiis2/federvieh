@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Form PUBLIC "1" "http://federvieh.local/etc/form3.dtd">
+<Form Name="FORM_Bestandsliste">
+  <General Name="General_515" StyleSheet="/etc/apiis.css" Description="PM-Bestandsliste" MenuID="M1" AR="user" Difficulty="basic"
+           ToolTip="__('Parametrisierung zur Erzeugung einer Bestandsübersicht')" Help="/doc/Bestandsliste.html"/>
+
+  <Block Name="Block_488" Description="Bestandsliste" NavigationBar="no">
+    <DataSource Name="DataSource_493" >
+      <none/>
+    </DataSource>
+
+    <Label Name="Bestandsliste_Label_490" Content="Bestandsliste">
+      <Position Column="0-1" Position="absolute" Row="0"/>
+      <Text FontSize="24px" TextDecoration="underline"/>
+      <Format PaddingBottom="10px"/>
+    </Label>
+
+    <Label Name="Label_1491b" Content="Tiergruppe:">
+      <Position Column="0" Position="absolute" Row="1"/>
+    </Label>
+    <Field Name="tiergruppe" FlowOrder="1" Check="NotNull"  LabelName="Label_1491b" ToolTip="__('Beschränkung der Auswertung auf eine der folgenden Tiergruppen')">
+      <DataSource Name="DataSource_493a">
+        <SqlFunction Action="do_execute_sql" View="ScrollinglistEingrenzungBestand"/>  
+      </DataSource>
+      <ScrollingList Size="1" Default="Gesamtbestand" />
+      <Position Column="1" Position="absolute" Row="1"/>
+      <Miscellaneous/>
+      <Text/>
+      <Color/>
+      <Format/>
+    </Field>
+    
+    <Label Name="Bestandsliste_L3" Content="__('von'):">
+      <Position Column="0" Position="absolute" Row="3"/>
+    </Label>
+    <Field Name="bestandsliste_von" FlowOrder="3" LabelName="Bestandsliste_L3" ToolTip="__('Zugänge in den Bestand ab diesem Zeitpunkt')">
+      <TextField Size="10" MaxLength="10" DefaultFunction="today"/>
+      <Position Column="1" Position="absolute" Row="3" />
+      <Miscellaneous/>
+      <Text/>
+      <Color/>
+      <Format MarginRight="5px"/>
+    </Field>
+
+    <Label Name="Bestandsliste_L3b" Content="__('bis'):">
+      <Position Column="0" Position="absolute" Row="4"/>
+    </Label>
+    <Field Name="bestandsliste_bis" FlowOrder="4" LabelName="Bestandsliste_L3b" ToolTip="__('Abgänge aus den Bestand ab diesem Zeitpunkt')">
+      <TextField Size="10" MaxLength="10" DefaultFunction="today"/>
+      <Position Column="1" Position="absolute" Row="4" />
+      <Miscellaneous/>
+      <Text/>
+      <Color/>
+      <Format/>
+    </Field>
+
+    <Label Name="Label_1491c" Content="__('Züchter'):">
+      <Position Column="0" Position="absolute" Row="5"/>
+    </Label>
+    <Field Name="betrieb" FlowOrder="5" LabelName="Label_1491c" ToolTip="__('Auswahl eines oder mehrerer Züchter')">
+      <DataSource Name="DataSource_betrieb">
+        <SqlFunction Action="do_execute_sql" View="ScrollinglistBreederBestand"/>  
+      </DataSource>
+      <ScrollingList Size="7" SelectMode="multiple"/>
+      <Position Column="1" Position="absolute" Row="5"/>
+      <Miscellaneous/>
+      <Text/>
+      <Color/>
+      <Format/>
+    </Field>
+    
+    <Label Name="Label_14911c" Content="__('Farbdruck'):">
+      <Position Column="0" Position="absolute" Row="6"/>
+    </Label>
+    <Field Name="farbe" FlowOrder="6" LabelName="Label_14911c" ToolTip="__('Die Zu- und Abgänge werden farblich markiert. Für scharz/weiß-Druck den Haken entfernen')" >
+      <CheckBox Checked="no" />
+      <Position Column="1" Position="absolute" Row="6"/>
+      <Miscellaneous/>
+      <Text/>
+      <Color/>
+      <Format/>
+    </Field>
+    
+    <Label Name="Label_14911ca" Content="__('Datumsangabe'):">
+      <Position Column="0" Position="absolute" Row="7"/>
+    </Label>
+    <Field Name="datum" FlowOrder="6" LabelName="Label_14911ca" ToolTip="__('Hinter der Tiernummer wird zusätzlich das Datum des Zu- oder Abgangs ausgegeben')">
+      <CheckBox Checked="no" />
+      <Position Column="1" Position="absolute" Row="7"/>
+      <Miscellaneous/>
+      <Text/>
+      <Color/>
+      <Format/>
+    </Field>
+    
+    <Label Name="Label_14911caa" Content="__('Zusammenfassungen'):">
+      <Position Column="0" Position="absolute" Row="8"/>
+    </Label>
+    <Field Name="zusammenfassung" FlowOrder="7" LabelName="Label_14911caa" ToolTip="__('Fügt eine Tabelle an den Anfang der Liste ein mit einer Gesamtübersicht der Zu- und Abgänge getrennt nach Rassen/Farbschlägen')">
+      <CheckBox Checked="no" />
+      <Position Column="1" Position="absolute" Row="8"/>
+      <Miscellaneous/>
+      <Text/>
+      <Color/>
+      <Format/>
+    </Field>
+    
+    <Label Name="Label_1499c" Content="__('Sortierung'):">
+      <Position Column="0" Position="absolute" Row="9"/>
+    </Label>
+    <Field Name="sort" FlowOrder="8" LabelName="Label_1499c" 
+           ToolTip="__('In der Liste werden die Daten nach Tiernummern oder nach Nummernkreisen (Züchter/Bundesring) sortiert dargestellt')">
+      <DataSource Name="DataSource_499b">
+        <SqlFunction Action="do_execute_sql" View="ScrollinglistSortierungBestand"/>  
+      </DataSource>
+      <ScrollingList Size="1" Default="Nummer" OnlyListEntries="yes"/>
+      <Position Column="1" Position="absolute" Row="9"/>
+      <Miscellaneous/>
+      <Text/>
+      <Color/>
+      <Format/>
+    </Field>
+    
+    <Field Name="Field_514">
+      <Button ButtonLabel="Bestandsliste zusammenstellen" URL="/etc/reports/Bestandsliste.rpt" Command="do_exit"  ToolTip="__('Liste wird erzeugt und als pdf angezeigt')"/>
+      <Position Column="0" Columnspan="2" Position="absolute" Row="10"/>
+      <Miscellaneous/>
+      <Text/>
+      <Color/>
+      <Format MarginTop="10px" MarginRight="10px"/>
+      
+    </Field>
+    <Field Name="Field_515">
+      <Button ButtonLabel="R&amp;uuml;ckg&amp;auml;ngig" URL="/etc/reports/Bestandsliste.pm" Command="do_clear"  ToolTip="__('Parameter werden auf die Voreinstellungen zurückgesetzt')"/>
+      <Position Column="0" Columnspan="2" Position="absolute" Row="10"/>
+      <Miscellaneous/>
+      <Text/>
+      <Color/>
+      <Format MarginTop="10px"/>
+    </Field>
+
+    <Color BackGround="#f0f0f0"/>
+    <Format BorderStyle="ridge" BorderColor="#f0f0f0" Padding="10px"/>
+
+  </Block>
+</Form>

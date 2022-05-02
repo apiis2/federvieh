@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--DOCTYPE GUI PUBLIC "1" "report.dtd"-->
+<Report>
+  <General
+    Name="Adressen Stammkarte" PageFooter="All_Pages" PageHeader="All_Pages"
+    UseForm="/etc/forms/MitgliederStammkarte.pfrm"
+    DataSource="sql({kategorie},{status})"
+    StyleSheet="../etc/apiis.css"/>
+  <GUIHeader Name="GUIHeader_0">
+    <Text Column="1-2" Content="Mitglieder Stammkarte" Name="Text_00" Row="1" FontSize="24px" TextAlign="left"/>
+    <Text Column="1" Content="Ort: " Name="Text_01" Row="2" FontSize="14px"/>
+    <Text Column="1" Content="Datum: " Name="Text_02" Row="3" FontSize="14px"/>
+  </GUIHeader>
+  <Detail Name="Detail_0">
+    <Text Column="1-2" Content="Betriebsbezeichnungen" Name="Data_1" Row="1" FontSize="18px" TextAlign="left" TextDecoration="underline"/>
+    <Text Column="1" Content="KNDNR:" Name="Data_99" Row="2" PaddingLeft="20px"/>
+    <Data Column="2" Content="[hb_nr]" Name="Data_98" Row="2" />
+    <Text Column="1" Content="Einrichtung:" Name="Data_2" Row="3" PaddingLeft="20px"/>
+    <Data Column="2" Content="[firma_name]" Name="Data_3" Row="3" />
+    <Text Column="1" Content="zu Haenden:" Name="Data_4" Row="4" PaddingLeft="20px"/>
+    <Data Column="2" Content="[zu_haenden]" Name="Data_5" Row="4" />
+    <Text Column="1" Content="VVO-Nr.:" Name="Data_6" Row="5" PaddingLeft="20px"/>
+    <Data Column="2" Content="[vvo_nr]" Name="Data_7" Row="5" />
+    <Text Column="1" Content="LKV-Nr.:" Name="Data_8" Row="6" PaddingLeft="20px"/>
+    <Data Column="2" Content="[lkv_nr]" Name="Data_9" Row="6" />
+    <Text Column="1" Content="Steuer-Nr.:" Name="Data_10" Row="7" PaddingLeft="20px"/>
+    <Data Column="2" Content="[steuer_nr]" Name="Data_11" Row="7" />
+    <Text Column="1" Content="Tierseuchenkassen-Nr.:" Name="Data_12" Row="8" PaddingLeft="20px"/>
+    <Data Column="2" Content="[tsk_nr]" Name="Data_13" Row="8" />
+    <Text Column="1" Content="Herdenzeichen:" Name="Data_14" Row="9" PaddingLeft="20px"/>
+    <Data Column="2" Content="[hz]" Name="Data_15" Row="9" />
+    
+    <Text Column="1-2" Content="Adresse" Name="Data_18" Row="10" FontSize="18px" TextAlign="left" TextDecoration="underline"/>
+    <Text Column="1" Content="Titel:" Name="Data_19" Row="11" PaddingLeft="20px"/>
+    <Data Column="2" Content="[db_title]" Name="Data_20" Row="11" />
+    <Text Column="1" Content="Anrede:" Name="Data_21" Row="12" PaddingLeft="20px"/>
+    <Data Column="2" Content="[db_salutation]" Name="Data_22" Row="12" />
+    <Text Column="1" Content="Vorname:" Name="Data_23" Row="13" PaddingLeft="20px"/>
+    <Data Column="2" Content="[first_name]" Name="Data_24" Row="13" />
+    <Text Column="1" Content="Nachname:" Name="Data_25" Row="14" PaddingLeft="20px"/>
+    <Data Column="2" Content="[second_name]" Name="Data_26" Row="14" />
+    <Text Column="1" Content="geboren:" Name="Data_27" Row="15" PaddingLeft="20px"/>
+    <Data Column="2" Content="[birth_dt]" Name="Data_28" Row="15" />
+    <Text Column="1" Content="Strasse:" Name="Data_29" Row="16" PaddingLeft="20px"/>
+    <Data Column="2" Content="[street]" Name="Data_30" Row="16" />
+    <Text Column="1" Content="PLZ:" Name="Data_31" Row="17" PaddingLeft="20px"/>
+    <Data Column="2" Content="[zip]" Name="Data_32" Row="17" />
+    <Text Column="1" Content="Ort:" Name="Data_33" Row="18" PaddingLeft="20px"/>
+    <Data Column="2" Content="[town]" Name="Data_34" Row="18" />
+    <Text Column="1" Content="Landkreis:" Name="Data_35" Row="19" PaddingLeft="20px"/>
+    <Data Column="2" Content="[landkreis]" Name="Data_36" Row="19" />
+    <Text Column="1" Content="Land:" Name="Data_37" Row="20" PaddingLeft="20px"/>
+    <Data Column="2" Content="[db_country]" Name="Data_38" Row="20" />
+    <Text Column="1" Content="Sprache:" Name="Data_39" Row="21" PaddingLeft="20px"/>
+    <Data Column="2" Content="[db_language]" Name="Data_40" Row="21" />
+    <Text Column="1" Content="Telefon (privat):" Name="Data_41" Row="22" PaddingLeft="20px"/>
+    <Data Column="2" Content="[phone_priv]" Name="Data_42" Row="22" />
+    <Text Column="1" Content="Telefon (dienstl.):" Name="Data_43" Row="23" PaddingLeft="20px"/>
+    <Data Column="2" Content="[phone_firma]" Name="Data_44" Row="23" />
+    <Text Column="1" Content="Telefon (mobil):" Name="Data_45" Row="24" PaddingLeft="20px"/>
+    <Data Column="2" Content="[phone_mobil]" Name="Data_46" Row="24" />
+    <Text Column="1" Content="Fax:" Name="Data_47" Row="25" PaddingLeft="20px"/>
+    <Data Column="2" Content="[fax]" Name="Data_48" Row="25" />
+    <Text Column="1" Content="eMail:" Name="Data_49" Row="26" PaddingLeft="20px"/>
+    <Data Column="2" Content="[email]" Name="Data_50" Row="26" />
+    <Text Column="1" Content="Web-Seite:" Name="Data_51" Row="27" PaddingLeft="20px"/>
+    <Data Column="2" Content="[http]" Name="Data_52" Row="27" />
+    <Text Column="1" Content="Kommentar:" Name="Data_53" Row="28" PaddingLeft="20px"/>
+    <Data Column="2" Content="[comment]" Name="Data_54" Row="28" />
+    
+    <Text Column="1-2" Content="Bankverbindung" Name="Data_55" Row="29" FontSize="18px" TextAlign="left" TextDecoration="underline"/>
+    <Text Column="1" Content="Name der Bank:" Name="Data_56" Row="30" PaddingLeft="20px"/>
+    <Data Column="2" Content="[bank]" Name="Data_57" Row="30" />
+    <Text Column="1" Content="BLZ:" Name="Data_58" Row="31" PaddingLeft="20px"/>
+    <Data Column="2" Content="[blz]" Name="Data_59" Row="31" />
+    <Text Column="1" Content="Konto-Nr.:" Name="Data_60" Row="32" PaddingLeft="20px"/>
+    <Data Column="2" Content="[konto]" Name="Data_61" Row="32" />
+    <Text Column="1" Content="Zahlungsart:" Name="Data_62" Row="33" PaddingLeft="20px"/>
+    <Data Column="2" Content="[db_zahlung]" Name="Data_63" Row="33" />
+    
+    <Text Column="1-2" Content="Mitgliederstatus" Name="Data_64" Row="34" FontSize="18px" TextAlign="left" TextDecoration="underline"/>
+    <Text Column="1" Content="Mitglied seit:" Name="Data_65" Row="35" PaddingLeft="20px"/>
+    <Data Column="2" Content="[mg_seit_dt]" Name="Data_66" Row="35" />
+    <Text Column="1" Content="Mitglied bis:" Name="Data_67" Row="36" PaddingLeft="20px"/>
+    <Data Column="2" Content="[mg_bis_dt]" Name="Data_68" Row="36" />
+    <Text Column="1" Content="letzte Aenderung durch:" Name="Data_88" Row="37" PaddingLeft="20px"/>
+    <Data Column="2" Content="[last_change_user]" Name="Data_89" Row="37" />
+    <Text Column="1" Content="letzte Aenderung am:" Name="Data_90" Row="38" PaddingLeft="20px"/>
+    <Data Column="2" Content="[last_change_dt]" Name="Data_91" Row="38" />
+    <Lines Column="1-2" ForegroundColor="#000000" LineType="solid"
+      LineWidth="thin" Name="Lines_2" Row="39"/>
+    <PageBreak Name="BP" Column="1" Row="40"/>  
+  </Detail>
+</Report>

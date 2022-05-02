@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--DOCTYPE report SYSTEM "report.dtd" -->
+<Report>
+  <General
+    Name="Steckbrief" 
+    UseForm="/etc/reports/Steckbrief.pfrm"
+    StrictParameter="no"
+    AR="user" Content="__('Steckbrief')" Difficulty="basic" 
+    CreatePDF="pdf()"
+    DataSource="Steckbrief({animal_ext_unit},{animal_ext_id},{animal_ext_animal})"
+    StyleSheet="/etc/apiis.css" 
+    PageFooter="All_Pages" PageHeader="All_Pages"/>
+  <Detail Name="Detail_0">
+    <Hidden Content="[db_animal]" Name="Data_00"/>
+      
+  </Detail>
+</Report>

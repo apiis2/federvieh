@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Form PUBLIC "1" "http://federvieh.local/etc/form2.dtd">
+
+<Form Name="FP2">
+  <General Name="General_515" StyleSheet="/etc/apiis.css" Description="Adressen"/>
+
+  <Block Name="Block_488" Description="Adressen" NavigationBar="no">
+    <DataSource Name="DataSource_493" >
+      <Sql Statement="select 'Alle Gruppen' as ext_unit union select ext_unit from unit where ext_unit not in (select ext_code from codes where class='ID_SET') group by ext_unit order by ext_unit"/>
+      <Column Name="Column_494" Order="0" Type="DB"/>
+    </DataSource>
+
+    <Label Name="Label_490" Content="Adressen">
+      <Position Column="0-1" Position="absolute" Row="0"/>
+      <Text FontSize="24px" TextDecoration="underline"/>
+      <Format PaddingBottom="12px"/>
+    </Label>
+
+    <Label Name="Label_491" Content="Verband:">
+      <Position Column="0" Position="absolute" Row="1"/>
+    </Label>
+    <Field Name="unit" DSColumn="Column_494" FlowOrder="0">
+      <ScrollingList Size="1" OnlyListEntries="yes"/>
+      <Position Column="1" Position="absolute" Row="1"/>
+      <Miscellaneous/>
+      <Text/>
+      <Color/>
+      <Format/>
+      
+    </Field>
+
+    <Field Name="Field_514">
+      <Button ButtonLabel="Adressen erstellen" URL="/etc/reports/Adressen.rpt" Command="do_exit"/>
+      <Position Column="0-1" Position="absolute" Row="3"/>
+      <Miscellaneous/>
+      <Text/>
+      <Color/>
+      <Format MarginTop="12px"/>
+      
+    </Field>
+
+    <Color BackGround="#f0f0f0"/>
+    <Format BorderStyle="ridge" BorderColor="#f0f0f0" Padding="12px"/>
+
+  </Block>
+</Form>

@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Form PUBLIC "1" "form.dtd">
+<Form Name="FP3">
+  <General Name="General_515" StyleSheet="/etc/apiis.css" Description="Adressaufkleber"/>
+
+  <Block Name="Block_488" Description="Adressaufkleber" NavigationBar="no">
+    <DataSource Name="DataSource_493" >
+      <none/>
+    </DataSource>
+
+    <Label Name="Label_490" Content="Adressaufkleber">
+      <Position Column="0-1" Position="absolute" Row="0"/>
+      <Text FontSize="24px" TextDecoration="underline"/>
+      <Format PaddingBottom="10px"/>
+    </Label>
+
+    <Label Name="Label1" Content="EinschlieÃlich:">
+      <Position Column="1" Position="absolute" Row="1"/>
+    </Label>
+    <Label Name="Label2" Content="Au&amp;szlig;er:">
+      <Position Column="2" Position="absolute" Row="1"/>
+    </Label>
+    
+    <Label Name="Label_491a" Content="Rasse:">
+      <Position Column="0" Position="absolute" Row="3"/>
+    </Label>
+    <Field Name="Rasse" InternalData="yes">
+      <DataSource Name="DataSource_493b" >
+        <Sql Statement="select db_code, case when long_name isnull then case when short_name isnull then ext_code else
+        short_name end else long_name end as ext_breed from codes b where b.class='BREED' order by ext_breed;"/>
+      </DataSource>
+      <ScrollingList Size="5" SelectMode="multiple"/>
+      <Position Column="1" Position="absolute" Row="3"/>
+      <Miscellaneous/>
+      <Text/>
+      <Color/>
+      <Format/>
+    </Field>
+
+    <Field Name="NotRasse" InternalData="yes">
+      <DataSource Name="DataSource2_493b" >
+        <Sql Statement="select db_code, case when long_name isnull then case when short_name isnull then ext_code else
+        short_name end else long_name end as ext_breed from codes b where b.class='BREED' order by ext_breed;"/>
+      </DataSource>
+      <ScrollingList Size="5" SelectMode="multiple"/>
+      <Position Column="2" Position="absolute" Row="3"/>
+      <Miscellaneous/>
+      <Text/>
+      <Color/>
+      <Format/>
+    </Field>
+    
+    <Label Name="Label_4912b" Content="Event:">
+      <Position Column="0" Position="absolute" Row="4"/>
+    </Label>
+    <Field Name="Event">
+      <DataSource Name="DataSource_493y1c" >
+        <Sql Statement="set datestyle to 'german';SELECT b.db_event as id,  CASE WHEN c.ext_code::text isnull THEN
+        'unknown' ELSE c.ext_code::text END  || ' | ' ||  CASE WHEN b.event_dt::text isnull THEN 'unknown' ELSE
+        b.event_dt::text END || ' | ' || CASE WHEN d.ext_id::text isnull THEN 'unknown' ELSE d.ext_id::text END  as
+        ext_trait FROM event b LEFT OUTER JOIN  codes AS c ON c.db_code=b.db_event_type LEFT OUTER JOIN  entry_unit AS d ON
+        d.db_unit=b.db_location where date_part('year',b.event_dt) >=date_part('year',current_date)-1 GROUP BY id,ext_trait ORDER BY ext_trait;"/>
+      </DataSource>
+      <ScrollingList Size="5" SelectMode="multiple"/>
+      <Position Column="1" Position="absolute" Row="4"/>
+      <Miscellaneous/>
+      <Text/>
+      <Color/>
+      <Format/>
+    </Field>
+    
+    <Field Name="NotEvent">
+      <DataSource Name="DataSource3_493y1c" >
+        <Sql Statement="set datestyle to 'german';SELECT b.db_event as id,  CASE WHEN c.ext_code::text isnull THEN
+        'unknown' ELSE c.ext_code::text END  || ' | ' ||  CASE WHEN b.event_dt::text isnull THEN 'unknown' ELSE
+        b.event_dt::text END || ' | ' || CASE WHEN d.ext_id::text isnull THEN 'unknown' ELSE d.ext_id::text END  as
+        ext_trait FROM event b LEFT OUTER JOIN  codes AS c ON c.db_code=b.db_event_type LEFT OUTER JOIN  entry_unit AS d ON
+        d.db_unit=b.db_location where date_part('year',b.event_dt) >=date_part('year',current_date)-1 GROUP BY id,ext_trait ORDER BY ext_trait;"/>
+      </DataSource>
+      <ScrollingList Size="5" SelectMode="multiple"/>
+      <Position Column="2" Position="absolute" Row="4"/>
+      <Miscellaneous/>
+      <Text/>
+      <Color/>
+      <Format/>
+    </Field>
+
+    <Label Name="Label_4911b" Content="Unit (Gruppe):">
+      <Position Column="0" Position="absolute" Row="5"/>
+    </Label>
+    <Field Name="Unit">
+      <DataSource Name="DataSource_493yc" >
+        <Sql Statement="select ext_unit, ext_unit from entry_unit where db_address notnull group by ext_unit order by ext_unit;"/>
+      </DataSource>
+      <ScrollingList Size="5" SelectMode="multiple"/>
+      <Position Column="1" Position="absolute" Row="5"/>
+      <Miscellaneous/>
+      <Text/>
+      <Color/>
+      <Format/>
+    </Field>
+    
+    <Field Name="NotUnit">
+      <DataSource Name="DataSource4_493yc" >
+        <Sql Statement="select ext_unit, ext_unit from entry_unit where db_address notnull group by ext_unit order by
+        ext_unit;"/>
+      </DataSource>
+      <ScrollingList Size="5" SelectMode="multiple"/>
+      <Position Column="2" Position="absolute" Row="5"/>
+      <Miscellaneous/>
+      <Text/>
+      <Color/>
+      <Format/>
+    </Field>
+
+    <Label Name="Label_491y2c" Content="KNDNR:">
+      <Position Column="0" Position="absolute" Row="6"/>
+    </Label>
+    <Field Name="AdressID">
+      <TextField Size="30" MaxLength="50"/>
+      <Position Column="1" Position="absolute" Row="6"/>
+      <Miscellaneous/>
+      <Text/>
+      <Color/>
+      <Format/>
+    </Field>
+    <Field Name="NotAdressID">
+      <TextField Size="30" MaxLength="50"/>
+      <Position Column="2" Position="absolute" Row="6"/>
+      <Miscellaneous/>
+      <Text/>
+      <Color/>
+      <Format/>
+    </Field>
+
+    <Label Name="Label_491x2c" Content="KÃ¼rzel:">
+      <Position Column="0" Position="absolute" Row="7"/>
+    </Label>
+    <Field Name="HZ">
+      <TextField Size="30" MaxLength="50"/>
+      <Position Column="1" Position="absolute" Row="7"/>
+      <Miscellaneous/>
+      <Text/>
+      <Color/>
+      <Format/>
+    </Field>
+    <Field Name="NotHZ">
+      <TextField Size="30" MaxLength="50"/>
+      <Position Column="2" Position="absolute" Row="7"/>
+      <Miscellaneous/>
+      <Text/>
+      <Color/>
+      <Format/>
+    </Field>
+
+    <Label Name="Label_plz" Content="PLZ:">
+      <Position Column="0" Position="absolute" Row="8"/>
+    </Label>
+    <Field Name="PLZ">
+      <TextField Size="30" MaxLength="50"/>
+      <Position Column="1" Position="absolute" Row="8"/>
+      <Miscellaneous/>
+      <Text/>
+      <Color/>
+      <Format/>
+    </Field>
+    <Field Name="NotPLZ">
+      <TextField Size="30" MaxLength="50"/>
+      <Position Column="2" Position="absolute" Row="8"/>
+      <Miscellaneous/>
+      <Text/>
+      <Color/>
+      <Format/>
+    </Field>
+
+
+    <Label Name="Label_491b" Content="Etikettenformat:">
+      <Position Column="0" Position="absolute" Row="9"/>
+    </Label>
+    <Field Name="Etikett" InternalData="yes" Check="NotNull">
+      <DataSource Name="DataSource_493c" >
+        <Sql Statement="select 'a' as a, 'Liste-Adress-Id' as b 
+                        union select 'b' as a, 'Liste-Name' as b 
+                        union select 'c' as a, 'Liste-Gruppe' as c 
+                        union select sticker_id::text, name || ' - ' || height || 'x' || width || '  ' || margintop || '-' || marginright || '/' || fontsize from stickers"/>
+      </DataSource>
+      <ScrollingList Size="1"/>
+      <Position Column="1" Position="absolute" Row="9"/>
+      <Miscellaneous/>
+      <Text/>
+      <Color/>
+      <Format/>
+    </Field>
+    
+    <Label Name="Label_491c" Content="Start ab Position:">
+      <Position Column="0" Position="absolute" Row="10"/>
+    </Label>
+    <Field Name="Start" Check="NotNull">
+      <TextField Size="2" Default="1" InputType="number"/>
+      <Position Column="1" Position="absolute" Row="10"/>
+      <Miscellaneous/>
+      <Text/>
+      <Color/>
+      <Format/>
+    </Field>
+
+    <Label Name="Label_491c204" Content="Druckpapier:">
+      <Position Column="0" Position="absolute" Row="11"/>
+    </Label>
+
+    <Field Name="roll" Check="NotNull">
+      <DataSource Name="DataSource_493208" >
+        <Sql Statement="select 1 as typ, 'DIN-A4' as seite union select 3 as typ, 'DIN-A4-einspaltig' as seite"/>
+      </DataSource>
+      <ScrollingList Size="1" Default="DIN-A4-einspaltig"/>
+      <Position Column="1" Position="absolute" Row="11"/>
+      <Miscellaneous/>
+      <Text/>
+      <Color/>
+      <Format/>
+    </Field>
+
+    <Label Name="Label_1491b" Content="Ausgabe als:">
+      <Position Column="0" Position="absolute" Row="12"/>
+    </Label>
+    <Field Name="_exportfilter" DSColumn="Column_495a" Check="NotNull" >
+      <DataSource Name="DataSource_493a">
+        <Sql Statement="select 'htm2pdf','PDF' union select 'htm2exl', 'EXCEL' union select 'htm2ascii', 'ASCII' "/> 
+      </DataSource>
+      <ScrollingList Size="1" Default="PDF"/>
+      <Position Column="1" Position="absolute" Row="12"/>
+      <Miscellaneous/>
+      <Text/>
+      <Color/>
+      <Format/>
+    </Field>
+    
+    <Field Name="Field_514">
+      <Button ButtonLabel="Adressaufkleber erstellen" URL="/etc/reports/Adressaufkleber.rpt" Command="do_exit"/>
+      <Position Column="0" Columnspan="3" Position="absolute" Row="13"/>
+      <Miscellaneous/>
+      <Text/>
+      <Color/>
+      <Format MarginTop="10px"/>
+    </Field>
+    <Field Name="Field_515">
+      <Button ButtonLabel="R&amp;uuml;ckg&amp;auml;ngig" URL="/etc/reports/Adressaufkleber.rpt" Command="do_clear"/>
+      <Position Column="0" Columnspan="3" Position="absolute" Row="13"/>
+      <Miscellaneous/>
+      <Text/>
+      <Color/>
+      <Format MarginTop="10px"/>
+      
+    </Field>
+
+    <Color BackGround="#f0f0f0"/>
+    <Format BorderStyle="ridge" BorderColor="#f0f0f0" Padding="10px"/>
+
+  </Block>
+</Form>
+

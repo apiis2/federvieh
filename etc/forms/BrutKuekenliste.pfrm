@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Form PUBLIC "1" "http://federvieh.local/etc/form2.dtd">
+<Form Name="BrutKükenliste" >
+  <General Name="BrutKükenliste_General" StyleSheet="/etc/apiis.css" Description="Parameter-BrutKükenliste"/>
+
+  <Block Name="BrutKükenliste_B1" Description="BrutKükenliste" NavigationBar="no">
+    <DataSource Name="BrutKükenliste_DS1"  Connect="no">
+        <none/>
+    </DataSource>
+
+    <Label Name="BrutKükenliste_L1" Content="__('BrutK&amp;uuml;kenliste')">
+      <Position Column="0" Columnspan="2" Position="absolute" Row="0"/>
+      <Text FontSize="24px" TextDecoration="underline"/>
+      <Format PaddingBottom="10px"/>
+    </Label>
+
+    
+    <Label Name="BrutKükenliste_L8" Content="__('Besitzer'): ">
+      <Position Column="0" Position="absolute" Row="2"/>
+    </Label>
+    <Field Name="ext_location" Check="NotNull" >
+      <DataSource Name="DataSource_493a5">
+        <Sql Statement="
+                        SELECT 
+                            b.ext_id, 
+                            b.ext_id || ' - ' || case when a.second_name isnull then '' else a.second_name end || ', ' || 
+                            case when first_name isnull then '' else first_name end || ', ' || 
+                            case when zip isnull then '' else zip end  || ' ' || 
+                            case when town isnull then '' else town end  as ext_trait 
+
+                            FROM  locations c inner join unit AS b on c.db_location=b.db_unit
+                            inner join address a on a.db_address=b.db_address 
+                            GROUP BY c.db_location, b.db_unit, b.ext_id, ext_trait ORDER BY ext_trait 
+                        "/>
+      </DataSource>
+      <ScrollingList Size="1"/>
+      <Position Column="1" Position="absolute" Row="2"/>
+      <Miscellaneous/>
+      <Text/>
+      <Color/>
+      <Format/>
+    </Field>
+    
+    <Label Name="BrutKükenliste_L4" Content="__('Zuchtjahr'): ">
+      <Position Column="0" Position="absolute" Row="3"/>
+    </Label>
+    <Field Name="zuchtjahr" Check="NotNull" >
+      <DataSource Name="DataSource_493a5b">
+        <Sql Statement="
+        select date_part('year',current_date) || '/' || date_part('year',current_date)+1 as jahr  union select date_part('year',current_date)-1 || '/' || date_part('year',current_date) as jahr  union                         select date_part('year',current_date)-2 || '/' || date_part('year',current_date)-1 union  select date_part('year',current_date)-3 || '/' || date_part('year',current_date)-2 union  select date_part('year',current_date)-4 || '/' || date_part('year',current_date)-3 union  select date_part('year',current_date)-5 || '/' || date_part('year',current_date)-4 union  select date_part('year',current_date)-6 || '/' || date_part('year',current_date)-5 union  select date_part('year',current_date)-7 || '/' || date_part('year',current_date)-6 union  select date_part('year',current_date)-8 || '/' || date_part('year',current_date)-7 union  select date_part('year',current_date)-9 || '/' || date_part('year',current_date)-8 union  select date_part('year',current_date)-10 || '/' || date_part('year',current_date)-9 order by jahr desc
+                        "/>
+      </DataSource>
+      <ScrollingList Size="1"/>
+      <Position Column="1" Position="absolute" Row="3"/>
+      <Miscellaneous/>
+      <Text/>
+      <Color/>
+      <Format/>
+    </Field>
+    
+    <Label Name="BrutKükenliste_L5" Content="__('Rasse/Farbschlag'): ">
+      <Position Column="0" Position="absolute" Row="4"/>
+    </Label>
+    <Field Name="db_breedcolor" Check="NotNull" >
+      <DataSource Name="DataSource_493a5bc">
+        <Sql Statement="
+                        SELECT b.db_breedcolor as id,  
+                        CASE WHEN b.db_breed::text isnull THEN 'unknown' ELSE user_get_ext_code(b.db_breed)::text END   || ':::' ||   
+                        CASE WHEN b.db_color::text isnull THEN 'unknown' ELSE user_get_ext_code(b.db_color)::text END  as ext_trait 
+                        FROM breedcolor AS b  
+                        GROUP BY id,ext_trait 
+                        ORDER BY ext_trait
+                        "/>
+      </DataSource>
+      <ScrollingList Size="1"/>
+      <Position Column="1" Position="absolute" Row="4"/>
+      <Miscellaneous/>
+      <Text/>
+      <Color/>
+      <Format/>
+    </Field>
+    
+    <Field Name="Field_514">
+      <Button ButtonLabel="__('Liste drucken')" URL="/etc/reports/BrutKuekenliste.rpt" Command="do_exit"/>
+      <Position Column="1" Columnspan="2" Position="absolute" Row="7"/>
+      <Miscellaneous/>
+      <Text/>
+      <Color/>
+      <Format MarginTop="20px"/>
+      
+    </Field>
+
+    <Color BackGround="#f0f0f0"/>
+    <Format BorderStyle="ridge" BorderColor="#f0f0f0" Padding="10px"/>
+
+  </Block>
+</Form>

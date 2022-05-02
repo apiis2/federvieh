@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Form PUBLIC "1" "http://federvieh.local/etc/form2.dtd"[  
+  <!ENTITY NavigationButtons_Fields SYSTEM "http://federvieh.local/etc/navigationbuttons.xml">
+  <!ENTITY ActionButtons_Fields     SYSTEM "http://federvieh.local/etc/actionbuttons.xml">
+  <!ENTITY StatusLine_Block         SYSTEM "http://federvieh.local/etc/statusbar.xml">
+  <!ENTITY DumpButton_Block         SYSTEM "http://federvieh.local/etc/dumpbutton_block.xml">
+  <!ENTITY StatusLine2_Block        SYSTEM "http://federvieh.local/etc/statusbar.xml">
+  <!ENTITY CallForm_Block           SYSTEM "http://federvieh.local/etc/callform_button_block.xml">
+]>
+<Form Name="Administration_m2">
+  <General Description="Menu" Name="General_0a2" StyleSheet="/etc/apiis.css"/>
+  <Block Description="Administration" Name="Block_0a2" NavigationBar="no">
+    
+    <DataSource Name="DataSource_0a2">
+      <none/>
+    </DataSource>
+    
+    <Label Name="Label_0a2" Content="Administration">
+      <Position Row="0" Column="0-6"/>
+      <Text FontSize="34px" TextAlign="center"/>
+    </Label>
+ 
+    <Label Name="Label_1a2" Content="Eingabe">
+      <Position Column="0-6" Row="1"/>
+      <Text FontSize="16px" TextAlign="center"/>
+    </Label>
+   
+
+
+    <Image Name="Image_71aa2" Alt="Test" Src="/icons/blank1.gif">
+       <Position Column="0" Row="2" Width="1px"/>
+       <Color BackGround="white" />
+       <Format MarginTop="30px"/>
+    </Image>
+    
+    <Field Name="NeuerNutzer">
+      <Button ButtonLabel="Ersterfassung eines neuen Nutzers" URL="Ladestroeme/LS10_NeuerNutzer.frm" Command="do_open_form"/>
+      <Position Row="2" Column="1"/>
+      <Miscellaneous/>
+      <Text FontSize="12px" TextAlign="center"/>
+      <Color BackGround="#ffc600"/>
+      <Format BorderStyle="groove" BorderColor="lightgray"/>
+    </Field>
+    <Image Name="Image_71ca2" Alt="Test" Src="/icons/blank1.gif">
+       <Position Column="2" Row="2" Width="1px"/>
+       <Color BackGround="white" />
+       <Format MarginTop="30px"/>
+    </Image>
+    <Image Name="Image_31a2" Alt="Test" Src="/icons/blank1.gif">
+      <Position Column="3" Row="2" Width="1px"/>
+      <Color BackGround="black" />
+      <Format MarginRight="20px"/>
+    </Image>
+    <Image Name="Image_71da2" Alt="Test" Src="/icons/blank1.gif">
+       <Position Column="4" Row="2" Width="1px"/>
+       <Color BackGround="white" />
+       <Format MarginTop="30px"/>
+    </Image>
+    <Field Name="Field_82ea2">
+      <Button ButtonLabel="Nutzerliste" URL="/etc/reports/NutzerListe.rpt" Command="do_open_report"/>
+      <Position Column="5" Row="2"/>
+      <Miscellaneous/>
+      <Text FontSize="12px" TextAlign="center"/>
+      <Color BackGround="#c5ffff"/>
+      <Format BorderStyle="groove" BorderColor="lightgray"/>
+      
+    </Field>
+    <Image Name="Image_71fa2" Alt="Test" Src="/icons/blank1.gif">
+       <Position Column="6" Row="2" Width="1px"/>
+       <Color BackGround="white" />
+       <Format MarginTop="30px"/>
+    </Image>
+
+    <Field Name="Field_82ba2">
+      <Button ButtonLabel="Nutzer &amp;Auml;ndern" URL="Login.frm" Command="do_open_form"/>
+      <Position Column="1" Row="3"/>
+      <Miscellaneous/>
+      <Text FontSize="12px" TextAlign="center"/>
+      <Color BackGround="#ffc600"/>
+      <Format BorderStyle="groove" BorderColor="lightgray"/>
+    </Field>
+
+    <Color BackGround="#ffffdd"/>
+    <Format BorderStyle="ridge" BorderColor="#004ce4" Padding="10px"/>
+ 
+  </Block>
+</Form>

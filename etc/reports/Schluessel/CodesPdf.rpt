@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Form PUBLIC "1" "http://federvieh.local/etc/report.dtd">  
+<Report>
+  <General
+    Name="Codes"
+    ToolTip="__('Erzeugt eine Liste aller in der Datenbank genutzen Schlüssel')"
+    Help="/doc/CodesPdf.html"
+    DataSource="GetData()"
+    AR="coord" Content="__('Liste Codes')" Difficulty="advanced" 
+    CreatePDF="pdf()"
+    PageFooter="All_Pages" PageHeader="All_Pages"/>
+  <Detail Name="Detail_0">
+    <Lines Column="1" Name="Lines_11" Row="1" LineType="solid" LineWidth="thin"/>
+  </Detail>
+</Report>

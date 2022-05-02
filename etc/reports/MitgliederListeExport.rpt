@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--DOCTYPE GUI PUBLIC "1" "report.dtd"-->
+<Report>
+  <General
+    Name="Adressen Export" PageFooter="All_Pages" PageHeader="All_Pages"
+    UseForm="/etc/forms/MitgliederListeExport.pfrm"
+    DataSource="sql({status})"
+    StyleSheet="../etc/apiis.css"/>
+  <PageHeader Name="GUIHeader_0">
+    <Text Row="1" Content="Herdbuch-Nr." Name="Data_99" Column="1" PaddingLeft="20px"/>
+    <Text Row="1" Content="Einrichtung" Name="Data_2" Column="2" PaddingLeft="20px"/>
+    <Text Row="1" Content="zu Haenden" Name="Data_4" Column="3" PaddingLeft="20px"/>
+    <Text Row="1" Content="VVO-Nr." Name="Data_6" Column="4" PaddingLeft="20px"/>
+    <Text Row="1" Content="LKV-Nr." Name="Data_8" Column="5" PaddingLeft="20px"/>
+    <Text Row="1" Content="Steuer-Nr." Name="Data_10" Column="6" PaddingLeft="20px"/>
+    <Text Row="1" Content="Tierseuchenkassen-Nr." Name="Data_12" Column="7" PaddingLeft="20px"/>
+    <Text Row="1" Content="Herdenzeichen" Name="Data_14" Column="8" PaddingLeft="20px"/>
+    <Text Row="1" Content="Anrede" Name="Data_21" Column="10" PaddingLeft="20px"/>
+    <Text Row="1" Content="Titel" Name="Data_19" Column="11" PaddingLeft="20px"/>
+    <Text Row="1" Content="Vorname" Name="Data_23" Column="12" PaddingLeft="20px"/>
+    <Text Row="1" Content="Nachname" Name="Data_25" Column="13" PaddingLeft="20px"/>
+    <Text Row="1" Content="geboren" Name="Data_27" Column="14" PaddingLeft="20px"/>
+    <Text Row="1" Content="Strasse" Name="Data_29" Column="15" PaddingLeft="20px"/>
+    <Text Row="1" Content="PLZ" Name="Data_31" Column="16" PaddingLeft="20px"/>
+    <Text Row="1" Content="Ort" Name="Data_33" Column="17" PaddingLeft="20px"/>
+    <Text Row="1" Content="Landkreis" Name="Data_35" Column="18" PaddingLeft="20px"/>
+    <Text Row="1" Content="Land" Name="Data_37" Column="19" PaddingLeft="20px"/>
+    <Text Row="1" Content="Sprache" Name="Data_39" Column="20" PaddingLeft="20px"/>
+    <Text Row="1" Content="Telefon (privat)" Name="Data_41" Column="21" PaddingLeft="20px"/>
+    <Text Row="1" Content="Telefon (dienstl.)" Name="Data_43" Column="22" PaddingLeft="20px"/>
+    <Text Row="1" Content="Telefon (mobil)" Name="Data_45" Column="23" PaddingLeft="20px"/>
+    <Text Row="1" Content="Fax" Name="Data_47" Column="24" PaddingLeft="20px"/>
+    <Text Row="1" Content="eMail" Name="Data_49" Column="25" PaddingLeft="20px"/>
+    <Text Row="1" Content="Web-Seite" Name="Data_51" Column="26" PaddingLeft="20px"/>
+    <Text Row="1" Content="Kommentar" Name="Data_53" Column="27" PaddingLeft="20px"/>
+    <Text Row="1" Content="Name der Bank" Name="Data_56" Column="28" PaddingLeft="20px"/>
+    <Text Row="1" Content="BLZ" Name="Data_58" Column="29" PaddingLeft="20px"/>
+    <Text Row="1" Content="Konto-Nr." Name="Data_60" Column="30" PaddingLeft="20px"/>
+    <Text Row="1" Content="Zahlungsart" Name="Data_62" Column="31" PaddingLeft="20px"/>
+    <Text Row="1" Content="Mitglied seit" Name="Data_65" Column="32" PaddingLeft="20px"/>
+    <Text Row="1" Content="Mitglied bis" Name="Data_67" Column="33" PaddingLeft="20px"/>
+    <Text Row="1" Content="Paratuberkulose saniert" Name="Data_86" Column="42" PaddingLeft="20px"/>
+    <Text Row="1" Content="letzte Aenderung durch" Name="Data_88" Column="43" PaddingLeft="20px"/>
+    <Text Row="1" Content="letzte Aenderung am" Name="Data_90" Column="44" PaddingLeft="20px"/>
+  </PageHeader>
+  <Detail Name="Detail_0">
+    <Data Row="1" Content="[hb_nr]" Name="Data_98" Column="1" />
+    <Data Row="1" Content="[firma_name]" Name="Data_3" Column="2" />
+    <Data Row="1" Content="[zu_haenden]" Name="Data_5" Column="3" />
+    <Data Row="1" Content="[vvo_nr]" Name="Data_7" Column="4" />
+    <Data Row="1" Content="[lkv_nr]" Name="Data_9" Column="5" />
+    <Data Row="1" Content="[steuer_nr]" Name="Data_11" Column="6" />
+    <Data Row="1" Content="[tsk_nr]" Name="Data_13" Column="7" />
+    <Data Row="1" Content="[hz]" Name="Data_15" Column="8" />
+    
+    <Data Row="1" Content="[db_title]" Name="Data_20" Column="10" />
+    <Data Row="1" Content="[db_salutation]" Name="Data_22" Column="11"/>
+    <Data Row="1" Content="[first_name]" Name="Data_24" Column="12" />
+    <Data Row="1" Content="[second_name]" Name="Data_26" Column="13" />
+    <Data Row="1" Content="[birth_dt]" Name="Data_28" Column="14" />
+    <Data Row="1" Content="[street]" Name="Data_30" Column="15" />
+    <Data Row="1" Content="[zip]" Name="Data_32" Column="16" />
+    <Data Row="1" Content="[town]" Name="Data_34" Column="17" />
+    <Data Row="1" Content="[landkreis]" Name="Data_36" Column="18" />
+    <Data Row="1" Content="[db_country]" Name="Data_38" Column="19" />
+    <Data Row="1" Content="[db_language]" Name="Data_40" Column="20" />
+    <Data Row="1" Content="[phone_priv]" Name="Data_42" Column="21" />
+    <Data Row="1" Content="[phone_firma]" Name="Data_44" Column="22" />
+    <Data Row="1" Content="[phone_mobil]" Name="Data_46" Column="23" />
+    <Data Row="1" Content="[fax]" Name="Data_48" Column="24" />
+    <Data Row="1" Content="[email]" Name="Data_50" Column="25" />
+    <Data Row="1" Content="[http]" Name="Data_52" Column="26" />
+    <Data Row="1" Content="[comment]" Name="Data_54" Column="27" />
+    
+    <Data Row="1" Content="[bank]" Name="Data_57" Column="28" />
+    <Data Row="1" Content="[blz]" Name="Data_59" Column="29" />
+    <Data Row="1" Content="[konto]" Name="Data_61" Column="30" />
+    <Data Row="1" Content="[db_zahlung]" Name="Data_63" Column="31" />
+    
+    <Data Row="1" Content="[mg_seit_dt]" Name="Data_66" Column="32" />
+    <Data Row="1" Content="[mg_bis_dt]" Name="Data_68" Column="33" />
+    <Data Row="1" Content="[last_change_dt]" Name="Data_91" Column="44" />
+  </Detail>
+</Report>

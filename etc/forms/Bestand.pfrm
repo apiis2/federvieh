@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Form PUBLIC "1" "form.dtd">
+<Form Name="Bestand_1129e">
+  <General Name="General_515" StyleSheet="/etc/apiis.css" Description="Bestand"/>
+
+  <Block Name="Block_488" Description="Bestandsliste" NavigationBar="no">
+    <DataSource Name="DataSource_493" >
+      <none/>
+    </DataSource>
+
+    <Label Name="Label_490" Content="Bestand">
+      <Position Column="0" Columnspan="1" Position="absolute" Row="0"/>
+      <Text FontSize="24px" TextDecoration="underline"/>
+      <Format PaddingBottom="10px"/>
+    </Label>
+
+    <Label Name="Bestandsliste_L3" Content="Von:">
+      <Position Column="0" Position="absolute" Row="3"/>
+    </Label>
+    <Field Name="bestand_von">
+      <TextField Size="10"/>
+      <Position Column="1" Position="absolute" Row="3"/>
+      <Miscellaneous/>
+      <Text/>
+      <Color/>
+      <Format/>
+    </Field>
+
+    <Label Name="Bestandsliste_L4" Content="Bis:">
+      <Position Column="0" Position="absolute" Row="4"/>
+    </Label>
+    <Field Name="bestand_bis" >
+      <TextField Size="10"/>
+      <Position Column="1" Position="absolute" Row="4"/>
+      <Miscellaneous/>
+      <Text/>
+      <Color/>
+      <Format/>
+    </Field>
+<!--
+    <Label Name="Zu_Ab" Content="mit Zu- und Abg&amp;auml;ngen">
+      <Position Column="0" Position="absolute" Row="5"/>
+    </Label>
+    <Field Name="zu_ab" >
+      <CheckBox  Checked="no"/>
+      <Position Column="1" Position="absolute" Row="5"/>
+      <Miscellaneous/>
+      <Text/>
+      <Color/>
+      <Format/>
+    </Field>
+-->
+    <Field Name="Field_514" FlowOrder="2">
+      <Button ButtonLabel="Bestandsliste zusammenstellen" URL="/etc/reports/Bestand.rpt" Command="do_exit"/>
+      <Position Column="0" Columnspan="2" Position="absolute" Row="7"/>
+      <Miscellaneous/>
+      <Text/>
+      <Color/>
+      <Format MarginTop="10px"/>
+      
+    </Field>
+
+    <Color BackGround="#f0f0f0"/>
+    <Format BorderStyle="ridge" BorderColor="#f0f0f0" Padding="10px"/>
+
+  </Block>
+</Form>

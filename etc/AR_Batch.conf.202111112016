@@ -1,0 +1,404 @@
+################################################
+######## ROLE DEFINITIONS ######################
+################################################
+[ROLE administrator_scripts]
+ROLE_LONG_NAME=executing administrator scripts
+ROLE_TYPE=ST
+ROLE_DESCR=This role gives a possibility to execute access control scripts
+ROLE_SUBSET=
+ROLE_POLICIES=1,2,3,4,5,6,7,8,9
+
+[ROLE insert_breed_data]
+ROLE_LONG_NAME=inserting breed data
+ROLE_TYPE=DBT
+ROLE_DESCR=The role gives a permissions for inserting data into the breed tables.
+ROLE_SUBSET=update_breed_data
+ROLE_POLICIES=50,54,58,62,66,70,74,78,82,86,90,94,98,102,106,110,114,118,122,126,134
+
+[ROLE update_breed_data]
+ROLE_LONG_NAME=updating breed data
+ROLE_TYPE=DBT
+ROLE_DESCR=The role gives a permissions for updating data in the breed tables.
+ROLE_SUBSET=delete_breed_data
+ROLE_POLICIES=51,55,59,63,67,71,75,79,83,87,91,95,99,103,107,111,115,119,123,127,135
+
+[ROLE delete_breed_data]
+ROLE_LONG_NAME=deleting breed data
+ROLE_TYPE=DBT
+ROLE_DESCR=The role gives a permissions for inserting data from the breed tables.
+ROLE_SUBSET=delete_sys_data
+ROLE_POLICIES=52,56,60,64,68,72,76,80,84,88,92,96,100,104,108,112,116,120,124,128,136
+
+[ROLE select_breed_data]
+ROLE_LONG_NAME=selecting breed data
+ROLE_TYPE=DBT
+ROLE_DESCR=The role gives a permissions for selecting data from the breed tables.
+ROLE_SUBSET=
+ROLE_POLICIES=49,53,57,61,65,69,73,77,81,85,89,93,97,101,105,109,113,117,121,125,133
+
+[ROLE insert_sys_data]
+ROLE_LONG_NAME=inserting sys data
+ROLE_TYPE=DBT
+ROLE_DESCR=The role gives a permissions for inserting data into the system tables (access rights and synchronization table).
+ROLE_SUBSET=
+ROLE_POLICIES=2,6,10,14,18,22,26,30,34,38,42,46,130
+
+[ROLE update_sys_data]
+ROLE_LONG_NAME=updating sys data
+ROLE_TYPE=DBT
+ROLE_DESCR=The role gives a permissions for updating data in the system tables (access rights and synchronization table).
+ROLE_SUBSET=
+ROLE_POLICIES=3,7,11,15,19,23,27,31,35,39,43,47,131
+
+[ROLE delete_sys_data]
+ROLE_LONG_NAME=deleting sys data
+ROLE_TYPE=DBT
+ROLE_DESCR=The role gives a permissions for deleting data from the system tables (access rights and synchronization table).
+ROLE_SUBSET=delete_breed_data
+ROLE_POLICIES=4,8,12,16,20,24,28,32,36,40,44,48,132
+
+[ROLE select_sys_data]
+ROLE_LONG_NAME=selecting sys data
+ROLE_TYPE=DBT
+ROLE_DESCR=The role gives a permissions for selecting data from the system tables (access rights and synchronization table).
+ROLE_SUBSET=
+ROLE_POLICIES=1,5,9,13,17,21,25,29,33,37,41,45,129
+
+[ROLE administrator_dbt]
+ROLE_LONG_NAME=database administrator
+ROLE_TYPE=DBT
+ROLE_DESCR=The role gives a permissions for executing all sql actions on the all tables.
+ROLE_SUBSET=insert_breed_data,update_breed_data,delete_breed_data,select_breed_data,insert_sys_data,update_sys_data,delete_sys_data,select_sys_data
+ROLE_POLICIES=
+
+[ROLE coordinator_dbt]
+ROLE_LONG_NAME=database coordinator
+ROLE_TYPE=DBT
+ROLE_DESCR=The role gives a permissions for executing all sql actions on the breed tables.
+ROLE_SUBSET=insert_breed_data,update_breed_data,delete_breed_data,select_breed_data
+ROLE_POLICIES=
+
+[ROLE anonymous_dbt]
+ROLE_LONG_NAME=database anonymous user
+ROLE_TYPE=DBT
+ROLE_DESCR=The role gives a permissions for selecting all breed data from the database.
+ROLE_SUBSET=select_breed_data,insert_breed_data
+ROLE_POLICIES=
+
+[ROLE arm_anonymous]
+ROLE_LONG_NAME=arm anonymous
+ROLE_TYPE=ST
+ROLE_DESCR=anonymous actions for the web access rights manager
+ROLE_SUBSET=
+ROLE_POLICIES=10,12
+
+[ROLE arm_admin]
+ROLE_LONG_NAME=arm admin
+ROLE_TYPE=ST
+ROLE_DESCR=admin actions for the web access rights manager
+ROLE_SUBSET=
+ROLE_POLICIES=10,11,12,13,14
+
+################################################
+######## SYSTM TASK DEFINITIONS ################
+################################################
+[SYSTEM_TASK POLICIES]
+1=access_rights_manager.pl|program
+2=show info about users or roles|action
+3=create public views|action
+4=add new user|action
+5=add new role|action
+6=grant role to the user|action
+7=delete role|action
+8=delete user|action
+9=revoke role from the user|action
+10=documentation|www
+11=logout|www
+12=help|www
+13=access_rights_manager tool|form
+14=arm|www
+
+################################################
+######## DATABASE TASK DEFINITIONS #############
+################################################
+[DATABASE_TASK TABLES]
+
+##### TABLE "ar_users" #####
+1=ar_users|user_id,user_login,user_password,user_language_id,user_marker,user_disabled,user_status,user_last_login,user_last_activ_time,user_session_id,user_access_view,user_category,last_change_dt,last_change_user,dirty,chk_lvl,guid,owner,version,synch
+2=ar_users|user_id,user_login,user_password,user_language_id,user_marker,user_disabled,user_status,user_last_login,user_last_activ_time,user_session_id,user_access_view,user_category,synch
+##### TABLE "ar_users_data" #####
+3=ar_users_data|user_id,user_first_name,user_second_name,user_institution,user_email,user_country,user_street,user_town,user_zip,user_other_info,opening_dt,closing_dt,last_change_dt,last_change_user,creation_dt,creation_user,end_dt,end_user,dirty,chk_lvl,guid,owner,version,synch
+4=ar_users_data|user_id,user_first_name,user_second_name,user_institution,user_email,user_country,user_street,user_town,user_zip,user_other_info,opening_dt,closing_dt,synch
+##### TABLE "ar_roles" #####
+5=ar_roles|role_id,role_name,role_long_name,role_type,role_subset,role_descr,last_change_dt,last_change_user,dirty,chk_lvl,guid,owner,version,synch
+6=ar_roles|role_id,role_name,role_long_name,role_type,role_subset,role_descr,synch
+##### TABLE "ar_user_roles" #####
+7=ar_user_roles|user_id,role_id,last_change_dt,last_change_user,dirty,chk_lvl,guid,owner,version,synch
+8=ar_user_roles|user_id,role_id,synch
+##### TABLE "ar_dbtpolicies" #####
+9=ar_dbtpolicies|dbtpolicy_id,action_id,table_id,descriptor_id,last_change_dt,last_change_user,dirty,chk_lvl,guid,owner,version,synch
+10=ar_dbtpolicies|dbtpolicy_id,action_id,table_id,descriptor_id,synch
+##### TABLE "ar_role_dbtpolicies" #####
+11=ar_role_dbtpolicies|role_id,dbtpolicy_id,last_change_dt,last_change_user,dirty,chk_lvl,guid,owner,version,synch
+12=ar_role_dbtpolicies|role_id,dbtpolicy_id,synch
+##### TABLE "ar_dbttables" #####
+13=ar_dbttables|table_id,table_name,table_columns,table_desc,last_change_dt,last_change_user,dirty,chk_lvl,guid,owner,version,synch
+14=ar_dbttables|table_id,table_name,table_columns,table_desc,synch
+##### TABLE "ar_dbtdescriptors" #####
+15=ar_dbtdescriptors|descriptor_id,descriptor_name,descriptor_value,descriptor_desc,last_change_dt,last_change_user,dirty,chk_lvl,guid,owner,version,synch
+16=ar_dbtdescriptors|descriptor_id,descriptor_name,descriptor_value,descriptor_desc,synch
+##### TABLE "ar_stpolicies" #####
+17=ar_stpolicies|stpolicy_id,stpolicy_name,stpolicy_type,stpolicy_desc,last_change_dt,last_change_user,dirty,chk_lvl,guid,owner,version,synch
+18=ar_stpolicies|stpolicy_id,stpolicy_name,stpolicy_type,stpolicy_desc,synch
+##### TABLE "ar_role_stpolicies" #####
+19=ar_role_stpolicies|role_id,stpolicy_id,last_change_dt,last_change_user,dirty,chk_lvl,guid,owner,version,synch
+20=ar_role_stpolicies|role_id,stpolicy_id,synch
+##### TABLE "ar_constraints" #####
+21=ar_constraints|cons_id,cons_name,cons_type,cons_desc,last_change_dt,last_change_user,dirty,chk_lvl,guid,owner,version,synch
+22=ar_constraints|cons_id,cons_name,cons_type,cons_desc,synch
+##### TABLE "ar_role_constraints" #####
+23=ar_role_constraints|cons_id,first_role_id,second_role_id,last_change_dt,last_change_user,dirty,chk_lvl,guid,owner,version,synch
+24=ar_role_constraints|cons_id,first_role_id,second_role_id,synch
+##### TABLE "ar_users_schemes" #####
+25=ar_users_schemes|ar_users_id,ar_users_schemes_id,ar_users_breed,ar_users_regex_breed,ar_users_owner,ar_users_regex_owner,ar_users_event,ar_users_regex_event,ar_users_sql,last_change_dt,last_change_user,dirty,chk_lvl,guid,owner,version,synch
+26=ar_users_schemes|ar_users_id,ar_users_schemes_id,ar_users_breed,ar_users_regex_breed,ar_users_owner,ar_users_regex_owner,ar_users_event,ar_users_regex_event,ar_users_sql,synch
+##### TABLE "traits" #####
+27=traits|traits_id,db_trait,unit,decimals,minimum,maximum,description,last_change_dt,last_change_user,dirty,chk_lvl,guid,owner,version,synch
+28=traits|traits_id,db_trait,unit,decimals,minimum,maximum,description,synch
+##### TABLE "units_breedcolors" #####
+29=units_breedcolors|db_unit,db_breedcolor,last_change_dt,last_change_user,dirty,chk_lvl,guid,owner,version,synch
+30=units_breedcolors|db_unit,db_breedcolor,synch
+##### TABLE "performances" #####
+31=performances|performance_id,db_event,db_animal,db_trait,performance,last_change_dt,last_change_user,dirty,chk_lvl,guid,owner,version,synch
+32=performances|performance_id,db_event,db_animal,db_trait,performance,synch
+##### TABLE "eggs_per_month" #####
+33=eggs_per_month|db_animal,year,month,n_eggs,n_weighed_eggs,weight_eggs,last_change_dt,last_change_user,dirty,chk_lvl,guid,owner,version,synch
+34=eggs_per_month|db_animal,year,month,n_eggs,n_weighed_eggs,weight_eggs,synch
+##### TABLE "stickers" #####
+35=stickers|sticker_id,name,height,width,margintop,marginright,fontsize,last_change_dt,last_change_user,dirty,chk_lvl,guid,owner,version,synch
+36=stickers|sticker_id,name,height,width,margintop,marginright,fontsize,synch
+##### TABLE "event" #####
+37=event|db_event,db_event_type,db_sampler,event_dt,event_dtend,db_location,add_info,last_change_dt,last_change_user,dirty,chk_lvl,guid,owner,version,synch
+38=event|db_event,db_event_type,db_sampler,event_dt,event_dtend,db_location,add_info,synch
+##### TABLE "raisinglist" #####
+39=raisinglist|db_breeder,hatch_dt,no_pickled_eggs,no_unfertilized_eggs,no_hatched_eggs,no_losses_chicken,no_ringed_chicken,comments,last_change_dt,last_change_user,dirty,chk_lvl,guid,owner,version,synch
+40=raisinglist|db_breeder,hatch_dt,no_pickled_eggs,no_unfertilized_eggs,no_hatched_eggs,no_losses_chicken,no_ringed_chicken,comments,synch
+##### TABLE "layinglist" #####
+41=layinglist|db_breedcolor,db_breeder,year,month,day,hens_no,eggs_no,last_change_dt,last_change_user,dirty,chk_lvl,guid,owner,version,synch
+42=layinglist|db_breedcolor,db_breeder,year,month,day,hens_no,eggs_no,synch
+##### TABLE "litter" #####
+43=litter|db_litter,db_dam,db_dam_group,db_sire,db_sire_group,laid_id,litter_dt,set_eggs_no,unfertilized_no,dead_eggs_no,born_alive_no,male_born_no,last_change_dt,last_change_user,dirty,chk_lvl,guid,owner,version,synch
+44=litter|db_litter,db_dam,db_dam_group,db_sire,db_sire_group,laid_id,litter_dt,set_eggs_no,unfertilized_no,dead_eggs_no,born_alive_no,male_born_no,synch
+##### TABLE "configurations" #####
+45=configurations|user_login,db_key,key,value,last_change_dt,last_change_user,dirty,chk_lvl,guid,owner,version,synch
+46=configurations|user_login,db_key,key,value,synch
+##### TABLE "ratings" #####
+47=ratings|db_animal,db_event,cage_no,points,db_rating,last_change_dt,last_change_user,dirty,chk_lvl,guid,owner,version,synch
+48=ratings|db_animal,db_event,cage_no,points,db_rating,synch
+##### TABLE "transfer" #####
+49=transfer|db_animal,db_unit,ext_animal,opening_dt,closing_dt,id_set,last_change_dt,last_change_user,dirty,chk_lvl,guid,owner,version,synch
+50=transfer|db_animal,db_unit,ext_animal,opening_dt,closing_dt,id_set,synch
+##### TABLE "unit" #####
+51=unit|db_unit,ext_unit,ext_id,db_role,db_member,db_address,user_id,opening_dt,closing_dt,last_change_dt,last_change_user,dirty,chk_lvl,guid,owner,version,synch
+52=unit|db_unit,ext_unit,ext_id,db_role,db_member,db_address,user_id,opening_dt,closing_dt,synch
+##### TABLE "codes" #####
+53=codes|db_code,class,ext_code,short_name,long_name,description,opening_dt,closing_dt,last_change_dt,last_change_user,dirty,chk_lvl,guid,owner,version,synch
+54=codes|db_code,class,ext_code,short_name,long_name,description,opening_dt,closing_dt,synch
+##### TABLE "address" #####
+55=address|db_address,ext_address,firma_name,zu_haenden,vvo_nr,lkv_nr,steuer_nr,tsk_nr,verein_nr,local_area,db_kv,db_lv,db_title,db_salutation,first_name,second_name,street,zip,town,county,db_country,db_language,phone_priv,phone_firma,phone_mobil,fax,email,http,hz,birth_dt,comment,bank,iban,bic,db_payment,member_entry_dt,member_exit_dt,last_change_dt,last_change_user,dirty,chk_lvl,guid,owner,version,synch
+56=address|db_address,ext_address,firma_name,zu_haenden,vvo_nr,lkv_nr,steuer_nr,tsk_nr,verein_nr,local_area,db_kv,db_lv,db_title,db_salutation,first_name,second_name,street,zip,town,county,db_country,db_language,phone_priv,phone_firma,phone_mobil,fax,email,http,hz,birth_dt,comment,bank,iban,bic,db_payment,member_entry_dt,member_exit_dt,synch
+##### TABLE "animal_groups_animals" #####
+57=animal_groups_animals|db_animal_group,db_animal,last_change_dt,last_change_user,dirty,chk_lvl,guid,owner,version,synch
+58=animal_groups_animals|db_animal_group,db_animal,synch
+##### TABLE "animal" #####
+59=animal|db_animal,db_sire,db_sire_group,db_dam_group,db_dam,db_sex,db_breed,db_litter,db_selection,name,birth_dt,la_rep_dt,la_rep,last_change_dt,last_change_user,dirty,chk_lvl,guid,owner,version,synch
+60=animal|db_animal,db_sire,db_sire_group,db_dam_group,db_dam,db_sex,db_breed,db_litter,db_selection,name,birth_dt,la_rep_dt,la_rep,synch
+##### TABLE "locations" #####
+61=locations|db_animal,db_location,entry_dt,db_entry_action,exit_dt,db_exit_action,last_change_dt,last_change_user,dirty,chk_lvl,guid,owner,version,synch
+62=locations|db_animal,db_location,entry_dt,db_entry_action,exit_dt,db_exit_action,synch
+##### TABLE "languages" #####
+63=languages|lang_id,iso_lang,lang,creation_dt,creation_user,end_dt,end_user,last_change_dt,last_change_user,dirty,chk_lvl,guid,owner,version,synch
+64=languages|lang_id,iso_lang,lang,synch
+##### TABLE "nodes" #####
+65=nodes|nodename,address,last_change_dt,last_change_user,dirty,chk_lvl,guid,owner,version,synch
+66=nodes|nodename,address,synch
+##### TABLE "breedcolor" #####
+67=breedcolor|db_breedcolor,db_breed,db_color,db_breedgroup,last_change_dt,last_change_user,dirty,chk_lvl,guid,owner,version,synch
+68=breedcolor|db_breedcolor,db_breed,db_color,db_breedgroup,synch
+
+[DATABASE_TASK DESCRIPTORS]
+#The format: descriptor_id=descriptor_name|(descriptor_operator which can be defined as:=,>,<,<>)descriptor_value
+1=owner|(=)Mariensee
+
+[DATABASE_TASK POLICIES]
+#The format: dbtpolicy_id=db_actions|db_table|db_descriptor
+##### TABLE "ar_users" #####
+1=select|1|1
+2=insert|2|1
+3=update|2|1
+4=delete|2|1
+##### TABLE "ar_users_data" #####
+5=select|3|1
+6=insert|4|1
+7=update|4|1
+8=delete|4|1
+##### TABLE "ar_roles" #####
+9=select|5|1
+10=insert|6|1
+11=update|6|1
+12=delete|6|1
+##### TABLE "ar_user_roles" #####
+13=select|7|1
+14=insert|8|1
+15=update|8|1
+16=delete|8|1
+##### TABLE "ar_dbtpolicies" #####
+17=select|9|1
+18=insert|10|1
+19=update|10|1
+20=delete|10|1
+##### TABLE "ar_role_dbtpolicies" #####
+21=select|11|1
+22=insert|12|1
+23=update|12|1
+24=delete|12|1
+##### TABLE "ar_dbttables" #####
+25=select|13|1
+26=insert|14|1
+27=update|14|1
+28=delete|14|1
+##### TABLE "ar_dbtdescriptors" #####
+29=select|15|1
+30=insert|16|1
+31=update|16|1
+32=delete|16|1
+##### TABLE "ar_stpolicies" #####
+33=select|17|1
+34=insert|18|1
+35=update|18|1
+36=delete|18|1
+##### TABLE "ar_role_stpolicies" #####
+37=select|19|1
+38=insert|20|1
+39=update|20|1
+40=delete|20|1
+##### TABLE "ar_constraints" #####
+41=select|21|1
+42=insert|22|1
+43=update|22|1
+44=delete|22|1
+##### TABLE "ar_role_constraints" #####
+45=select|23|1
+46=insert|24|1
+47=update|24|1
+48=delete|24|1
+##### TABLE "ar_users_schemes" #####
+49=select|25|1
+50=insert|26|1
+51=update|26|1
+52=delete|26|1
+##### TABLE "traits" #####
+53=select|27|1
+54=insert|28|1
+55=update|28|1
+56=delete|28|1
+##### TABLE "units_breedcolors" #####
+57=select|29|1
+58=insert|30|1
+59=update|30|1
+60=delete|30|1
+##### TABLE "performances" #####
+61=select|31|1
+62=insert|32|1
+63=update|32|1
+64=delete|32|1
+##### TABLE "eggs_per_month" #####
+65=select|33|1
+66=insert|34|1
+67=update|34|1
+68=delete|34|1
+##### TABLE "stickers" #####
+69=select|35|1
+70=insert|36|1
+71=update|36|1
+72=delete|36|1
+##### TABLE "event" #####
+73=select|37|1
+74=insert|38|1
+75=update|38|1
+76=delete|38|1
+##### TABLE "raisinglist" #####
+77=select|39|1
+78=insert|40|1
+79=update|40|1
+80=delete|40|1
+##### TABLE "layinglist" #####
+81=select|41|1
+82=insert|42|1
+83=update|42|1
+84=delete|42|1
+##### TABLE "litter" #####
+85=select|43|1
+86=insert|44|1
+87=update|44|1
+88=delete|44|1
+##### TABLE "configurations" #####
+89=select|45|1
+90=insert|46|1
+91=update|46|1
+92=delete|46|1
+##### TABLE "ratings" #####
+93=select|47|1
+94=insert|48|1
+95=update|48|1
+96=delete|48|1
+##### TABLE "transfer" #####
+97=select|49|1
+98=insert|50|1
+99=update|50|1
+100=delete|50|1
+##### TABLE "unit" #####
+101=select|51|1
+102=insert|52|1
+103=update|52|1
+104=delete|52|1
+##### TABLE "codes" #####
+105=select|53|1
+106=insert|54|1
+107=update|54|1
+108=delete|54|1
+##### TABLE "address" #####
+109=select|55|1
+110=insert|56|1
+111=update|56|1
+112=delete|56|1
+##### TABLE "animal_groups_animals" #####
+113=select|57|1
+114=insert|58|1
+115=update|58|1
+116=delete|58|1
+##### TABLE "animal" #####
+117=select|59|1
+118=insert|60|1
+119=update|60|1
+120=delete|60|1
+##### TABLE "locations" #####
+121=select|61|1
+122=insert|62|1
+123=update|62|1
+124=delete|62|1
+##### TABLE "languages" #####
+125=select|63|1
+126=insert|64|1
+127=update|64|1
+128=delete|64|1
+##### TABLE "nodes" #####
+129=select|65|1
+130=insert|66|1
+131=update|66|1
+132=delete|66|1
+##### TABLE "breedcolor" #####
+133=select|67|1
+134=insert|68|1
+135=update|68|1
+136=delete|68|1
