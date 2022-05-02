@@ -1,0 +1,69 @@
+#!/usr/bin/perl -w
+#
+##############################################################################
+# $Id: load.DS,v 1.4 2022/02/26 18:52:28 ulf Exp $
+##############################################################################
+# This is only a test file to help during development. You can see how to
+# use the different methods of the Form object.
+#-- Aufruf: perl test.LO LO_DS06 ~/datastuff/chick/load/data/DS06_2014.csv off 2014
+BEGIN {
+   use Env qw( APIIS_HOME );
+   die "\n\tAPIIS_HOME is not set!\n\n" unless $APIIS_HOME;
+   push @INC, "$APIIS_HOME/lib";
+   push @INC, "$APIIS_HOME/etc/reports";
+}
+
+use strict;
+use warnings;
+use Apiis;
+Apiis->initialize( VERSION => '$Revision: 1.4 $' );
+use Apiis::DataBase::User;
+use Data::Dumper;
+$Data::Dumper::Indent = 1;
+$Data::Dumper::Terse  = 1;
+
+my $LO = $ARGV[0];
+
+## create a user objec create a user object to save repeated user/pw typing during tests:
+my $testuser = Apiis::DataBase::User->new(
+   id       => 'tneubert',
+   password => 'agrum1',
+);
+
+$testuser->check_status;
+$apiis->join_model('federvieh', userobj => $testuser );
+$apiis->check_status;
+no strict "refs";
+
+my $load_string="use $LO";
+eval $load_string;
+if ($@) { 
+  print $@;
+}
+my %data_hash;
+my ( $json,$stru ) = &$LO($apiis, {'FILE'=>$ARGV[1], 'importfilter'=>$ARGV[0], 'onlycheck'=>$ARGV[2],'action'=>'insert' }, $ARGV[3] );
+
+print "\n -----Result for $ARGV[1] ----\n\n";
+
+if (@{$json->{'Error'}}) {
+    foreach my $record (@{$json->{'Error'}} ) {
+        print $record."\n";
+    }
+}
+else {
+
+    foreach my $record (@{$json->{'RecordSet'}} ) {
+        foreach my $err (@{$record->{'Error'}}) {
+            map {print "$_ => $err->{$_}\n" } sort keys %{$err}; 
+            print "-----------------------------------------\n";
+        }
+    }
+    no warnings;
+
+    foreach my $record (@{$json->{'Result'}} ) {
+        print join(";",@$record)."\n";
+    }
+}
+print "\n -----Ende Result $ARGV[1] ----\n\n";
+
+
