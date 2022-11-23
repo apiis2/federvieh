@@ -33,6 +33,7 @@
       <Position Column="0" Position="absolute" Row="1"/>
     </Label>
 
+<!--
     <Field Name="F129" DSColumn="C128" FlowOrder="3" >
       <DataSource Name="DS113a">
         <SqlFunction Action="do_execute_sql" View="ScrollinglistGetZuchtjahre"/>
@@ -47,6 +48,7 @@
     <Label Name="L110" Content="__('Z&amp;uuml;chter'): ">
       <Position Column="0" Position="absolute" Row="2"/>
     </Label>
+-->
 
     <Field Name="F114" DSColumn="C111" FlowOrder="4" InternalData="yes">
       <DataSource Name="DS113">

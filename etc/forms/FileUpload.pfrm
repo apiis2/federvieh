@@ -14,7 +14,7 @@
       <Format PaddingBottom="10px"/>
     </Label>
 
-    
+<!--    
     <Label Name="FileUpload_L8" Content="__('Ladeströme')">
       <Position Column="0" Position="absolute" Row="2"/>
     </Label>
@@ -29,13 +29,13 @@
       <Color/>
       <Format/>
     </Field>
-    
+-->    
     <Label Name="FileUpload_L4" Content="__('Dateiname')">
-      <Position Column="0" Position="absolute" Row="5"/>
+      <Position Column="0" Position="absolute" Row="1"/>
     </Label>
     <Field Name="filename" LabelName="FileUpload_L4" ToolTip="__('Auswahl der hochzuladenden Datei')">
       <FileField Size="50"/>
-      <Position Column="1" Position="absolute" Row="5"/>
+      <Position Column="1" Position="absolute" Row="1"/>
       <Miscellaneous/>
       <Text/>
       <Color/>
@@ -43,17 +43,32 @@
     </Field>
     
     <Label Name="FileUpload_L4a" Content="__('nur Prüfen?')">
-      <Position Column="0" Position="absolute" Row="3"/>
+      <Position Column="0" Position="absolute" Row="2"/>
     </Label>
     <Field Name="onlycheck" LabelName="FileUpload_L4a" ToolTip="__('Ist der Haken gesetzt, werden die Daten nur geprüft, aber nicht in die Datenbank übernommen. Es wird empfohlen, den Vorgang zweimal durchzuführen: Den ersten Durchlauf mit Haken nur als Prüfung und wenn keine Fehler auftraten, den zweiten Durchlauf ohne Haken.')">
       <CheckBox Checked="yes" />
-      <Position Column="1" Position="absolute" Row="3"/>
+      <Position Column="1" Position="absolute" Row="2"/>
       <Miscellaneous/>
       <Text/>
       <Color/>
       <Format/>
     </Field>
 
+    <Label Name="Label_1491b" Content="Ausgabe als:">
+      <Position Column="0" Position="absolute" Row="3"/>
+    </Label>
+    <Field Name="_exportfilter" Check="NotNull">
+      <DataSource Name="DataSource_493b">
+        <Sql Statement="select 'json2html','HTML'"/> 
+      </DataSource>
+      <ScrollingList Size="1" Default="json2html"/>
+      <Position Column="1" Position="absolute" Row="3"/>
+      <Miscellaneous/>
+      <Text/>
+      <Color/>
+      <Format/>
+    </Field>
+    
     
 <!--    <Field Name="action">
       <TextField Size="50" Default="insert"/>
@@ -66,7 +81,7 @@
 -->
     <Field Name="Field_514">
       <Button ButtonLabel="__('Upload file')" URL="/etc/forms/FileUpload.rpt" Command="do_exit" ToolTip="__('Datei wird hochgeladen')"/>
-      <Position Column="1" Columnspan="2" Position="absolute" Row="7"/>
+      <Position Column="1" Columnspan="2" Position="absolute" Row="4"/>
       <Miscellaneous/>
       <Text/>
       <Color/>

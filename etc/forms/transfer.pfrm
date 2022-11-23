@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Form PUBLIC "1" "http://federvieh.local/etc/form3.dtd"[  <!ENTITY NavigationButtons_Fields SYSTEM "http://federvieh.local/etc/navigationbuttons.xml">
+  <!ENTITY ActionButtons_Fields     SYSTEM "http://federvieh.local/etc/actionbuttons.xml">
+  <!ENTITY StatusLine_Block         SYSTEM "http://federvieh.local/etc/statusbar.xml">
+  <!ENTITY DumpButton_Block         SYSTEM "http://federvieh.local/etc/dumpbutton_block.xml">
+  <!ENTITY StatusLine2_Block        SYSTEM "http://federvieh.local/etc/statusbar.xml">
+  <!ENTITY CallForm_Block           SYSTEM "http://federvieh.local/etc/callform_button_block.xml">
+]>
+<Form Name="EM_transfer">
+
+  <General Name      ="transfer_General"  MenuID="M1" AR="user" Content="__('Tiernummern')" Difficulty="basic" 
+           StyleSheet="/etc/apiis.css" Description="Tiernummern einem Tier zuordnen" 
+           ToolTip   ="__'(Zuordnung einer Nummer zu einem Tier')" Help="/doc/Transfer.html"/>
+
+  <Block Name="B613" Description="Update Transfer">
+     
+    <DataSource Name="transfer_DS1" Connect="no">
+      <Record TableName="transfer"/>
+      <Column DBName="db_animal"    Name="C1" Order="1" Type="DB"/>
+        <Column DBName="ext_unit"   Name="C2" Order="2" RelatedColumn="C1" RelatedOrder="0" Type="Related"/>
+        <Column DBName="ext_id"     Name="C3" Order="3" RelatedColumn="C1" RelatedOrder="1" Type="Related"/>
+        <Column DBName="ext_animal" Name="C4" Order="4" RelatedColumn="C1" RelatedOrder="2" Type="Related"/>
+      <Column DBName="opening_dt"   Name="C5" Order="5" Type="DB"/>
+      <Column DBName="closing_dt"   Name="C6" Order="6" Type="DB"/>
+      <Column DBName="guid"         Name="C7" Order="7" Type="DB"/>
+    </DataSource>
+      
+
+    <Label Name="L694" Content="__('Korrektur - Tiernummern')">
+      <Position Column="0" Columnspan="3" Position="absolute" Row="0"/>
+      <Text FontSize="24px" TextDecoration="underline"/>
+      <Format PaddingBottom="10px"/>
+    </Label>
+
+    <Label Name="L1" Content="__('Tiernummer')">
+      <Position Column="0" Position="absolute" Row="2"/>
+    </Label>
+    
+    <Label Name="L2" Content="__('Nummernsystem')">
+      <Position Column="1" Position="absolute" Row="1"/>
+      <Text FontSize="10px"/>
+    </Label>
+    <Label Name="L3" Content="__('Nummernkreis')">
+      <Position Column="2" Position="absolute" Row="1"/>
+      <Text FontSize="10px"/>
+    </Label>
+    <Label Name="L4" Content="__('Tiernummer')">
+      <Position Column="3" Position="absolute" Row="1"/>
+      <Text FontSize="10px"/>
+    </Label>
+    
+    <Field Name="F1" DSColumn="C1" FlowOrder="0" InternalData="yes"  LabelName="L1">
+      <TextField Override="no" Size="20"/>
+      <Position Column="1" Position="absolute" Row="2"/>
+      <Miscellaneous Visibility="hidden" Enabled="no"/>
+      <Text/>
+      <Color />
+      <Format/>
+    </Field>
+    <Field Name="F2" DSColumn="C2" FlowOrder="2" InternalData="yes"  LabelName="L2" ToolTip="__('Auswahl des Nummernsystems')">
+      <DataSource Name="EM_Transfer_DS2">
+        <SqlFunction Action="do_execute_sql" View="ScrollinglistGetID_SET"/>
+      </DataSource>
+      <ScrollingList Size="1" DefaultFunction="apiisrc" Default="ext_unit" />  
+      <Position Column="1" Position="absolute" Row="2"/>
+      <Miscellaneous />
+      <Text />
+      <Color/>
+      <Format/>
+    </Field>
+    <Field Name="F3" DSColumn="C3" FlowOrder="3" InternalData="yes"  LabelName="L3" ToolTip="__('Auswahl des Nummernkreises')">
+      <DataSource Name="EM_Transfer_DS3">
+        <SqlFunction Action="do_execute_sql" View="ScrollinglistGetID_SET_ext_id"/>
+      </DataSource>
+      <ScrollingList Size="1" DefaultFunction="apiisrc" Default="ext_id" StartCompareString="right" ReduceEntries="yes" />  
+      <Position Column="2" Position="absolute" Row="2"/>
+      <Miscellaneous />
+      <Text />
+      <Color/>
+      <Format/>
+    </Field>
+    <Field Name="F4" DSColumn="C4" FlowOrder="4" InternalData="yes"  LabelName="L4" ToolTip="__('Tiernummer eingeben')">
+      <TextField Size="8"/>
+      <Position Column="3" Position="absolute" Row="2"/>
+      <Miscellaneous />
+      <Text />
+      <Color />
+      <Format/>
+    </Field>
+
+
+    <Label Name="L5" Content="__('Tiernummer aktiv ab')">
+      <Position Column="0" Position="absolute" Row="3"/>
+    </Label>
+    <Field Name="F5" DSColumn="C5" FlowOrder="5" InternalData="yes"  LabelName="L5" ToolTip="__('Ab wann ist die Tiernummer aktiv? dd.mm.yyyy')">
+      <TextField Size="10" />
+      <Position Column="1" Position="absolute" Row="3"/>
+      <Miscellaneous/>
+      <Text/>
+      <Color/>
+      <Format/>
+    </Field>
+
+    <Label Name="L6" Content="__('Tiernummer deaktivieren ab')">
+      <Position Column="0" Position="absolute" Row="4"/>
+    </Label>
+    <Field Name="F6" DSColumn="C6" FlowOrder="6" InternalData="yes"  LabelName="L6" ToolTip="__('Ab wann ist die Tiernummer nicht mehr aktiv? dd.mm.yyyy')">
+      <TextField Size="10"/>
+      <Position Column="1" Position="absolute" Row="4"/>
+      <Miscellaneous/>
+      <Text/>
+      <Color/>
+      <Format/>
+    </Field>
+
+    <Label Name="EM_TransferL609" Content="Interne Id:">
+      <Position Column="0" Position="absolute" Row="7"/>
+    </Label>
+
+    <Field Name="EM_TransferF611" DSColumn="C7" >
+      <TextField Size="10"/>
+      <Position Column="1" Position="absolute" Row="7"/>
+      <Miscellaneous Enabled="no"/>
+      <Text/>
+      <Color BackGround="transparent"/>
+      <Format BorderColor="transparent"/>
+    </Field>
+    
+    <Image Name="EM_TransferImage_311" Alt="Test" Src="/icons/blank1.gif">
+      <Position Column="0" Columnspan="3" Row="7"/>
+      <Format PaddingTop="20px"/>
+    </Image>
+    
+    &NavigationButtons_Fields;
+    &ActionButtons_Fields;
+    &StatusLine_Block;
+    
+    <Color BackGround="#f0f0f0"/>
+    <Format BorderStyle="ridge" BorderColor="#f0f0f0" Padding="10px"/>
+  </Block>
+
+</Form>

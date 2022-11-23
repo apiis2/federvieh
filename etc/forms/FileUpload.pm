@@ -1,96 +1,132 @@
-#-- EDIT --
-#-- Name of modul and name of function has to be identically
-
-my @datastreams=('LO_LS01', 'LO_LS02','LO_LS03','LO_LS04','LO_LS05','LO_LS11');
-
-#-- END
-
-
-use CGI qw/:standard :html3 :html4 /;
-
 use strict;
 use warnings;
 
-#-- load datastream moduls
-foreach (@datastreams) {
-    my $vstr="use $_"; 
-    eval($vstr);
+sub CheckLO {
+    
+    my $js=shift;
+
+    #-- loop over all date until match 
+    foreach my $rec (@{ $js->{'data'} }) {
+
+        my $v=join(',',@$rec);
+
+        return 'LO_LS13_eNest' if ($v=~/TransponderEPC/);
+        return 'LO_LS21_Vorwerkhuehner' if ($v=~/ZuchtstammID.+?2=Klarei/); 
+    }
+    
+    return undef;
 }
 
 #-- upload a general ascii-file
 sub FileUpload {
-    my ( $self, $filename, $importfilter,$onlycheck, $action, $breed, $db_animal ) = @_;
-    my ( $history); 
+    my ($self,$filename,$LO_old,$onlycheck) = @_;
     
-    
-    $breed          =$self->{_Query}->{param}->{'breed'}->[0];
-#    $action         =$self->{_Query}->{param}->{'action'}->[0];
-    $action         ='insert';
-    $onlycheck      =$self->{_Query}->{param}->{'onlycheck'}->[0];
-    $importfilter   =$self->{_Query}->{param}->{'importfilter'}->[0]; 
-    $filename       =$self->{_Query}->{param}->{'filename'}->[0]; 
-    $history        =$self->{_Query}->{param}->{'history'}->[0]; 
-    $db_animal      =$self->{_Query}->{param}->{'db_animal'}->[0]; 
+    my ($json,$LO);
 
-    my @bak;
-    my $json;
-    my @data;    
-    my $pack;
-    my $table;
-    my @rdata;
-    my @title;
-    my $row='<td>'.main::__('No').'</td><td></td>';
-    my $pruefort;
-    my $db_event;
-    my @field;
-    my $zeile;
-    my $error;
-    my $insert_ok=0;
-    my $insert_false=0;
-    my $lo='';
-    
+    if ($self->{_Query}->{param}) {
+        $filename       =$self->{_Query}->{param}->{'filename'}->[0]; 
+        $onlycheck      =$self->{_Query}->{param}->{'onlycheck'}->[0];
+    }
+
     $onlycheck='off' if (!$onlycheck);
     
-    #-- leeren json-String generieren
-    my $args={'JSON'=>{},
-              'FILE'=>$filename,
-              'importfilter'=>$importfilter};
+    my  $args           = {};
+    $args->{'data'}     = [];
+    $args->{'onlycheck'} = $onlycheck;
+    $args->{'fileimport'}=1 ;
 
-    $args->{'onlycheck'}=$onlycheck;
-    $args->{'action'}=$action;
-    $args->{'breed'}=$breed;
-    $args->{'db_animal'}=$db_animal;
-    $args->{'history'}=$history;
-   
+    #-- Check LO
+    open( IN, "$filename" ) || die "error: kann $filename nicht öffnen";
 
-    print '<style type="text/css">
-        .tip { border-bottom:1px dotted #000000; }
-        a.tip,
-        a.tip:link,
-        a.tip:visited,
-        a.tip:active { color: #616161; text-decoration: none; position: relative; }
-        a.tip:hover { background: transparent; z-index: 100; }
-        a.tip span { display: none; text-decoration: none; }
-        a.tip:hover span {
-        display: block;
-        position: absolute;
-        top: 40px;
-        left: 0;
-        width: 400px;
-        z-index: 100;
-        color: #2f2f2f;
-        font-family: Helvetica, Geneva, Arial, SunSans-Regular, sans-serif;
-        padding: 2px 10px;
-        background-color: #ebebeb;
-            text-align: left;
-            border-color: #780303;
-            border-style: solid;
-            border-width: 1px 4px; }
-            </style>';
+    if ($filename=~/\.xlsx$/) {
+      
+        #-- Excel-Tabelle öffnen 
+        my $book = Spreadsheet::Read->new ($filename, dtfmt => "dd.mm.yyyy");
+        my $sheet = $book->sheet(1);
 
-    my $tt="$importfilter".'($apiis,$args)';
-    $json=eval($tt);
-   
+        #-- Fehlermeldung, wenn es nicht geht 
+        if(defined $book->[0]{'error'}){
+            print "Error occurred while processing $filename:".
+                $book->[0]{'error'}."\n";
+            exit(-1);
+        }
+    
+        my $max_rows = $sheet->{'maxrow'};
+        my $max_cols = $sheet->{'maxcol'};
+
+        #--Schleife über alle Zeilen 
+        for my $row_num (1..($max_rows))  {
+
+           #-- declare
+            my $data    =[];
+            my $col     ='A';
+
+            #-- Schleife über alle Spalten       
+            for my $col_num (1..($max_cols)) {
+
+                #-- einen ";" String erzeugen  
+                push(@{$data}, encode_utf8 $sheet->{$col.$row_num});
+
+                $col++;
+            }
+            
+            push(@{$args->{'data'}},$data); 
+        }
+    } 
+    elsif ($filename=~/(\.csv$|\.txt$)/) {
+        
+        while (<IN>) {
+
+            chop;
+            my @data=split("\t",$_,1000);
+
+            next if (!@data);
+
+            push(@{$args->{'data'}},\@data);
+        }
+    } 
+    else {
+        #-- Fehler auslösen
+    }
+
+    close(IN);
+
+    if (!$LO) {
+    
+        $LO=CheckLO($args);
+    }
+
+    #-- wenn keinen güligen Ladestrom gefunden
+    if (!$LO) {
+        $apiis->errors (Apiis::Errors->new(
+                    type       => 'DATA',
+                    severity   => 'CRIT',
+                    from       => 'FileUpload',
+                    ext_fields => [], 
+                    msg_short  =>"Filestruktur entspricht keinem gültigen Ladestrom."
+                    ));
+        $apiis->status(1);
+
+        return undef;
+    }
+    else {
+        #-- load datastream moduls
+        my $vstr="use $LO"; 
+        eval($vstr);
+        
+        my $tt="$LO".'($apiis,$args)';
+        
+        $json=eval($tt);
+    }
+    
+    return $json;
+}
+1;
+__END__
+
+
+
+
     if ($@) {print $@;}
 
     #-- Ausgabe der fehlerhaften Daten
