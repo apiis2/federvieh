@@ -15,17 +15,17 @@
     
     &AccessRightsTables;
     
-<!-- _______trait_standards_content___________________________________ -->  
+<!-- _______standard_traits_content___________________________________ -->  
     <table
 
-        name  = "trait_standards_content">
+        name  = "standard_traits_content">
 
         &GlobalColumns;
         
         <column
-            name         = "trait_standards_id"
+            name         = "standard_traits_id"
             DESCRIPTION  = "Eindeutige ID des Merkmalstandards"
-            CHECK        = "NotNull"
+            CHECK        = "NotNull, ForeignKey standard_traits standard_traits_id"
             LENGTH       = "10"
             DATATYPE     = "BIGINT">
         </column>
@@ -50,20 +50,20 @@
                                'SetUser last_change_user'">
             </TRIGGER> 
             <CONSTRAINTS 
-                         INDEX="trait_standards_id">
+                         INDEX="unique standard_traits_id traits_id">
             </CONSTRAINTS>
         </TABLE>
     </table>
 
-<!-- _______trait_standards___________________________________ -->  
+<!-- _______standard_traits___________________________________ -->  
     <table
 
-        name  = "trait_standards">
+        name  = "standard_traits">
 
         &GlobalColumns;
         
         <column
-            name         = "trait_standards_id"
+            name         = "standard_traits_id"
             DESCRIPTION  = "Eindeutige ID des Merkmals"
             CHECK        = "NotNull"
             LENGTH       = "10"
@@ -71,7 +71,7 @@
         </column>
 
         <column 
-            name        = "name" 
+            name        = "label" 
             DATATYPE    = "CHAR" 
             LENGTH      = "20" 
             DESCRIPTION = "Bezeichnung des Standards" 
@@ -91,42 +91,41 @@
                 PREUPDATE  = " 'SetVersion version',
                                'SetNow last_change_dt',
                                'SetUser last_change_user'"
-                PREINSERT  = " 'SetVersion version',
+                PREINSERT  = " 'SetColumn standard_traits_id seq_standard_traits__standard_traits_id',
+                               'SetVersion version',
                                'SetGuid guid',
                                'SetNode owner',
                                'SetNow last_change_dt',
                                'SetUser last_change_user'">
             </TRIGGER> 
             <CONSTRAINTS 
-                         SEQUENCE="seq_trait_standards__trait_standards_id" 
-                         INDEX="unique trait_standards_id">
+                         SEQUENCE="seq_standard_traits__standard_traits_id" 
+                         INDEX="unique standard_traits_id, unique label">
             </CONSTRAINTS>
         </TABLE>
     </table>
 
-<!-- _______event_standards___________________________________ -->  
+<!-- _______standard_events___________________________________ -->  
     <table
 
-        name  = "event_standards">
+        name  = "standard_events">
 
         &GlobalColumns;
         
         <column
-            name         = "event_standards_id"
+            name         = "standard_events_id"
             DESCRIPTION  = "Eindeutige ID des Merkmals"
             CHECK        = "NotNull"
             LENGTH       = "10"
             DATATYPE     = "BIGINT">
         </column>
-
         <column 
-            name        = "name" 
+            name        = "label" 
             DATATYPE    = "CHAR" 
             LENGTH      = "20" 
             DESCRIPTION = "Bezeichnung des Standards" 
             CHECK       = "NotNull"  >
         </column>
-        
         <column 
             name        = "description" 
             DATATYPE    = "CHAR" 
@@ -135,14 +134,126 @@
             CHECK       = ""  >
         </column>
         
+        <column     name=   "db_event_type" DATATYPE="BIGINT" LENGTH="20" 
+                    DESCRIPTION="Interne ID der Art der Pruefung" 
+                    CHECK="NotNull, ForeignKey codes db_code class=EVENT"  >
+        </column>
+      
         <column
-            name         = "trait_standards_id"
+            name         = "standard_traits_id"
             DESCRIPTION  = "Eindeutige ID des Merkmalstandards"
-            CHECK        = "NotNull, ForeignKey trait_standards trait_standards_id"
+            CHECK        = "NotNull, ForeignKey standard_traits standard_traits_id"
+            LENGTH       = "10"
+            DATATYPE     = "BIGINT">
+        </column>
+        <column
+            name         = "standard_breeds_id"
+            DESCRIPTION  = "Eindeutige ID des Rassestandards"
+            CHECK        = "NotNull, ForeignKey standard_breeds standard_breeds_id"
+            LENGTH       = "10"
+            DATATYPE     = "BIGINT">
+        </column>
+        <column
+            name         = "standard_users_id"
+            DESCRIPTION  = "Eindeutige ID des Merkmalstandards"
+            CHECK        = "ForeignKey standard_users standard_users_id"
             LENGTH       = "10"
             DATATYPE     = "BIGINT">
         </column>
 
+        <TABLE>
+            <TRIGGER
+                PREUPDATE  = " 'SetVersion version',
+                               'SetNow last_change_dt',
+                               'SetUser last_change_user'"
+                PREINSERT  = " 'SetColumn standard_events_id seq_standard_events__standard_events_id',
+                               'SetVersion version',
+                               'SetGuid guid',
+                               'SetNode owner',
+                               'SetNow last_change_dt',
+                               'SetUser last_change_user'">
+            </TRIGGER> 
+            <CONSTRAINTS 
+                         SEQUENCE   = "seq_standard_events__standard_events_id" 
+                         INDEX      = "unique standard_events_id, unique label"
+                         PRIMARYKEY = "CONCAT:label;REF_COL:standard_events_id">
+            </CONSTRAINTS>
+        </TABLE>
+    </table>
+
+<!-- _______standard_users___________________________________ -->  
+    <table
+
+        name  = "standard_users">
+
+        &GlobalColumns;
+        
+        <column
+            name         = "standard_users_id"
+            DESCRIPTION  = "Eindeutige ID des Merkmals"
+            CHECK        = "NotNull"
+            LENGTH       = "10"
+            DATATYPE     = "BIGINT">
+        </column>
+
+        <column 
+            name        = "label" 
+            DATATYPE    = "CHAR" 
+            LENGTH      = "20" 
+            DESCRIPTION = "Bezeichnung des Standards" 
+            CHECK       = "NotNull"  >
+        </column>
+        
+        <column 
+            name        = "description" 
+            DATATYPE    = "CHAR" 
+            LENGTH      = "20" 
+            DESCRIPTION = "Beschreibung des Standards" 
+            CHECK       = ""  >
+        </column>
+        
+        <TABLE>
+            <TRIGGER
+                PREUPDATE  = " 'SetVersion version',
+                               'SetNow last_change_dt',
+                               'SetUser last_change_user'"
+                PREINSERT  = " 'SetColumn standard_users_id seq_standard_users__standard_users_id',
+                               'SetVersion version',
+                               'SetGuid guid',
+                               'SetNode owner',
+                               'SetNow last_change_dt',
+                               'SetUser last_change_user'">
+            </TRIGGER> 
+            <CONSTRAINTS 
+                         SEQUENCE="seq_standard_users__standard_users_id" 
+                         INDEX="unique standard_users_id, unique label">
+            </CONSTRAINTS>
+        </TABLE>
+    </table>
+
+<!-- _______standard_users_content___________________________________ -->  
+    <table
+
+        name  = "standard_users_content">
+
+        &GlobalColumns;
+        
+        <column
+            name         = "standard_users_id"
+            DESCRIPTION  = "Eindeutige ID des Usersstandards"
+            CHECK        = "NotNull"
+            LENGTH       = "10"
+            DATATYPE     = "BIGINT">
+        </column>
+
+        <column 
+            name        = "db_user" 
+            DATATYPE    = "BIGINT" 
+            LENGTH      = "20" 
+            DESCRIPTION = "Bezeichnung des Users-Standards" 
+            CHECK       = "NotNull">
+        </column>
+        
         <TABLE>
             <TRIGGER
                 PREUPDATE  = " 'SetVersion version',
@@ -155,21 +266,70 @@
                                'SetUser last_change_user'">
             </TRIGGER> 
             <CONSTRAINTS 
-                         SEQUENCE="seq_event_standards__event_standards_id" 
-                         INDEX="unique event_standards_id">
+                         INDEX="standard_users_id, db_user">
             </CONSTRAINTS>
         </TABLE>
     </table>
 
-<!-- _______breed_standards_content___________________________________ -->  
+    <!-- _______standard_breeds___________________________________ -->  
     <table
 
-        name  = "breed_standards_content">
+        name  = "standard_breeds">
 
         &GlobalColumns;
         
         <column
-            name         = "breed_standards_id"
+            name         = "standard_breeds_id"
+            DESCRIPTION  = "Eindeutige ID des Merkmals"
+            CHECK        = "NotNull"
+            LENGTH       = "10"
+            DATATYPE     = "BIGINT">
+        </column>
+
+        <column 
+            name        = "label" 
+            DATATYPE    = "CHAR" 
+            LENGTH      = "20" 
+            DESCRIPTION = "Bezeichnung des Standards" 
+            CHECK       = "NotNull"  >
+        </column>
+        
+        <column 
+            name        = "description" 
+            DATATYPE    = "CHAR" 
+            LENGTH      = "20" 
+            DESCRIPTION = "Beschreibung des Standards" 
+            CHECK       = ""  >
+        </column>
+        
+        <TABLE>
+            <TRIGGER
+                PREUPDATE  = " 'SetVersion version',
+                               'SetNow last_change_dt',
+                               'SetUser last_change_user'"
+                PREINSERT  = " 'SetColumn standard_breeds_id seq_standard_breeds__standard_breeds_id',
+                               'SetVersion version',
+                               'SetGuid guid',
+                               'SetNode owner',
+                               'SetNow last_change_dt',
+                               'SetUser last_change_user'">
+            </TRIGGER> 
+            <CONSTRAINTS 
+                         SEQUENCE="seq_standard_breeds__standard_breeds_id" 
+                         INDEX="unique standard_breeds_id, unique label">
+            </CONSTRAINTS>
+        </TABLE>
+    </table>
+
+<!-- _______standard_breeds_content___________________________________ -->  
+    <table
+
+        name  = "standard_breeds_content">
+
+        &GlobalColumns;
+        
+        <column
+            name         = "standard_breeds_id"
             DESCRIPTION  = "Eindeutige ID des Rassestandards"
             CHECK        = "NotNull"
             LENGTH       = "10"
@@ -196,41 +356,88 @@
                                'SetUser last_change_user'">
             </TRIGGER> 
             <CONSTRAINTS 
-                         INDEX="breed_standards_id">
+                         INDEX="standard_breeds_id, db_breed">
             </CONSTRAINTS>
         </TABLE>
     </table>
 
-<!-- _______breed_standards___________________________________ -->  
+<!-- ________ standard_performances___________________________________ -->  
     <table
 
-        name  = "breed_standards">
+        name  = "standard_performances">
 
-        &GlobalColumns;
-        
         <column
-            name         = "breed_standards_id"
-            DESCRIPTION  = "Eindeutige ID des Merkmals"
+            name         = "standard_performances_id"
+            DESCRIPTION  = "Eindeutige ID der Leistung"
             CHECK        = "NotNull"
             LENGTH       = "10"
-            DATATYPE     = "BIGINT">
-        </column>
+            DATATYPE     = "BIGINT"/>
 
         <column 
-            name        = "name" 
-            DATATYPE    = "CHAR" 
+            name        = "db_event" 
+            DATATYPE    = "BIGINT" 
             LENGTH      = "20" 
-            DESCRIPTION = "Bezeichnung des Standards" 
+            DESCRIPTION = "Event-ID, Verweis auf das Event" 
             CHECK       = "NotNull"  >
         </column>
         
-        <column 
-            name        = "description" 
-            DATATYPE    = "CHAR" 
-            LENGTH      = "20" 
-            DESCRIPTION = "Beschreibung des Standards" 
-            CHECK       = ""  >
+        <column
+            name         = "db_animal"
+            DATATYPE     = "BIGINT"
+            CHECK        = "NotNull,ForeignKey transfer db_animal"
+            DESCRIPTION  = "Internal ID of animal"
+            LENGTH       = "20">
         </column>
+
+        &GlobalColumns;
+        
+        <TABLE>
+            <TRIGGER
+                PREUPDATE  = "  'SetVersion version',
+                                'SetNow last_change_dt',
+                                'SetUser last_change_user'"
+                PREINSERT  = " 'SetColumn standard_performances_id seq_standard_performances__standard_performances_id',
+                               'SetVersion version',
+                               'SetGuid guid',
+                               'SetNode owner',
+                               'SetNow last_change_dt',
+                               'SetUser last_change_user'">
+            </TRIGGER>
+              
+            <CONSTRAINTS PRIMARYKEY="REF_COL:standard_performances_id;CONCAT:db_event, db_animal" 
+                         SEQUENCE="seq_standard_performances__standard_performances_id" 
+                         INDEX="unique standard_performances_id, unique db_event db_animal">
+            </CONSTRAINTS>
+        </TABLE>
+    </table>
+
+<!-- ________performances___________________________________ -->  
+    <table
+
+        name  = "performances">
+
+        <column
+            name         = "standard_performances_id"
+            DESCRIPTION  = "Eindeutige ID der Leistung"
+            CHECK        = "NotNull"
+            LENGTH       = "10"
+            DATATYPE     = "BIGINT"/>
+
+        <column
+            name         = "traits_id"
+            CHECK        = "NotNull, ForeignKey traits traits_id"
+            DESCRIPTION  = "Code des Merkmals"
+            LENGTH       = "10"
+            DATATYPE     = "BIGINT"/>
+
+        <column
+            name         = "result"
+            CHECK        = "NotNull"
+            DESCRIPTION  = "Spezifische Leistung des Tieres"
+            LENGTH       = "10"
+            DATATYPE     = "CHAR"/>
+
+        &GlobalColumns;
         
         <TABLE>
             <TRIGGER
@@ -242,76 +449,10 @@
                                'SetNode owner',
                                'SetNow last_change_dt',
                                'SetUser last_change_user'">
-            </TRIGGER> 
-            <CONSTRAINTS 
-                         SEQUENCE="seq_breed_standards__breed_standards_id" 
-                         INDEX="unique breed_standards_id">
-            </CONSTRAINTS>
-        </TABLE>
-    </table>
+            </TRIGGER>
+              
+            <CONSTRAINTS INDEX="unique standard_performances_id traits_id, standard_performances_id, traits_id"/>
 
-<!-- _______performance_test_standards___________________________________ -->  
-    <table
-
-        name  = "performance_test_standards">
-
-        &GlobalColumns;
-        
-        <column
-            name         = "performance_test_standards_id"
-            DESCRIPTION  = "Eindeutige ID des Merkmals"
-            CHECK        = "NotNull"
-            LENGTH       = "10"
-            DATATYPE     = "BIGINT">
-        </column>
-
-        <column 
-            name        = "breed_standards_id" 
-            DATATYPE    = "BIGINT" 
-            LENGTH      = "20" 
-            DESCRIPTION = "Verweis aus einen Standard, der bestimmt Rassen enthält" 
-            CHECK       = "NotNull, ForeignKey breed_standards breed_standards_id"  >
-        </column>
-        
-        <column 
-            name        = "event_standards_id" 
-            DATATYPE    = "BIGINT" 
-            LENGTH      = "20" 
-            DESCRIPTION = "Verweis auf einen Standard, der bestimmte Events enthält" 
-            CHECK       = "NotNull, ForeignKey event_standards event_standards_id"  >
-        </column>
-        
-        <column 
-            name        = "name" 
-            DATATYPE    = "CHAR" 
-            LENGTH      = "20" 
-            DESCRIPTION = "Bezeichnung des Standards" 
-            CHECK       = "NotNull"  >
-        </column>
-        
-        <column 
-            name        = "description" 
-            DATATYPE    = "CHAR" 
-            LENGTH      = "20" 
-            DESCRIPTION = "Beschreibung des Standards" 
-            CHECK       = ""  >
-        </column>
-        
-        <TABLE>
-            <TRIGGER
-                PREUPDATE  = " 'SetVersion version',
-                               'SetNow last_change_dt',
-                               'SetUser last_change_user'"
-                PREINSERT  = " 'SetVersion version',
-                               'SetGuid guid',
-                               'SetNode owner',
-                               'SetNow last_change_dt',
-                               'SetUser last_change_user'">
-            </TRIGGER> 
-            <CONSTRAINTS 
-                         SEQUENCE="seq_performance_test_standards__performance_test_standards_id" 
-                         INDEX="unique performance_test_standards_id">
-            </CONSTRAINTS>
         </TABLE>
     </table>
 
@@ -336,8 +477,24 @@
             CHECK       = "NotNull, ForeignKey codes db_code class=TRAITS"  >
         </column>
         
+        <column 
+            name        = "db_method" 
+            DATATYPE    = "BIGINT" 
+            LENGTH      = "20" 
+            DESCRIPTION = "Verweis auf das Merkmal in codes" 
+            CHECK       = "NotNull, ForeignKey codes db_code class=METHODE"  >
+        </column>
+        
+        <column 
+            name        = "db_bezug" 
+            DATATYPE    = "BIGINT" 
+            LENGTH      = "20" 
+            DESCRIPTION = "Verweis auf das Merkmal in codes" 
+            CHECK       = "NotNull, ForeignKey codes db_code class=BEZUG"  >
+        </column>
+        
         <column
-            name         = "name"
+            name         = "label"
             DATATYPE     = "CHAR"
             CHECK        = "NotNull"
             DESCRIPTION  = "Name des Merkmals"
@@ -345,7 +502,7 @@
         </column>
 
         <column
-            name         = "label_kurz"
+            name         = "label_short"
             DATATYPE     = "CHAR"
             CHECK        = "NotNull"
             DESCRIPTION  = "Kurzbezeichnung des Merkmals"
@@ -353,7 +510,7 @@
         </column>
 
         <column
-            name         = "label_mittel"
+            name         = "label_medium"
             DATATYPE     = "CHAR"
             CHECK        = "NotNull"
             DESCRIPTION  = "Mittelbezeichnung des Merkmals"
@@ -371,7 +528,7 @@
         <column
             name         = "type"
             DATATYPE     = "CHAR"
-            CHECK        = "List numeric varchar date key"
+            CHECK        = "List numeric varchar date text char key"
             DESCRIPTION  = "Datentyp des Merkmals"
             LENGTH       = "20">
         </column>
@@ -413,14 +570,14 @@
             DATATYPE     = "CHAR"/>
 
         <column
-            name         = "variante"
+            name         = "variant"
             CHECK        = "NotNull"
             DESCRIPTION  = "Variante"
             LENGTH       = "10"
             DATATYPE     = "BIGINT"/>
 
         <column
-            name         = "db_herkunft"
+            name         = "db_source"
             CHECK        = "NotNull, ForeignKey unit db_unit"
             DESCRIPTION  = "Herkunft, welcher Verband hat das Merkmal initiiert"
             LENGTH       = "10"
@@ -433,7 +590,8 @@
                 PREUPDATE  = " 'SetVersion version',
                                'SetNow last_change_dt',
                                'SetUser last_change_user'"
-                PREINSERT  = " 'SetVersion version',
+                PREINSERT  = " 'SetColumn traits_id seq_traits__traits_id',
+                               'SetVersion version',
                                'SetGuid guid',
                                'SetNode owner',
                                'SetNow last_change_dt',
@@ -442,7 +600,7 @@
               
             <CONSTRAINTS 
                          SEQUENCE="seq_traits__traits_id" 
-                         INDEX="unique traits_id, unique name,variante">
+                         INDEX="unique traits_id, unique db_trait variant db_method db_bezug">
             </CONSTRAINTS>
         </TABLE>
     </table>
@@ -487,172 +645,6 @@
         </TABLE>
     </table>
 
-<!-- ________performances___________________________________ -->  
-    <table
-
-        name  = "performances">
-
-        <column
-            name         = "performances_id"
-            DESCRIPTION  = "Eindeutige ID der Leistung"
-            CHECK        = "NotNull"
-            LENGTH       = "10"
-            DATATYPE     = "BIGINT"/>
-
-        <column 
-            name        = "db_event" 
-            DATATYPE    = "BIGINT" 
-            LENGTH      = "20" 
-            DESCRIPTION = "Event-ID, Verweis auf das Event" 
-            CHECK       = "NotNull"  >
-        </column>
-        
-        <column
-            name         = "db_animal"
-            DATATYPE     = "BIGINT"
-            CHECK        = "NotNull,ForeignKey transfer db_animal"
-            DESCRIPTION  = "Internal ID of animal"
-            LENGTH       = "20">
-        </column>
-
-        &GlobalColumns;
-        
-        <TABLE>
-            <TRIGGER
-                PREUPDATE  = "  'SetVersion version',
-                                'SetNow last_change_dt',
-                                'SetUser last_change_user'"
-                PREINSERT  = " 'SetVersion version',
-                               'SetGuid guid',
-                               'SetNode owner',
-                               'SetNow last_change_dt',
-                               'SetUser last_change_user'">
-            </TRIGGER>
-              
-            <CONSTRAINTS PRIMARYKEY="REF_COL:performances_id;CONCAT:db_event, db_animal" 
-                         SEQUENCE="seq_performances__performances_id" 
-                         INDEX="unique performances_id, unique db_event db_animal">
-            </CONSTRAINTS>
-        </TABLE>
-    </table>
-
-<!-- ________performances___________________________________ -->  
-    <table
-
-        name  = "performances_results">
-
-        <column
-            name         = "performances_id"
-            DESCRIPTION  = "Eindeutige ID der Leistung"
-            CHECK        = "NotNull"
-            LENGTH       = "10"
-            DATATYPE     = "BIGINT"/>
-
-        <column
-            name         = "traits_id"
-            CHECK        = "NotNull, ForeignKey traits traits_id"
-            DESCRIPTION  = "Code des Merkmals"
-            LENGTH       = "10"
-            DATATYPE     = "BIGINT"/>
-
-        <column
-            name         = "result"
-            CHECK        = "NotNull"
-            DESCRIPTION  = "Spezifische Leistung des Tieres"
-            LENGTH       = "10"
-            DATATYPE     = "CHAR"/>
-
-        &GlobalColumns;
-        
-        <TABLE>
-            <TRIGGER
-                PREUPDATE  = " 'SetVersion version',
-                               'SetNow last_change_dt',
-                               'SetUser last_change_user'"
-                PREINSERT  = " 'SetVersion version',
-                               'SetGuid guid',
-                               'SetNode owner',
-                               'SetNow last_change_dt',
-                               'SetUser last_change_user'">
-            </TRIGGER>
-              
-            <CONSTRAINTS INDEX="unique performances_id traits_id"/>
-
-        </TABLE>
-    </table>
-
-<!-- ________eggs_per_month___________________________________ -->  
-    <table
-
-        name  = "eggs_per_month">
-
-        <column
-            name         = "db_animal"
-            DATATYPE     = "BIGINT"
-            CHECK        = "NotNull,ForeignKey transfer db_animal"
-            DESCRIPTION  = "Internal ID of animal"
-            LENGTH       = "20">
-        </column>
-
-        <column
-            name         = "year"
-            DATATYPE     = "CHAR"
-            CHECK        = "NotNull"
-            DESCRIPTION  = "Jahr"
-            LENGTH       = "20">
-        </column>
-
-        <column
-            name         = "month"
-            DATATYPE     = "BIGINT"
-            CHECK        = "NotNull"
-            DESCRIPTION  = "Monat"
-            LENGTH       = "20">
-        </column>
-
-        <column
-            name         = "n_eggs"
-            DATATYPE     = "BIGINT"
-            CHECK        = "NotNull"
-            DESCRIPTION  = "Anzahl Eier"
-            LENGTH       = "20">
-        </column>
-
-        <column
-            name         = "n_weighed_eggs"
-            DATATYPE     = "BIGINT"
-            CHECK        = "NotNull"
-            DESCRIPTION  = "Gewicht der Eier"
-            LENGTH       = "20">
-        </column>
-
-        <column
-            name         = "weight_eggs"
-            DATATYPE     = "BIGINT"
-            CHECK        = "NotNull"
-            DESCRIPTION  = "Gewicht der Eier"
-            LENGTH       = "20">
-        </column>
-
-        &GlobalColumns;
-        
-        <TABLE>
-
-            <CONSTRAINTS>
-
-                SEQUENCE    = ""
-                INDEX       = "unique db_animal year month"
-            </CONSTRAINTS>
-
-            <TRIGGER
-
-                PREUPDATE  = "'SetVersion version','SetNow last_change_dt','SetUser last_change_user'"
-                PREINSERT  = "'SetVersion version','SetGuid guid','SetNode owner','SetNow last_change_dt','SetUser last_change_user'">
-            </TRIGGER>
-        </TABLE>
-    </table>
-
-
 <!-- ________STICKERS_________________________________________ -->  
 
     <table       name="stickers">
@@ -662,7 +654,7 @@
                 DESCRIPTION="ID of class" 
                 struct_type="optional"      form_type="editable"    ar_check="1"/>
 
-    <column     name=       "name"          DATATYPE="CHAR"         LENGTH="100" 
+    <column     name=       "label"          DATATYPE="CHAR"         LENGTH="100" 
                 CHECK=      "NotNull" 
                 DESCRIPTION="Format" 
                 struct_type="optional"      form_type="editable"    ar_check="1"/>
@@ -721,22 +713,22 @@
                     CHECK="NotNull"  >
         </column>
         
-        <column     name=   "db_event_type" DATATYPE="BIGINT" LENGTH="20" 
-                    DESCRIPTION="Interne ID der Art der Pruefung" 
-                    CHECK="NotNull,ForeignKey codes db_code class=EVENT"  >
+        <column     name="standard_events_id" DATATYPE="BIGINT" LENGTH="20" 
+                    DESCRIPTION="Interne ID des Pruefers" 
+                    CHECK="NotNull, ForeignKey standard_events standard_events_id"  >
         </column>
-      
+    
         <column     name="db_sampler" DATATYPE="BIGINT" LENGTH="20" 
                     DESCRIPTION="Interne ID des Pruefers" 
                     CHECK="ForeignKey unit db_unit"  >
         </column>
     
-        <column     name="event_dt" DATATYPE="DATE" LENGTH="10" 
+        <column     name="event_dt" DATATYPE="TIMESTAMP" LENGTH="10" 
                     DESCRIPTION="Test-Datum" 
                     CHECK="NotNull"  >
         </column>
         
-        <column     name="event_dtend" DATATYPE="DATE" LENGTH="10" 
+        <column     name="event_dtend" DATATYPE="TIMESTAMP" LENGTH="10" 
                     DESCRIPTION="until to Test-Datum" 
                     CHECK=""  >
         </column>
@@ -765,111 +757,13 @@
                                     'SetUser last_change_user'">
             </TRIGGER>
             
-        <CONSTRAINTS    PRIMARYKEY="REF_COL:db_event;CONCAT:db_event_type,event_dt,db_location" 
+        <CONSTRAINTS    PRIMARYKEY="REF_COL:db_event;CONCAT:standard_events_id, event_dt,db_location" 
                         SEQUENCE="seq_event__db_event" 
                         INDEX="unique db_event">
             </CONSTRAINTS>
         </TABLE>
     </table>
 
-    <table name="raisinglist">
-
-    <column   name="db_breeder" DATATYPE="BIGINT" LENGTH="20" 
-                DESCRIPTION="Interne ID des Bockes" 
-                CHECK="NotNull,ForeignKey unit db_unit" />
-
-    <column   name="hatch_dt"  CHECK="NotNull"  DATATYPE="SMALLINT" LENGTH="20" 
-                DESCRIPTION="Schlupftag" />
-
-    <column   name="no_pickled_eggs"  CHECK="NotNull"  DATATYPE="SMALLINT" LENGTH="20" 
-                DESCRIPTION="Anzahl der eingelegten Eier" />
-
-    <column   name="no_unfertilized_eggs"  CHECK="NotNull"  DATATYPE="SMALLINT" LENGTH="20" 
-                DESCRIPTION="Zahl der unbefruchteten Eier"  />
-
-    <column   name="no_hatched_eggs" DATATYPE="SMALLINT" LENGTH="20" 
-                DESCRIPTION="Anzahl geschlüpfter Küken" CHECK="NotNull"  />
-
-    <column   name="no_losses_chicken" DATATYPE="SMALLINT" LENGTH="20" 
-                DESCRIPTION="Anzahl Verluste bei der Aufzucht"  />
-
-    <column   name="no_ringed_chicken" DATATYPE="SMALLINT" LENGTH="20" 
-                DESCRIPTION="Anzahl beringter Küken"  />
-
-    <column   name="comments" DATATYPE="CHAR" LENGTH="20" 
-                DESCRIPTION="Kommentar" CHECK="" />
-
-       &GlobalColumns;
-
-        <TABLE>
-            <TRIGGER   PREINSERT=" 'SetVersion version',
-                                    'SetGuid guid',
-                                    'SetNode owner',
-                                    'SetNow last_change_dt',
-                                    'SetUser last_change_user'" 
-
-                        PREUPDATE=" 'SetVersion version',
-                                    'SetNow last_change_dt',
-                                    'SetUser last_change_user'"
-
-                        POSTUPDATE=""
-                                    >
-            </TRIGGER>
-            <CONSTRAINTS    PRIMARYKEY="" 
-                            SEQUENCE="" 
-                            INDEX="unique db_breeder hatch_dt">
-            </CONSTRAINTS>
-        </TABLE>
-    </table>
-
-
-    <table name="layinglist">
-
-    <column   name="db_breedcolor" DATATYPE="BIGINT" LENGTH="20" 
-                DESCRIPTION="Interne ID des Tieres" 
-                 CHECK="NotNull, ForeignKey breedcolor db_breedcolor"/>
-    
-    <column   name="db_breeder" DATATYPE="BIGINT" LENGTH="20" 
-                DESCRIPTION="Interne ID des Bockes" 
-                CHECK="NotNull,ForeignKey unit db_unit" />
-
-    <column   name="year"  CHECK="NotNull"  DATATYPE="CHAR" LENGTH="20" 
-                DESCRIPTION="Jahr"  />
-
-    <column   name="month"  CHECK="NotNull"  DATATYPE="SMALLINT" LENGTH="20" 
-                DESCRIPTION="Monat"  />
-
-    <column   name="day"  CHECK="NotNull"  DATATYPE="SMALLINT" LENGTH="20" 
-                DESCRIPTION="Tag"  />
-
-    <column   name="hens_no" DATATYPE="SMALLINT" LENGTH="3" 
-                DESCRIPTION="Anzahl Hennen" CHECK="NotNull"  />
-
-    <column   name="eggs_no" DATATYPE="SMALLINT" LENGTH="3" 
-                DESCRIPTION="Anzahl Eier" CHECK="" />
-
-       &GlobalColumns;
-
-        <TABLE>
-            <TRIGGER   PREINSERT=" 'SetVersion version',
-                                    'SetGuid guid',
-                                    'SetNode owner',
-                                    'SetNow last_change_dt',
-                                    'SetUser last_change_user'" 
-
-                        PREUPDATE=" 'SetVersion version',
-                                    'SetNow last_change_dt',
-                                    'SetUser last_change_user'"
-
-                        POSTUPDATE=""
-                                    >
-            </TRIGGER>
-            <CONSTRAINTS    PRIMARYKEY="" 
-                            SEQUENCE="" 
-                            INDEX="unique db_breedcolor db_breeder year month day">
-            </CONSTRAINTS>
-        </TABLE>
-    </table>
 
 <table name="litter">
 
@@ -981,42 +875,6 @@
       </TABLE>
    </table>
     
-   <table name="ratings">
-        <column     name="db_animal" DATATYPE="BIGINT" 
-                    CHECK="NotNull,ForeignKey animal db_animal" DESCRIPTION="Interne ID des Tieres" 
-                    LENGTH="20"/>
-
-        <column     name="db_event" DATATYPE="BIGINT" 
-                    CHECK="NotNull,ForeignKey event db_event" DESCRIPTION="Event-DBID" LENGTH="20"/>
-    
-        <column     name="cage_no"   CHECK="" 
-                    DATATYPE="SMALLFLOAT" MODIFY=""       DESCRIPTION="Käfignummer" LENGTH="20" />
-        
-        <column     CHECK="Range 1 100"  DATATYPE="SMALLFLOAT" MODIFY=""   DESCRIPTION="Punkte" 
-                    LENGTH="20" name="points"/>
-      
-        <column     name="db_rating"          CHECK= "ForeignKey codes db_code class=RATINGCLASS" 
-                   DATATYPE="BIGINT"       DESCRIPTION="Preisklasse" />
-        
-      &GlobalColumns;
-      
-      <TABLE>
-         <TRIGGER   PREINSERT=" 'SetVersion version',
-                                'SetGuid guid',
-                                'SetNode owner',
-                                'SetNow last_change_dt',
-                                'SetUser last_change_user'" 
-                    PREUPDATE=" 'SetVersion version',
-                                'SetNow last_change_dt',
-                                'SetUser last_change_user'"/>
-
-         <CONSTRAINTS   PRIMARYKEY="" 
-                        SEQUENCE="" 
-                        INDEX="unique db_animal db_event"/>
-      </TABLE>
-   </table>
-
-
     <table
 
         name  = "transfer">
@@ -1063,7 +921,8 @@
             DATATYPE     = "DATE"
             LENGTH       = "10"
             DESCRIPTION  = "number channel is closed up to this time"
-            CHECK        = "DateDiff 0 5000 opening_dt">
+            CHECK        = "">
+<!-- temporär            CHECK        = "DateDiff 0 5000 opening_dt"> --> 
         </column>
 
         <column
@@ -1665,7 +1524,7 @@
 
         <column
 
-            DESCRIPTION  = "ID auf Gelege"
+            ESCRIPTION  = "ID auf Gelege"
             LENGTH       = "20"
             CHECK        = "ForeignKey litter db_litter"
             DATATYPE     = "BIGINT"

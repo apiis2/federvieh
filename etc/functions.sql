@@ -2,6 +2,8 @@ CREATE OR REPLACE FUNCTION user_get_ext_breedcolor(int) RETURNS text AS $$ selec
 
 CREATE OR REPLACE FUNCTION user_get_db_code(text, text) RETURNS int AS $$ select db_code from codes where class=$1 and (ext_code=$2 or short_name=$2 or long_Name=$2); $$ LANGUAGE SQL;
 
+CREATE OR REPLACE FUNCTION user_get_db_code_class(text) RETURNS int AS $$ select db_code from codes where class=$1; $$ LANGUAGE SQL;
+
 CREATE OR REPLACE FUNCTION user_get_all_db_code_ext(text) RETURNS setof record AS $$ select db_code::text, ext_code from codes where class=$1; $$ LANGUAGE SQL;
 
 CREATE OR REPLACE FUNCTION user_get_all_db_code_short(text) RETURNS setof record AS $$ select db_code::text, case when  short_name isnull then ext_code else short_name end from codes where class=$1; $$ LANGUAGE SQL;
@@ -22,8 +24,60 @@ select 'LO_LS21', 'LS21 - Vorwerkhühner-Daten' union
 select 'LO_LS20', 'LS20 - Leistungsschematas'  
 ; 
 
-create or replace view ScrollinglistGetZuchtjahre as 
-select distinct year as key, year as value from layinglist order by key;
+create or replace view ScrollinglistGetID_SET as 
+SELECT short_name as key ,short_name as value FROM codes WHERE class='ID_SET' order by value;
+;
+
+create or replace view ScrollinglistGetID_SET_ext_id as 
+select distinct ext_id as key, ext_id as value from unit where ext_unit in (select ext_code from codes where class='ID_SET') order by value;
+;
+
+create or replace view ScrollinglistGetMerkmale as 
+select db_code as key,  ext_code as value from codes where class='MERKMAL' order by value;
+;
+
+create or replace view ScrollinglistGetBezug as 
+select db_code as key,  concat(ext_code, ' - ', coalesce(long_name,short_name,ext_code)) as value from codes where class='BEZUG' order by value;
+;
+
+create or replace view ScrollinglistGetMethode as 
+select db_code as key,  concat(ext_code, ' - ', coalesce(long_name,short_name,ext_code)) as value from codes where class='METHODE' order by value;
+;
+
+create or replace view ScrollinglistGetEventTyp as 
+select db_code as key,  concat(ext_code, ' - ', coalesce(long_name,short_name,ext_code)) as value from codes where class='EVENT' order by value;
+;
+
+create or replace view ScrollinglistGetClass as 
+select distinct class as key , class as value from codes order by class;
+;
+
+create or replace view ScrollinglistGetHerkunft as 
+select distinct b.db_unit as key, ext_id as value from traits a inner join unit b on a.db_source=b.db_unit order by value;
+;
+
+create or replace view ScrollinglistGetSchemaMerkmale as 
+select distinct standard_traits_id as key,label as value from standard_traits order by label;
+;
+
+create or replace view ScrollinglistGetAllTraits as 
+select traits_id as key, concat(label,', ',variant, ', ', coalesce(minimum::text, '-'), ', ', coalesce(maximum::text, '-')) as value from traits order by label;
+;
+
+create or replace view ScrollinglistGetSchemaRassen as 
+select distinct standard_breeds_id as key,label as value from standard_breeds order by label;
+;
+
+create or replace view ScrollinglistGetAllBreeds as 
+select db_code as key, concat(ext_code, ', ', coalesce(short_name, long_name)) as value from codes where class='BREED' order by ext_code;
+;
+
+create or replace view ScrollinglistGetTraitSchemes as 
+select standard_traits_id as key, label as value from standard_traits order by label;
+;
+
+create or replace view ScrollinglistGetBreedSchemes as 
+select standard_breeds_id as key, label as value from standard_breeds order by label;
 ;
 
 CREATE OR REPLACE View ScrollinglistEingrenzungBestand AS  
