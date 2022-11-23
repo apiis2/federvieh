@@ -114,24 +114,22 @@ sub LO_LS12_Merkmale {
     
             #-- define format for record 
             $record = {
-                    'event_standard'      => [ $data[0],'',[] ],
-                    'breed_standard'      => [ $data[1],'',[] ],
-                    'trait_standard'      => [ $data[2],'',[] ],
-                    'ext_code'            => [ $data[3],'',[] ],
-                    'name'                => [ $data[4],'',[] ],
-                    'label_kurz'          => [ $data[5],'',[] ],
-                    'label_mittel'        => [ $data[6],'',[] ],
-                    'unit'                => [ $data[7],'',[] ],
-                    'decimals'            => [ $data[8],'',[] ],
-                    'minimum'             => [ $data[9],'',[] ],
-                    'maximum'             => [ $data[10],'',[] ],
-                    'variante'            => [ $data[11],'',[] ],
+                    'trait_standard'      => [ $data[0],'',[] ],
+                    'ext_code'            => [ $data[1],'',[] ],
+                    'variante'            => [ $data[2],'',[] ],
+                    'bezug'               => [ $data[3],'',[] ],
+                    'methode'             => [ $data[4],'',[] ],
+                    'name'                => [ $data[5],'',[] ],
+                    'label_kurz'          => [ $data[6],'',[] ],
+                    'label_mittel'        => [ $data[7],'',[] ],
+                    'unit'                => [ $data[8],'',[] ],
+                    'decimals'            => [ $data[9],'',[] ],
+                    'minimum'             => [ $data[10],'',[] ],
+                    'maximum'             => [ $data[11],'',[] ],
                     'ext_unit'            => [ $data[12],'',[] ],
                     'herkunft'            => [ $data[13],'',[] ],
                     'class'               => [ $data[14],'',[] ],
-                    'breed'               => [ $data[15],'',[] ],
-                    'performance_test_standard' => [ $data[15],'',[] ],
-                    'type'                => [ $data[16],'',[] ],
+                    'type'                => [ $data[15],'',[] ],
             };
 
             #-- Datensatz mit neuem Zeiger wegschreiben
@@ -145,8 +143,8 @@ sub LO_LS12_Merkmale {
         #-- Datei schließen
         close( IN );
 
-        $json->{ 'Header'}  ={'event_standard'=>'event_standard','breed_standard'=>'breed_standard','trait_standard'=>'trait_standard','db_trait'=>'merkmal','name'=>'Merkmalsbezeichnung','label_kurz'=>'label_kurz','label_mittel'=>'label_mittel','unit'=>'einheit','decimals'=>'dezimalstelle','minimum'=>'min','maximum'=>'max','variante'=>'variante','herkunft'=>'herkunft','class'=>'class','breed'=>'breed','type'=>'type'} ;
-        $json->{ 'Fields'}  = ['event_standard','breed_standard','trait_standard','db_trait','name','label_kurz','label_mittel','unit','decimals','minimum','maximum','variante','herkunft','class','breed', 'type'];
+        $json->{ 'Header'}  ={'trait_standard'=>'trait_standard','db_trait'=>'merkmal','bezug'=>'Bezug','method'=>'Methode','name'=>'Merkmalsbezeichnung','label_kurz'=>'label_kurz','label_mittel'=>'label_mittel','unit'=>'einheit','decimals'=>'dezimalstelle','minimum'=>'min','maximum'=>'max','variante'=>'variante','herkunft'=>'herkunft','class'=>'class','type'=>'type'} ;
+        $json->{ 'Fields'}  = ['trait_standard','db_trait','bezug','methode','name','label_kurz','label_mittel','unit','decimals','minimum','maximum','variante','herkunft','class','type'];
     }
     else {
 

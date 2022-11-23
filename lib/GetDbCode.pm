@@ -28,9 +28,11 @@ sub GetDbCode {
 
     #-- Notwendige Hash-Keys belegen 
     $args->{'ext_code'}         ='' if (!exists $args->{'ext_code'});
+    $args->{'short_name'}       ='' if (!exists $args->{'short_name'});
+    $args->{'long_name'}        ='' if (!exists $args->{'long_name'});
 
     #-- Wenn Nummer unvollständig ist, dann Fehlerobject erzeugen
-    if (($args->{'ext_code'} eq '') )   {    
+    if (($args->{'ext_code'} eq '') and ($args->{'short_name'} eq '') and ($args->{'long_name'} eq '') )   {    
 
         $apiis->status(1);
         $apiis->errors(
@@ -39,7 +41,7 @@ sub GetDbCode {
                 severity   => 'CRIT',
                 from       => 'LO::GetDbCode',
                 ext_fields => [ $args->{ 'ext_field'}],
-                msg_short  => "Code-Angaben unvollständig: " . $args->{'ext_code'} 
+                msg_short  => "Eine der Angaben ist notwendig: Schlüssel: " . $args->{'ext_code'} .", Kurzname: ".$args->{'short_name'}.", Langname: ". $args->{'long_name'} 
             )
         );
         goto ERR;
@@ -48,10 +50,10 @@ sub GetDbCode {
     # Record Objekt anlegen und mit Werten befüllen:
     my $code = Apiis::DataBase::Record->new( tablename => 'codes', );
 	
-    my @code_id= ( $args->{'class'}, $args->{'ext_code'} );
-    
     $code->column('class')->extdata( $args->{'class'});
-    $code->column('ext_code')->extdata( $args->{'ext_code'});
+    $code->column('ext_code')->extdata( $args->{'ext_code'})        if ($args->{'ext_code'} ne '');
+    $code->column('short_name')->extdata( $args->{'short_name'})    if ($args->{'short_name'} ne '');
+    $code->column('long_name')->extdata( $args->{'long_name'})      if ($args->{'long_name'} ne '');
 
     # Query starten:
     my @query_records = $code->fetch(
@@ -73,7 +75,7 @@ sub GetDbCode {
     if (! @query_records) {
    
         #-- wenn es code nicht gibt, und auch nicht erstellt werden soll, dann undef zurück 
-        return undef if ($create and ($create eq 'no')) ;
+        return undef if ($create and ($create=~/n/)) ;
     
         #-- wennn es code nicht gibt, dann wird sie neu erstellt 
         $action='insert';

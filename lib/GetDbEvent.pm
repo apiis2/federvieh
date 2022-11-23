@@ -36,14 +36,14 @@ sub GetDbEvent {
     #-- Notwendige Hash-Keys belegen 
     $args->{'ext_unit_event'}         ='' if (!$args->{'ext_unit_event'});
     $args->{'ext_id_event'}           ='' if (!$args->{'ext_id_event'});
-    $args->{'ext_event_type'}         ='' if (!$args->{'ext_event_type'});
+    $args->{'ext_standard_events_id'}         ='' if (!$args->{'ext_standard_events_id'});
     $args->{'event_dt'}               ='' if (!$args->{'event_dt'});
 
     #-- Wenn Nummer unvollständig ist, dann Fehlerobject erzeugen
     if (($args->{'ext_unit_event'}        eq '') or 
         ($args->{'ext_id_event'}          eq '')   or
         ($args->{'event_dt'}        eq '')   or
-        ($args->{'ext_event_type'}  eq '')) {    
+        ($args->{'ext_standard_events_id'}  eq '')) {    
 
             $apiis->status(1);
             $apiis->errors(
@@ -56,51 +56,54 @@ sub GetDbEvent {
                         . $args->{'ext_unit_event'} . ' | '
                         . $args->{'ext_id_event'} . ' | '
                         . $args->{'event_dt'} . ' | '
-                        . $args->{'ext_event_type'} . '',
+                        . $args->{'ext_standard_events_id'} . '',
                 )
             );
             goto ERR;
     }
 
     #--- aktuellen Event holen 
+    my $sql="select a.db_event 
+             from event a 
+             inner join unit b on a.db_location=b.db_unit 
+             inner join standard_events c on a.standard_events_id=c.standard_events_id
+             where c.label='$args->{'ext_standard_events_id'}' and a.event_dt='$args->{'event_dt'}' 
+                 and b.ext_unit='".$args->{'ext_unit_event'}."' and b.ext_id='".$args->{'ext_id_event'}."'"
+        ;  
+    my $sql_ref=$apiis->DataBase->sys_sql( $sql );
+
+    if ( $sql_ref->status and ( $sql_ref->status == 1 ) ) {
+        
+        #-- Fehlerbehandlung 
+        $apiis->errors( $sql_ref->errors);
+        $apiis->status(1);
+        goto EXIT;
+    }
     
+    $args->{'db_event'}='';
+    
+    # Auslesen des Ergebnisses der Datenbankabfrage
+    while ( my $q = $sql_ref->handle->fetch ) {
+        $args->{'db_event'}= $q->[0];
+    }
+
     # Record Objekt anlegen und mit Werten befüllen:
     my $event = Apiis::DataBase::Record->new( tablename => 'event', );
 	
-    my @event_id= ($args->{'ext_event_type'}, 
-	               $args->{'event_dt'}, 
-	               $args->{'ext_unit_event'},
-                   $args->{'ext_id_event'} );
-    
-    $event->column('db_event')->extdata(\@event_id);
-
-    # Query starten:
-    my @query_records = $event->fetch(
-           expect_rows    => 'one',
-           expect_columns => ['guid','db_event'],
-    );
-
-    #-- Wenn Fehler, dann Fehler nach apiis übertragen und abbruch 
-    if ( $event->status ) {
-        $apiis->errors(scalar $event->errors);
-        $apiis->status(1);
-        goto ERR;
-    }
-    
     #-- wenn kein Datensatz gefunden wurden, dann Event neu anlegen 
-    if (! @query_records) {
+    if ($args->{'db_event'} eq '') {
    
         return undef if ($create and ($create eq 'no')) ;
 
         #-- db_event_type 
-        if ( $args->{'db_event_type'}) {
-            $event->column('db_event_type')->intdata($args->{'db_event_type'});
-            $event->column('db_event_type')->encoded(1);
+        if ( $args->{'standard_events_id'}) {
+            $event->column('standard_events_id')->intdata($args->{'standard_events_id'});
+            $event->column('standard_events_id')->encoded(1);
         }
         else {
-            $event->column('db_event_type')->extdata($args->{'ext_event_type'});
+            $event->column('standard_events_id')->extdata($args->{'ext_standard_events_id'});
         }
-        $event->column('db_event_type')->ext_fields( $args->{ 'ext_field'});
+        $event->column('standard_events_id')->ext_fields( $args->{ 'ext_field'});
 
         #-- event_dt
         $event->column('event_dt')->extdata($args->{'event_dt'});
@@ -135,7 +138,7 @@ sub GetDbEvent {
     else {
 
         #-- interne db_event aus Recordobject holen 
-        $db_event = $event->column('db_event')->intdata;
+        $db_event = $args->{'db_event'};
     }
 
     if ( $apiis->status ) {

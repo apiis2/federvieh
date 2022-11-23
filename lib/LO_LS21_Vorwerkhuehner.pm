@@ -15,13 +15,14 @@ use GetDbCode;
 use GetDbAnimal;
 use GetDbUnit;
 use Encode;
+use GetDbPerformance;
 use CreateTransfer;
 use CreateLocation;
 use POSIX qw(strftime);
 use Time::Local;
 our $apiis;
 
-sub LO_LS21_Vorwerkhuehner_Daten {
+sub LO_LS21_Vorwerkhuehner {
     my $self     = shift;
     my $args     = shift;
  
@@ -53,15 +54,11 @@ sub LO_LS21_Vorwerkhuehner_Daten {
     my $fileimport;
     my ($kv);
     my %schlupfdatum;
-
-
-    if (exists $args->{ 'FILE' }) {
-        $fileimport=$args->{ 'FILE' };
-    }
+    my $cc=1;
     my $onlycheck='off';
-    if (exists $args->{ 'onlycheck' }) {
-        $onlycheck=lc($args->{ 'onlycheck' });
-    }
+
+    $fileimport=1                           if (exists $args->{ 'fileimport'});
+    $onlycheck=lc($args->{ 'onlycheck' })   if (exists $args->{ 'onlycheck' });
 
     #-- Wenn ein File geladen werden soll, dann zuerst umwandeln in
     #   einen JSON-String, damit einheitlich weiterverarbeitet werden kann
@@ -72,62 +69,8 @@ sub LO_LS21_Vorwerkhuehner_Daten {
                   'Bak'         => [],
                 };
        
-        my @ar_data;
-
-        #-- Datei öffnen
-        open( IN, "$fileimport" ) || die "error: kann $fileimport nicht öffnen";
-
-        if ($fileimport=~/\.xlsx/) {
-            #-- Excel-Tabelle öffnen 
-            my $book = Spreadsheet::Read->new ($fileimport, dtfmt => "dd.mm.yyyy");
-            my $sheet = $book->sheet(1);
-
-            #-- Fehlermeldung, wenn es nicht geht 
-            if(defined $book->[0]{'error'}){
-                print "Error occurred while processing $fileimport:".
-                    $book->[0]{'error'}."\n";
-                exit(-1);
-            }
-            
-            my $max_rows = $sheet->{'maxrow'};
-            my $max_cols = $sheet->{'maxcol'};
-
-            #--Schleife über alle Zeilen 
-            for my $row_num (1..($max_rows))  {
-
-                #-- declare
-                my @data;
-                my $col='A';
-
-                #-- Schleife über alle Spalten       
-                for my $col_num (1..($max_cols)) {
-
-                    #-- einen ";" String erzeugen  
-                    push(@data, encode_utf8 $sheet->{$col.$row_num});
-                
-                    $col++;
-                }
-                push(@ar_data,\@data);
-            }
-        }
-        else {
-            while (<IN>) {
-
-                chomp;
-                chop;
-                my @data=split("\t",$_,100);
-
-                next if (!@data);
-
-                push(@ar_data,\@data);
-            }
-        }
+        foreach my $dd (@{$args->{'data'}} ) {
         
-        #-- Datei schließen
-        close( IN );
-
-        foreach my $dd (@ar_data) {
-
             my @data=@$dd;
 
             #-- initialisieren mit '' 
@@ -162,11 +105,13 @@ sub LO_LS21_Vorwerkhuehner_Daten {
 
             #-- define format for record 
             my $record = {
-
+                    'no'             => [ $cc++,'',[] ], 
+                    'text_breeder'   => [ $data[0],'',[] ],
                     'ext_unit_location_br' => [ 'breeder','',[] ],
                     'ext_id_location_br'   => [ $data[1],'',[] ],
                     'ext_entry_action_br'  => [ 'birth','',[] ],
 
+                    'text_forster'   => [ $data[2],'',[] ],
                     'ext_unit_location_fo' => [ 'forster','',[] ],
                     'ext_id_location_fo'   => [ $data[3],'',[] ],
 
@@ -176,14 +121,19 @@ sub LO_LS21_Vorwerkhuehner_Daten {
                     'ext_unit_parent'  => [ 'zuchtstamm','',[] ], 
                     'ext_id_parent'    => [ $data[3],'',[] ],    
                     'ext_parent'       => [ $data[4],'',[] ],
+                    
+                    'ext_sire'         => [ $data[5],'',[] ],
+                    'ext_dam'         => [ $data[6],'',[] ],
+                    'schlupf'         => [ $data[7],'',[] ],
 
                     'ext_unit_animal_ei'  => [ 'einummer','',[] ], 
                     'ext_id_animal_ei'    => [ $data[3]."-$vyear-$data[7]",'',[] ],
                     'ext_animal_ei'       => [ $data[8],'',[] ],
 
                     'hsh_schlupfdatum' => [ $data[1].':::'.$data[7],'',[] ],
-                    'event_schlupf'    => [ '2'.$data[7],'',[] ],
+                    'event_schlupf'    => [ 'VWH-Schlupf-'.$data[7],'',[] ],
                     'eigewicht'        => [ $data[9],'',[] ],
+                    'eigewicht_gr'    => [ $data[10],'',[] ],
                     'schlupfergebnis'  => [ $data[11],'',[] ],
                     'schlupfdatum'     => [ $data[12],'',[] ],
                     
@@ -192,12 +142,14 @@ sub LO_LS21_Vorwerkhuehner_Daten {
                     'ext_animal_kn'       => [ $data[13],'',[] ],
 
                     'schlupfgewicht'   => [ $data[14],'',[] ],
+                    'text_sex'          => [$data[15],'',[] ],
                     'ext_sex'          => [ $sex,'',[] ],
                     'ext_breed'        => [ 'Vorwerkhühner','',[] ],
 
                     'ext_unit_animal_br' => [ 'bundesring','',[] ], 
                     'ext_id_animal_br'   => [ $vyear,'',[] ],     #-- Annett züchter oder aufzüchter?
                     'ext_animal_br'      => [ $data[16],'',[] ],
+
 
                     'ext_leaving'        => [ uc($data[17]),'',[] ],
                     'abgangsdatum'       => [ $data[18],'',[] ],
@@ -209,6 +161,7 @@ sub LO_LS21_Vorwerkhuehner_Daten {
                     'eindruck'            => [ $data[22],'',[] ],
                     'phaenotyp'           => [ $data[23],'',[] ],
                     'gesamt'              => [ $data[24],'',[] ],
+                    'text_selection'      => [ $data[25],'',[] ],
                     'ext_selection'       => [ uc($data[25]),'',[] ],
                     'lm_bewertung'        => [ $data[26],'',[] ],
                     'bewertungsdatum'     => [ $data[27],'',[] ],
@@ -223,24 +176,17 @@ sub LO_LS21_Vorwerkhuehner_Daten {
             );
         }
 
-        $json->{ 'Header'}  ={
-                    'ext_breeder'      => 'ext_breeder','ext_forster'=>'ext_forster','ext_unit_parent'=>'ext_unit_parent', 
-                    'ext_id_parent'    => 'ext_id_parent','ext_parent'=> 'ext_parent','ext_unit_animal_ei' =>'ext_unit_animal_ei', 
-                    'ext_id_animal_ei' => 'ext_id_animal_ei','ext_animal_ei'=> 'ext_animal_ei','event_schlupf' => 'event_schlupf',
-                    'eigewicht'        => 'eigewicht','schlupfergebnis'=>'schlupfergebnis','schlupfdatum'=>'schlupfdatum',
-                    'ext_unit_animal_kn'=>'ext_unit_animal_kn','ext_id_animal_kn'=> 'ext_id_animal_kn','ext_animal_kn'=>'ext_animal_kn',
-                    'schlupgewicht'    => 'schlupgewicht','ext_sex'=>'ext_sex','ext_unit_animal_br'=>'ext_unit_animal_br',
-                    'ext_id_animal_br' => 'ext_id_animal_br','ext_animal_br'=>'ext_animal_br','ext_leaving'=>'ext_leaving',
-                    'abgangsdatum'     => 'abgangsdatum','lm2wo'=>'lm2wo','lm10wo' => 'lm10wo','lm20wo'=> 'lm20wo',
-                    'eindruck'         => 'eindruck','phaenotyp'=>'phaenotyp','gesamt'=>'gesamt','ext_selection'=>'ext_selection',
-                    'lm_bewertung'     => 'lm_bewertung','bewertungsdatum'=>'bewertungsdatum'
-        };
-        $json->{ 'Fields'}  = [
-                    'ext_breeder','ext_forster','ext_unit_parent','ext_id_parent','ext_parent','ext_unit_animal_ei','ext_id_animal_ei',
-                    'ext_animal_ei','event_schlupf','eigewicht','schlupfergebnis','schlupfdatum','ext_unit_animal_kn',
-                    'ext_id_animal_kn','ext_animal_kn','schlupgewicht','ext_sex','ext_unit_animal_br','ext_id_animal_br','ext_animal_br',
-                    'ext_leaving','abgangsdatum','lm2wo','lm10wo','lm20wo','eindruck','phaenotyp','gesamt','ext_selection',
-                    'lm_bewertung','bewertungsdatum'
+        $json->{ 'Header'}  =['Nr.',
+            'Züchter-Name','Züchter-Nr.','Aufzüchter-Name','Aufzüchter-Nr.','Zuchtstamm','Ring-Vater','Ring-Mutter', 'SchlupfNr',
+            'EiNr','Eigewicht','EiGewGr','SchlupfErg','SchlupfDat','KükenNr','SchlupfGew','Geschlecht','RingNr', 'AbgangsUrs', 
+            'AbgangsDat', 'KM2Lw', 'KM10Lw', 'KM20Lw','Eindruck', 'Phänotyp', 'Gesamt', 'Zucht', 'KMBewertungstag', 'BewertungsDat'
+        ];
+
+        $json->{ 'Fields'}  = ['no',
+            'text_breeder','ext_id_location_br','text_forster','ext_id_location_fo','ext_parent','ext_sire', 'ext_dam',
+            'schlupf','ext_animal_ei','eigewicht','eigewicht_gr','schlupfergebnis','schlupfdatum','ext_animal_kn','schlupfgewicht',
+            'text_sex','ext_animal_br','ext_leaving','abgangsdatum','lm2wo','lm10wo','lm20wo','eindruck','phaenotyp','gesamt',
+            'text_selection','lm_bewertung','bewertungsdatum'
         ];
     }
     else {
@@ -261,6 +207,9 @@ sub LO_LS21_Vorwerkhuehner_Daten {
     my %hs_db_unit;
 
     my $zuchtstamm={};
+    my $hs_errcnt={};
+
+    my $tbd=[];
 
     #-- Ab hier ist es egal, ob die Daten aus einer Datei
     #   oder aus einer Maske kommen
@@ -278,11 +227,12 @@ sub LO_LS21_Vorwerkhuehner_Daten {
             $args->{$_}=$record->{ 'Data' }->{$_}->[0];
         }
 
-        
-        if (($args->{'ext_animal_br'} eq 'DU764')) {
-            print "kk";
-        }
+        my $hs_fields   ={};
 
+        foreach (@{$json->{'Fields'}}) {    
+            $hs_fields->{$_} ={'error'=>[]}; 
+        }
+        
         #-- falls kein Schlupfdatum exisitert 
         $args->{'schlupfdatum'}=$schlupfdatum{$args->{'hsh_schlupfdatum'}} if (!$args->{'schlupfdatum'}) ;
 
@@ -292,9 +242,10 @@ sub LO_LS21_Vorwerkhuehner_Daten {
             if ($args->{$vd} eq '') {
                 next ;
             }
-
+            
+            $args->{$vd}=~s/[,:]/./g; # Komme in Punkt, damit es ein gültiges Datum wird 
             #-- 20 davorsetzen 
-            my ($dd,$mm,$yy)=($args->{$vd}=~/(.{2})\.(.{2})\.(.+)/);
+            my ($dd,$mm,$yy)=($args->{$vd}=~/(.+?)\.(.+?)\.(.*)/);
             
             #-- Fehlerbehandlung
             if (!$yy and !$mm) {
@@ -303,34 +254,168 @@ sub LO_LS21_Vorwerkhuehner_Daten {
                 $yy='20'.$vyear;
             }
 
-            if ((length($yy)==2) and ($yy>"00")) {
+            if ((length($yy)==2) and ($yy<"80")) {
                 $args->{$vd}="$dd.$mm.20$yy";
-            } elsif ((length($yy)==2) and ($yy<"00")) {
+            } elsif ((length($yy)==2) and ($yy>"80")) {
                 $args->{$vd}="$dd.$mm.19$yy";
+            } else {
+                $args->{$vd}="$dd.$mm.$yy";
             }
         }
 
-        $args->{'entry_dt_br'}=$args->{'schlupfdatum'};
+        #-- Predefinition 
+        $args->{'entry_dt_br'}  = $args->{'schlupfdatum'};
+        $args->{'birth_dt'}     = $args->{'schlupfdatum'};
         $args->{'db_sire'}=1;
         $args->{'db_dam'}=2;
         $args->{'db_animal'}=undef;
         $args->{'db_parents'}=undef;
 
-        #-- Zuchtstamm initialisieren 
-        if (!exists $zuchtstamm->{$args->{'ext_id_animal_ei'}}) {
-            $zuchtstamm->{$args->{'ext_id_animal_ei'}}->{'anzahl_eier'}=0;
-            $zuchtstamm->{$args->{'ext_id_animal_ei'}}->{'eigewicht'}=[];
-            $zuchtstamm->{$args->{'ext_id_animal_ei'}}->{'schlupfergebnis'}=[];
+        #######################################################################################
+        #
+        #  Zuchtstammdaten speichern
+        #
+        #######################################################################################
+        
+        #-- Zuchtstamm holen
+        my $guid=undef;
+        ($args->{'db_parents'}, $guid) = GetDbAnimal({  'ext_unit'=>$args->{'ext_unit_parent'},
+                                                        'ext_id'=>$args->{'ext_id_parent'},
+                                                        'ext_animal'=>$args->{'ext_parent'}
+        });
+
+        $apiis->status(0);
+        $apiis->del_errors;
+        
+        #-- wenn kein Tierstamm gefunden wurde, dann neu erzeugen  
+        if (!$guid) {
+            
+            $args->{'db_unit_parent'}=GetDbUnit({'ext_unit'=>$args->{'ext_unit_parent'}
+                                               ,'ext_id'=>$args->{'ext_id_parent'}}
+                                               ,'y');
+            if ($apiis->status) {                    
+                push(@{$hs_fields->{'ext_parent'}->{'error'}},$apiis->errors);
+                $apiis->status(0);
+                $apiis->del_errors;
+            }
+            
+            #-- neue interne Nummer für Zuchtstamm erezeugen 
+            $args->{'db_parents'} = $apiis->DataBase->seq_next_val('seq_transfer__db_animal');
+
+            #-- Zuchtstamm in transfer anlegen 
+            $guid=CreateTransfer($apiis,
+                                {'db_animal'=>$args->{'db_parents'},
+                                'db_unit'=>$args->{'db_unit_parent'},
+                                'ext_unit'=>$args->{'ext_unit_parent'},
+                                'ext_id'=>$args->{'ext_id_parent'},
+                                'ext_animal'=>$args->{'ext_parent'},
+                                'opening_dt'=>$args->{'schlupfdatum'}}
+                                );
+            
+            if ($apiis->status) {                    
+                push(@{$hs_fields->{'ext_parent'}->{'error'}},$apiis->errors);
+                $apiis->status(0);
+                $apiis->del_errors;
+            }
         }
 
-        #-- Ergebnisse für den Zuchtstamm speichern 
-        $zuchtstamm->{$args->{'ext_id_animal_ei'}}->{'anzahl_eier'}++;         
-        push(@{$zuchtstamm->{$args->{'ext_id_animal_ei'}}->{'eigewicht'}}, $args->{'eigewicht'});         
-        push(@{$zuchtstamm->{$args->{'ext_id_animal_ei'}}->{'schlupfergebnis'}}, $args->{'eigewicht'});         
+        GetDbUnit({'ext_unit'=>$args->{'ext_unit_location_fo'}
+                  ,'ext_id'=>$args->{'ext_id_location_fo'}});
+        
+        if ($apiis->status) {                    
+            push(@{$hs_fields->{'ext_id_location_fo'}->{'error'}},$apiis->errors);
+            $apiis->status(0);
+            $apiis->del_errors;
+        }
+        
+        #-- Leistungen wegschreiben
+        #-- Event erzeugen
+        my $db_event='';
+
+        #-- Event erzeugen 
+        ($db_event, $guid) = GetDbEvent({
+                                        'ext_unit_event'        => $args->{'ext_unit_location_fo'},
+                                        'ext_id_event'          => $args->{'ext_id_location_fo'},
+
+                                        'ext_standard_events_id'=> $args->{'event_schlupf'},
+                                        'event_dt'              => $args->{'schlupfdatum'}},
+                                        'y'
+        );
+
+        if ($apiis->status) {                    
+            push(@{$hs_fields->{'schlupfdatum'}->{'error'}},$apiis->errors);
+            $apiis->status(0);
+            $apiis->del_errors;
+        }
+        
+        $guid=undef;
+        #-- Schleife über alle Merkmale
+        #-- animal-event-Verbindung erzeugen und mit Schlüssel die Leistunge wegschreiben
+        foreach my $trait ('Eigewicht','Schlupfergebnis') {
+            
+            my $result; my $ext_field; 
+            $args->{'ext_bezug'}= 'Zuchtstamm';
+            $args->{'variant'}  = '1';
+            $args->{'ext_trait'}    = $trait;
+            
+            if ($trait eq 'Eigewicht') {
+                $args->{'ext_methode'}  = 'Wiegen';
+                $result                 = $args->{'eigewicht'};
+                $ext_field='eigewicht';
+            }
+            if ($trait eq 'Schlupfergebnis') {
+                $args->{'ext_methode'}  = 'Klassifizieren';
+                $result                 = $args->{'schlupfergebnis'};
+                $ext_field='schlupfergebnis';
+            }
+
+            $guid=undef;
+            ($guid)=GetDbPerformance({
+                                'db_animal' => $args->{'db_parents'},
+                                'db_event'  => $db_event,
+                                'ext_trait' => $trait,
+                                'ext_method'=> $args->{'ext_methode'},
+                                'ext_bezug' => $args->{'ext_bezug'},
+                                'variant'   => $args->{'variant'},
+                                'ext_trait' => $args->{'ext_trait'},
+                                'result'    => $result
+                                },
+                                'y');
+           
+            if ($apiis->status) {
+                push(@{$hs_fields->{$ext_field}->{'error'}},$apiis->errors);
+               
+                $apiis->status(0);
+                $apiis->del_errors;
+            }
+        }
+
+        #######################################################################################
+        #
+        #  Einzeltierdaten speichern
+        #
+        #######################################################################################
 
         #-- wenn kein  Einzeltier, kein Geschlecht oder keine Tiernummer => Einzeltier nur wenn Geschlecht UND Tiernummer
         if ((!$args->{'ext_sex'}) or ( !$args->{'ext_animal_kn'} and !$args->{'ext_animal_ei'} and !$args->{'ext_animal_br'})) {
-            next;
+           
+            my $a= Apiis::Errors->new(
+                        type       => 'DATA',
+                        severity   => 'CRIT',
+                        from       => 'LO_LS21_Vorwerkhuehner',
+                        ext_fields => ['No'],
+                        msg_short  =>"Kein Geschlecht bzw. keine Tiernummer definiert."
+                    );
+            
+            push(@{$hs_fields->{'text_sex'}->{'error'}},$a);
+            push(@{$hs_fields->{'ext_animal_ei'}->{'error'}},$a);
+            push(@{$hs_fields->{'ext_animal_kn'}->{'error'}},$a);
+            push(@{$hs_fields->{'ext_animal_br'}->{'error'}},$a);
+            
+            $apiis->status(0);
+            $apiis->del_errors;
+            
+            goto EXIT;
         }
 
         #-- erstmalig reingehen, und db_breedcolor suchen. 
@@ -347,17 +432,24 @@ sub LO_LS21_Vorwerkhuehner_Daten {
         }
         $args->{'db_breed'}=$db_breedcolor;
 
-        my ($insert,$guid);
+        my $insert;
+        $guid=undef;
 
-        #----- Schleife über alle möglichen Nummernkanäle ---------------
+        #########################################################################################
+        # 
+        #----- Tiernummern anlegen Schleife über alle möglichen Nummernkanäle ---------------
+        #
+        #########################################################################################
         foreach my $e ('ei','kn','br') {
      
             #-- Leerzeichen in der Nummer entfernen 
             $args->{'ext_id_animal_'.$e}=~s/\s+//g;
             $args->{'ext_animal_'.$e}=~s/\s+//g;
 
-            #-- schauen, ob es eine Tiernummer auf einen der Kanäle gibt für eine gültige Nummer
+            #!! noch Check, wenn sich db_animal unterscheidet. Wie ist es bei verschiedenen Jahrgängen  
+            #-- schauen, ob es eine Tiernummer auf einem der Kanäle gibt für eine gültige Nummer
             if (!$args->{'db_animal'} and $args->{'ext_animal_'.$e}) {
+
                 ($args->{'db_animal'}, $guid) = GetDbAnimal({ 'ext_unit'=>$args->{'ext_unit_animal_'.$e},
                                                     'ext_id'=>$args->{'ext_id_animal_'.$e},
                                                     'ext_animal'=>$args->{'ext_animal_'.$e}
@@ -365,6 +457,7 @@ sub LO_LS21_Vorwerkhuehner_Daten {
             }
         }
 
+        #-- wenn kein Tier gefunden wurde, dann Fehler zurücksetzen und Tier anlegen 
         if (!$guid) {
 
             $apiis->del_errors;
@@ -375,6 +468,7 @@ sub LO_LS21_Vorwerkhuehner_Daten {
             $args->{'db_animal'} = $apiis->DataBase->seq_next_val('seq_transfer__db_animal');
 
             #----- Schleife über alle möglichen Nummernkanäle ---------------
+            #-- Erzeugen aller Tiernummern in Transfer 
             foreach my $e ('ei','kn','br') {
       
                 my $db_unit;
@@ -398,32 +492,32 @@ sub LO_LS21_Vorwerkhuehner_Daten {
                 }
 
                 $args->{'db_unit'}=$db_unit;
+                $args->{'closing_dt'}='';
 
                 #-- schauen, ob es eine Tiernummer auf einen der Kanäle gibt für eine gültige Nummer
                 if ($args->{'ext_animal_'.$e}) {
-                    my ($db_animal, $guid) = CreateTransfer($apiis,
-                                                       {'db_animal'=>$args->{'db_animal'},
-                                                        'db_unit'=>$args->{'db_unit'},
-                                                        'ext_unit'=>$args->{'ext_unit_animal_'.$e},
-                                                        'ext_id'=>$args->{'ext_id_animal_'.$e},
-                                                        'ext_animal'=>$args->{'ext_animal_'.$e},
-                                                        'birth_dt'=>$args->{'schlupfdatum'}}
-                                                        );
+
+                    $args->{'closing_dt'}=$args->{'schlupfdatum'}   if (($e eq 'ei') or ($e eq 'kn'));
+                    
+                    CreateTransfer($apiis,
+                                       {'db_animal' =>$args->{'db_animal'},
+                                        'db_unit'   =>$args->{'db_unit'},
+                                        'ext_unit'  =>$args->{'ext_unit_animal_'.$e},
+                                        'ext_id'    =>$args->{'ext_id_animal_'.$e},
+                                        'ext_animal'=>$args->{'ext_animal_'.$e},
+                                        'opening_dt'=>$args->{'schlupfdatum'},
+                                        'closing_dt'=>$args->{'closing_dt'} }
+                                        );
                 }
             }
 
-            #-- Zuchtstamm holen
-            ($args->{'db_parents'}, $guid) = GetDbAnimal({  'ext_unit'=>'zuchtstamm',
-                                                            'ext_id'=>$args->{'ext_id_location_fo'},
-                                                            'ext_animal'=>$args->{'ext_parent'}
-            });
 
             #-- Da Klassenvariable, db_code von codes holen 
             my $sql="select user_get_db_code('EINSTUFUNG','$args->{'ext_selection'}')";
             my $sql_ref = $apiis->DataBase->sys_sql( $sql);
             while ( my $q = $sql_ref->handle->fetch ) { 
                 $args->{'db_selection'}=$q->[0];
-                delete $args->{'ext_selection'};
+#                delete $args->{'ext_selection'};
             }
             
             #-- Da Klassenvariable, db_code von codes holen 
@@ -490,6 +584,11 @@ sub LO_LS21_Vorwerkhuehner_Daten {
             }
         }
 
+        #################################################################################### 
+        #
+        #-- Location
+        # 
+        #################################################################################### 
         $args->{'ext_unit_event'}=$args->{'ext_unit_location_br'};
         $args->{'ext_id_event'}=$args->{'ext_id_location_br'};
 
@@ -562,6 +661,12 @@ sub LO_LS21_Vorwerkhuehner_Daten {
             }
         }
 
+        #################################################################################### 
+        #
+        #-- Leistungen
+        # 
+        #################################################################################### 
+        
         #-- events anlegen
         my $fmt = '%d.%m.%Y';
         my $vdate=$args->{'schlupfdatum'};
@@ -569,220 +674,147 @@ sub LO_LS21_Vorwerkhuehner_Daten {
         my ($dd,$mm,$yy)=($vdate=~/^(\d+?)\.(\d+?).(\d+)/);
         my $t = timelocal(0,0,0,$dd,$mm-1,$yy-1900);
 
-        #-- Traits wegschreiben
-        foreach my $trait ('Schlupfgewicht [g]','Schlupfergebnis',
-                           'Körpergewicht [g] 2.LW','Körpergewicht [g] 10.LW','Körpergewicht [g] 20.LW',
-                           'Körpergewicht [g] am Bewertungstag','Eindruck','Phänotyp','Einstufung') {
+        #-- Schleife über alle Merkmale
+        #-- animal-event-Verbindung erzeugen und mit Schlüssel die Leistunge wegschreiben
+        foreach my $trait ('Körpergewicht-Schlupf','Körpergewicht-2LW',
+                           'Körpergewicht-10LW','Körpergewicht-20LW',
+                           'Eindruck','Phänotyp','Körpergewicht','Einstufung') {
+            
+            my $result= ''; my $ext_field; my $ext_fielde;
+            my $targs = {};
 
-            my $targs;
-            my $db_event; 
-            $targs->{'results'}='';
+            $targs->{'ext_bezug'}= 'Tier';
+            $targs->{'variant'}  = '1';
+            $targs->{'ext_trait'}    = $trait;
+            
+            ######################################################################## 
+            if ($trait eq 'Körpergewicht-Schlupf') {
+                $targs->{'ext_methode'}         = 'Wiegen';
+                $targs->{'standard_events_id'}  = 'VWH-Schlupf';    
+                $targs->{'event_dt'}            = $args->{'schlupfdatum'};
+                $result                         = $args->{'schlupfgewicht'};
+                $ext_field                      = 'schlupfgewicht';
+                $ext_fielde                     = 'schlupfdatum';
+            }
 
-            if (($trait eq 'Schlupfergebnis')) {
-
-                if ($args->{'schlupfergebnis'} eq '') {
-                    next;
-                }
-
-                $targs->{'ext_event_type'}  = $args->{'event_schlupf'};
-                $targs->{'event_dt'}        = $vdate;
-                $targs->{'results'}=undef;
-
-                #-- Da Klassenvariable, db_code von codes holen 
-                my $sql="select user_get_db_code('SCHLUPFERGEBNIS','$args->{'schlupfergebnis'}')";
-                my $sql_ref = $apiis->DataBase->sys_sql( $sql);
-                while ( my $q = $sql_ref->handle->fetch ) { 
-                    $targs->{'results'}=$q->[0];
-                }
-
-                if  (!$targs->{'results'}) {      
-                    $self->status(1);
-                    $self->errors(
-                            Apiis::Errors->new(
-                            type      => 'CODE',
-                            severity  => 'ERR',
-                            from      => '',
-                            msg_short => __("Schlüssel '[_1]' für SCHLUPFERGEBNIS nicht definiert",$args->{'schlupfergebnis'})
-                            )
-                    );
-                    next;    
-                }
-
-                $targs->{'results'}          = '' if (!$targs->{'results'});
+            ######################################################################## 
+            if ($trait eq 'Körpergewicht-2LW') {
+                $targs->{'ext_methode'}         = 'Wiegen';
+                $targs->{'standard_events_id'}  = 'VWH-Wägung2LW';    
+                $targs->{'event_dt'}            = strftime ($fmt, localtime ($t+14*60*60));
+                $result                         = $args->{'lm2wo'};
+                $ext_field                      = 'lm2wo';
+                $ext_fielde                     = 'schlupfdatum';
             }
             
-            if (($trait eq 'Schlupfgewicht [g]') ) {
-                $targs->{'ext_event_type'}  = $args->{'event_schlupf'};
-                $targs->{'event_dt'}        = $vdate;
-                $targs->{'results'}          = $args->{'schlupfgewicht'};
-            }
-            
-            if ($trait eq 'Körpergewicht [g] 2.LW') {
-                $targs->{'ext_event_type'}  = '31';
-                $targs->{'event_dt'}        = strftime ($fmt, localtime ($t+14*60*60));
-                $targs->{'results'}          = $args->{'lm2wo'};
-            }
-            
-            if ($trait eq 'Körpergewicht [g] 10.LW') {
-                $targs->{'ext_event_type'}  = '32';
-                $targs->{'event_dt'}        = strftime ($fmt, localtime ($t+70*60*60));
-                $targs->{'results'}          = $args->{'lm10wo'};
-            }
-            
-            if ($trait eq 'Körpergewicht [g] 20.LW') {
-                $targs->{'ext_event_type'}  = '33';
-                $targs->{'event_dt'}        = strftime ($fmt, localtime ($t+140*60*60));
-                $targs->{'results'}          = $args->{'lm20wo'};
-            }
-            
-            if (($trait eq 'Eindruck') ){ 
-                $targs->{'ext_event_type'}  = '30';
-                $targs->{'event_dt'}        = $args->{'bewertungsdatum'};
-                $targs->{'results'}          = $args->{'eindruck'};
-            }
-            
-            if (($trait eq 'Körpergewicht [g] am Bewertungstag') ) { 
-                $targs->{'ext_event_type'}  = '30';
-                $targs->{'event_dt'}        = $args->{'bewertungsdatum'};
-                $targs->{'results'}          = $args->{'lm_bewertung'};
-            }
-            
-            if (($trait eq 'Phänotyp') ){
-                $targs->{'ext_event_type'}  = '30';
-                $targs->{'event_dt'}        = $args->{'bewertungsdatum'};
-                $targs->{'results'}          = $args->{'phaenotyp'};
-            }
-            if (($trait eq 'Einstufung')) {
-            
-                #-- bereits hier schon Abbruch, damit der SQL nicht ausgeführt wird.  
-                if (!exists $args->{'db_selection'}) {
-                    next ;
-                }
-
-                $targs->{'ext_event_type'}  = '30';
-                $targs->{'event_dt'}        = $args->{'bewertungsdatum'};
-                $targs->{'results'}         = $args->{'db_selection'};
+            ######################################################################## 
+            if ($trait eq 'Körpergewicht-10LW') {
+                $targs->{'ext_methode'}         = 'Wiegen';
+                $targs->{'standard_events_id'}  = 'VWH-Wägung10LW';    
+                $targs->{'event_dt'}            = strftime ($fmt, localtime ($t+70*60*60));
+                $result                         = $args->{'lm10wo'};
+                $ext_field                      = 'lm10wo';
+                $ext_fielde                     = 'schlupfdatum';
             }
 
-            #-- nächstes Merkmale, wenn Merkmal leer ist 
-            if (!$targs->{'results'}) {
-                next;
-            }
-            if ($targs->{'results'} eq '') {
-                next ;
-            }
-
-            $targs->{'results'}          = '' if (!$targs->{'results'});
-
-            #-- db_event erzeugen 
-            if ($targs->{'event_dt'}) {
-                 ($db_event, $guid) = GetDbEvent({'ext_unit_event'  => $args->{'ext_unit_event'},
-                                                 'ext_id_event'     => $args->{'ext_id_event'},
-
-                                                 'ext_event_type'   => $targs->{'ext_event_type'},
-                                                 'event_dt'         => $targs->{'event_dt'}},
-                                                      
-                                                 'y'
-                );
+            ######################################################################### 
+            if ($trait eq 'Körpergewicht-20LW') {
+                $targs->{'ext_methode'}         = 'Wiegen';
+                $targs->{'standard_events_id'}  = 'VWH-Wägung20LW';    
+                $targs->{'event_dt'}            = strftime ($fmt, localtime ($t+140*60*60));
+                $result                         = $args->{'lm20wo'};
+                $ext_field                      = 'lm20wo';
+                $ext_fielde                     = 'schlupfdatum';
             }
 
-            if (!$db_event) {
+            ######################################################################### 
+            if ($trait eq 'Eindruck') {
+                $targs->{'ext_methode'}         = 'Bonitieren';
+                $targs->{'standard_events_id'}  = 'VWH-Bewertung';    
+                $targs->{'event_dt'}            = $args->{'bewertungsdatum'};
+                $result                         = $args->{'eindruck'};
+                $ext_field                      = 'eindruck';
+                $ext_fielde                     = 'bewertungsdatum';
+            }
+
+            ######################################################################### 
+            if ($trait eq 'Phänotyp') {
+                $targs->{'ext_methode'}         = 'Bonitieren';
+                $targs->{'standard_events_id'}  = 'VWH-Bewertung';    
+                $targs->{'event_dt'}            = $args->{'bewertungsdatum'};
+                $result                         = $args->{'phaenotyp'};
+                $ext_field                      = 'phaenotyp';
+                $ext_fielde                     = 'bewertungsdatum';
+            }
+
+            ######################################################################## 
+            if ($trait eq 'Körpergewicht') {
+                $targs->{'ext_methode'}         = 'Wiegen';
+                $targs->{'standard_events_id'}  = 'VWH-Bewertung';    
+                $targs->{'event_dt'}            = $args->{'bewertungsdatum'};
+                $result                         = $args->{'lm_bewertung'};
+                $ext_field                      = 'lm_bewertung';
+                $ext_fielde                     = 'bewertungsdatum';
+            }
+
+            if ($trait eq 'Einstufung') {
+                $targs->{'ext_methode'}         = 'Klassifizieren';
+                $targs->{'standard_events_id'}  = 'VWH-Bewertung';    
+                $targs->{'event_dt'}            = $args->{'bewertungsdatum'};
+                $result                         = $args->{'ext_selection'};
+                $ext_field                      = 'text_selection';
+                $ext_fielde                     = 'bewertungsdatum';
+            }
+
+            #- skip of no performances
+            if ($result eq '') {
                 next;
             }
 
-            my $performances_id;
-            my $guid;
+            #-- Leistungen wegschreiben
+            #-- Event erzeugen
+            my $db_event=undef;
 
-            #-- Check, ob es Eintrag in Performances und damit eine ID schon gibt
-            my $sql="select performances_id, guid from performances where db_event=$db_event and db_animal=$args->{'db_animal'}";
+            #-- Event erzeugen 
+            ($db_event, $guid) = GetDbEvent({
+                                            'ext_unit_event'        => $args->{'ext_unit_location_fo'},
+                                            'ext_id_event'          => $args->{'ext_id_location_fo'},
 
-            my $sql_ref = $apiis->DataBase->sys_sql( $sql);
-            while ( my $q = $sql_ref->handle->fetch ) { 
-                $performances_id=$q->[0];
-                $guid           =$q->[1];
-            }
-
-            if (!$guid) {
-                
-                $performances_id = $apiis->DataBase->seq_next_val('seq_performances__performances_id');
-                
-                my $table = Apiis::DataBase::Record->new( tablename => 'performances', );
-    
-                $table->column( 'performances_id' )->intdata( $performances_id );
-                $table->column( 'performances_id' )->encoded( 1 );
-
-                $table->column( 'db_animal' )->intdata( $args->{'db_animal'});
-                $table->column( 'db_animal' )->encoded( 1 );
-
-                $table->column( 'db_event' )->intdata( $db_event );
-                $table->column( 'db_event' )->encoded( 1 );
-
-                #-- neuen Eintrag in Animal  
-                $table->insert();
-
-                #-- Fehlerbehandlung 
-                if ( $table->status ) {
-                    $apiis->status(1);
-                    $apiis->errors( scalar $table->errors );
-
-                    goto EXIT;
-                }
-            }
-
-            my $traits_id;
-
-            #-- Check, ob es Eintrag in Performances und damit eine ID schon gibt
-            $sql="select traits_id from traits where name='$trait' and variante='1'";
-
-            $sql_ref = $apiis->DataBase->sys_sql( $sql);
-            while ( my $q = $sql_ref->handle->fetch ) { 
-                $traits_id=$q->[0];
-            }
+                                            'ext_standard_events_id'=> $targs->{'standard_events_id'},
+                                            'event_dt'              => $targs->{'event_dt'}},
+                                            'y'
+            );
             
-            #-- Fehlerbehandlung 
-            if (!$traits_id) {
-                next;
+            if ($apiis->status) {                    
+                push(@{$hs_fields->{$ext_fielde}->{'error'}},$apiis->errors);
+                $apiis->status(0);
+                $apiis->del_errors;
             }
 
             $guid=undef;
-
-            #-- Check, ob es Eintrag in Performances und damit eine ID schon gibt
-            $sql="select guid from performances_results where performances_id=$performances_id and traits_id=$traits_id";
-
-            $sql_ref = $apiis->DataBase->sys_sql( $sql);
-            while ( my $q = $sql_ref->handle->fetch ) { 
-                $guid           =$q->[0];
-            }
-
-            if (!$guid) {
-                
-                my $table = Apiis::DataBase::Record->new( tablename => 'performances_results', );
-    
-                $table->column( 'performances_id' )->intdata( $performances_id );
-                $table->column( 'performances_id' )->encoded( 1 );
-
-                $table->column( 'traits_id' )->intdata( $traits_id );
-                $table->column( 'traits_id' )->encoded( 1 );
-
-                $table->column( 'result' )->extdata( $targs->{'results'});
-
-                #-- neuen Eintrag in Animal  
-                $table->insert();
-
-                #-- Fehlerbehandlung 
-                if ( $table->status ) {
-                    $apiis->status(1);
-                    $apiis->errors( scalar $table->errors );
-
-                    goto EXIT;
-                }
+            ($guid)=GetDbPerformance({
+                                'db_animal' => $args->{'db_animal'},
+                                'db_event'  => $db_event,
+                                'ext_trait' => $trait,
+                                'ext_method'=> $targs->{'ext_methode'},
+                                'ext_bezug' => $targs->{'ext_bezug'},
+                                'variant'   => $targs->{'variant'},
+                                'ext_trait' => $targs->{'ext_trait'},
+                                'result'    => $result
+                                },
+                                'y');
+            
+            if ($apiis->status) {
+                push(@{$hs_fields->{$ext_field}->{'error'}},$apiis->errors);
+               
+                $apiis->status(0);
+                $apiis->del_errors;
             }
         }
 
-        #-- aggregierte Traits für Zuchtstamm wegschreiben
-
-
 EXIT:
+        $tbd=Federvieh::CreateTBD($tbd, $hs_fields, $json, $hs_errcnt, $args, $z );
+
         if ((!$apiis->status) and ($onlycheck eq 'off')) {
             $apiis->DataBase->commit;
         }
@@ -803,8 +835,12 @@ EXIT:
         $apiis->del_errors;
     }
      
+    ###### tr #######################################################################################
+    my $tr  =Federvieh::CreateTr( $json, $hs_errcnt );
+    my $data=Federvieh::CreateBody( $tbd, $tr, 'Ladestrom: LS21_Vorwerkhühner');
+
     if ($fileimport) {
-        return $json;
+        return JSON::to_json({'data'=>$data, 'tag'=>'body'});
     }
     else {
         return ( $self->status, $self->errors );

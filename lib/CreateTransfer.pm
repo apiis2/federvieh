@@ -45,11 +45,17 @@ sub CreateTransfer {
     }
     $transfer->column('db_unit')->ext_fields( 'ext_unit','ext_id' );
 
-    if ($args->{'birth_dt'}) {
-        $transfer->column('opening_dt')->extdata( $args->{'birth_dt'} );
+    $args->{'opening_dt'}=$args->{'birth_dt'} if (exists $args->{'birth_dt'} and !exists $args->{'opening_dt'});
+
+    if ($args->{'opening_dt'}) {
+        $transfer->column('opening_dt')->extdata( $args->{'opening_dt'} );
     }
     else  {
         $transfer->column('opening_dt')->extdata($apiis->today);
+    }
+
+    if ($args->{'closing_dt'} and ($args->{'closing_dt'} ne '')) {
+        $transfer->column('closing_dt')->extdata( $args->{'closing_dt'} );
     }
 
     $transfer->insert();
@@ -59,6 +65,8 @@ sub CreateTransfer {
         $apiis->errors( scalar $transfer->errors );
         $apiis->status( 1 );
     }
+    
+    return $transfer->column('guid')->intdata;
 }
 1;
 

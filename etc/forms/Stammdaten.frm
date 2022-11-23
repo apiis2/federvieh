@@ -242,7 +242,7 @@
 
     <Field Name="F167" AR="user" DSColumn="C166" FlowOrder="15" InternalData="yes">
       <DataSource Name="DataSource_1015aa5">
-        <Sql Statement="select a.db_breedcolor,b.ext_code || ' - ' || c.ext_code from breedcolor a inner join codes b on a.db_breed=b.db_code inner join codes c on a.db_color=c.db_code order by b.ext_code, c.ext_code"/>
+        <Sql Statement="select a.db_breedcolor,b.ext_code || case when a.db_color isnull then '' else ' - ' || c.ext_code end from breedcolor a inner join codes b on a.db_breed=b.db_code left outer join codes c on a.db_color=c.db_code where db_breedcolor=585  order by b.ext_code, c.ext_code"/>
       </DataSource>
       <ScrollingList Size="1"/>
       <Position Column="1" Columnspan="3" Position="absolute" Row="8"/>
