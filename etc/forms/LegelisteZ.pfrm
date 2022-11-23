@@ -14,7 +14,7 @@
       <Text FontSize="24px" TextDecoration="underline"/>
       <Format PaddingBottom="10px"/>
     </Label>
-
+<!-- 
     <Label Name="Label_1491c" Content="__('Züchter'):">
       <Position Column="0" Position="absolute" Row="5"/>
     </Label>
@@ -29,7 +29,7 @@
       <Color/>
       <Format/>
     </Field>
-    
+
     <Label Name="Label_1499c" Content="__('Zuchtjahr'):">
       <Position Column="0" Position="absolute" Row="9"/>
     </Label>
@@ -45,7 +45,8 @@
       <Color/>
       <Format/>
     </Field>
-    
+-->
+
     <Field Name="Field_514">
       <Button ButtonLabel="Legeliste zusammenstellen" URL="/etc/reports/LegelisteZ.rpt" Command="do_exit"  ToolTip="__('Liste wird erzeugt und als pdf angezeigt')"/>
       <Position Column="0" Columnspan="2" Position="absolute" Row="10"/>

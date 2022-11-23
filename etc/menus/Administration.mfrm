@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE Form PUBLIC "1" "http://federvieh.local/etc/form2.dtd"[  
+<!DOCTYPE Form PUBLIC "1" "form.dtd"[  
   <!ENTITY NavigationButtons_Fields SYSTEM "http://federvieh.local/etc/navigationbuttons.xml">
   <!ENTITY ActionButtons_Fields     SYSTEM "http://federvieh.local/etc/actionbuttons.xml">
   <!ENTITY StatusLine_Block         SYSTEM "http://federvieh.local/etc/statusbar.xml">
@@ -21,7 +21,7 @@
     </Label>
  
     <Label Name="Label_1a2" Content="Eingabe">
-      <Position Column="0-6" Row="1"/>
+      <Position Column="3" Row="1"/>
       <Text FontSize="16px" TextAlign="center"/>
     </Label>
    
@@ -58,13 +58,13 @@
     </Image>
     <Field Name="Field_82ea2">
       <Button ButtonLabel="Nutzerliste" URL="/etc/reports/NutzerListe.rpt" Command="do_open_report"/>
-      <Position Column="5" Row="2"/>
+      <Position Column="6" Row="2"/>
       <Miscellaneous/>
       <Text FontSize="12px" TextAlign="center"/>
       <Color BackGround="#c5ffff"/>
       <Format BorderStyle="groove" BorderColor="lightgray"/>
-      
     </Field>
+    
     <Image Name="Image_71fa2" Alt="Test" Src="/icons/blank1.gif">
        <Position Column="6" Row="2" Width="1px"/>
        <Color BackGround="white" />
@@ -74,6 +74,119 @@
     <Field Name="Field_82ba2">
       <Button ButtonLabel="Nutzer &amp;Auml;ndern" URL="Login.frm" Command="do_open_form"/>
       <Position Column="1" Row="3"/>
+      <Miscellaneous/>
+      <Text FontSize="12px" TextAlign="center"/>
+      <Color BackGround="#ffc600"/>
+      <Format BorderStyle="groove" BorderColor="lightgray"/>
+    </Field>
+
+    <Label Name="Label_s1a2" Content="Schema">
+      <Position Column="3" Row="5"/>
+      <Text FontSize="16px" TextAlign="center"/>
+    </Label>
+
+    <Field Name="Field_s82ba2">
+      <Button ButtonLabel="Merkmalschema anlegen" URL="standard_traits.frm" Command="do_open_form"/>
+      <Position Column="1" Row="6"/>
+      <Miscellaneous/>
+      <Text FontSize="12px" TextAlign="center"/>
+      <Color BackGround="#ffc600"/>
+      <Format BorderStyle="groove" BorderColor="lightgray"/>
+    </Field>
+    <Field Name="Field_s182ba2">
+      <Button ButtonLabel="Merkmal zuordnen" URL="standard_traits_content.frm" Command="do_open_form"/>
+      <Position Column="3" Row="6"/>
+      <Miscellaneous/>
+      <Text FontSize="12px" TextAlign="center"/>
+      <Color BackGround="#ffc600"/>
+      <Format BorderStyle="groove" BorderColor="lightgray"/>
+    </Field>
+    <Field Name="Field_s282ba2">
+      <Button ButtonLabel="Merkmal definieren" URL="traits.frm" Command="do_open_form"/>
+      <Position Column="5" Row="6"/>
+      <Miscellaneous/>
+      <Text FontSize="12px" TextAlign="center"/>
+      <Color BackGround="#ffc600"/>
+      <Format BorderStyle="groove" BorderColor="lightgray"/>
+    </Field>
+    <Field Name="Field_82ea2a">
+      <Button ButtonLabel="Merkmalsschemaliste" URL="/etc/reports/Merkmalsschemas.rpt" Command="do_open_report"/>
+      <Position Column="6" Row="6"/>
+      <Miscellaneous/>
+      <Text FontSize="12px" TextAlign="center"/>
+      <Color BackGround="#c5ffff"/>
+      <Format BorderStyle="groove" BorderColor="lightgray"/>
+    </Field>
+    
+    <Field Name="Field_b82ba2">
+      <Button ButtonLabel="Rasseschema anlegen" URL="standard_breeds.frm" Command="do_open_form"/>
+      <Position Column="1" Row="7"/>
+      <Miscellaneous/>
+      <Text FontSize="12px" TextAlign="center"/>
+      <Color BackGround="#ffc600"/>
+      <Format BorderStyle="groove" BorderColor="lightgray"/>
+    </Field>
+    <Field Name="Field_b182ba2">
+      <Button ButtonLabel="Rasse zuordnen" URL="standard_breeds_content.frm" Command="do_open_form"/>
+      <Position Column="3" Row="7"/>
+      <Miscellaneous/>
+      <Text FontSize="12px" TextAlign="center"/>
+      <Color BackGround="#ffc600"/>
+      <Format BorderStyle="groove" BorderColor="lightgray"/>
+    </Field>
+    <Field Name="Field_b282ba2">
+      <Button ButtonLabel="Rasse definieren" URL="Schluessel/Codes.frm" Command="do_open_form"/>
+      <Position Column="5" Row="7"/>
+      <Miscellaneous/>
+      <Text FontSize="12px" TextAlign="center"/>
+      <Color BackGround="#ffc600"/>
+      <Format BorderStyle="groove" BorderColor="lightgray"/>
+    </Field>
+    <Field Name="Field_82ea2ar">
+      <Button ButtonLabel="Rasseschemaliste" URL="/etc/reports/Rasseschemas.rpt" Command="do_open_report"/>
+      <Position Column="6" Row="7"/>
+      <Miscellaneous/>
+      <Text FontSize="12px" TextAlign="center"/>
+      <Color BackGround="#c5ffff"/>
+      <Format BorderStyle="groove" BorderColor="lightgray"/>
+    </Field>
+
+    <Field Name="Field_e82ba2">
+      <Button ButtonLabel="Eventschemas anlegen" URL="standard_events.frm" Command="do_open_form"/>
+      <Position Column="1" Row="8"/>
+      <Miscellaneous/>
+      <Text FontSize="12px" TextAlign="center"/>
+      <Color BackGround="#ffc600"/>
+      <Format BorderStyle="groove" BorderColor="lightgray"/>
+    </Field>
+    <Field Name="Field_e282ba2">
+      <Button ButtonLabel="Event definieren" URL="scheme_event_definition" Command="do_open_form"/>
+      <Position Column="5" Row="8"/>
+      <Miscellaneous/>
+      <Text FontSize="12px" TextAlign="center"/>
+      <Color BackGround="#ffc600"/>
+      <Format BorderStyle="groove" BorderColor="lightgray"/>
+    </Field>
+
+    <Field Name="Field_f82ba2">
+      <Button ButtonLabel="Rechteschema anlegen" URL="scheme_function_definition.frm" Command="do_open_form"/>
+      <Position Column="1" Row="9"/>
+      <Miscellaneous/>
+      <Text FontSize="12px" TextAlign="center"/>
+      <Color BackGround="#ffc600"/>
+      <Format BorderStyle="groove" BorderColor="lightgray"/>
+    </Field>
+    <Field Name="Field_f182ba2">
+      <Button ButtonLabel="Rechte zuordnen" URL="scheme_function_connect" Command="do_open_form"/>
+      <Position Column="3" Row="9"/>
+      <Miscellaneous/>
+      <Text FontSize="12px" TextAlign="center"/>
+      <Color BackGround="#ffc600"/>
+      <Format BorderStyle="groove" BorderColor="lightgray"/>
+    </Field>
+    <Field Name="Field_f282ba2">
+      <Button ButtonLabel="Recht definieren" URL="scheme_function_definition" Command="do_open_form"/>
+      <Position Column="5" Row="9"/>
       <Miscellaneous/>
       <Text FontSize="12px" TextAlign="center"/>
       <Color BackGround="#ffc600"/>
