@@ -46,15 +46,11 @@ sub LO_LS30_Merkmale {
     my %hs_version=();
     my %hs_event;
     my $fileimport;
-    my ($kv);
+    my ($kv, $record);
 
-    if (exists $args->{ 'FILE' }) {
-        $fileimport=$args->{ 'FILE' };
-    }
     my $onlycheck='off';
-    if (exists $args->{ 'onlycheck' }) {
-        $onlycheck=lc($args->{ 'onlycheck' });
-    }
+    $fileimport=1                           if (exists $args->{ 'fileimport'});
+    $onlycheck=lc($args->{ 'onlycheck' })   if (exists $args->{ 'onlycheck' });
 
     #-- Wenn ein File geladen werden soll, dann zuerst umwandeln in
     #   einen JSON-String, damit einheitlich weiterverarbeitet werden kann
@@ -65,55 +61,29 @@ sub LO_LS30_Merkmale {
                   'Bak'         => [],
                 };
         
-        #-- Datei öffnen
-        open( IN, "$fileimport" ) || die "error: kann $fileimport nicht öffnen";
-
-        #-- Excel-Tabelle öffnen 
-        my $book = Spreadsheet::Read->new ($fileimport, dtfmt => "dd.mm.yyyy");
-        my $sheet = $book->sheet(1);
-
-        #-- Fehlermeldung, wenn es nicht geht 
-        if(defined $book->[0]{'error'}){
-            print "Error occurred while processing $fileimport:".
-                $book->[0]{'error'}."\n";
-            exit(-1);
-        }
+        my $counter=1;
         
-        my $max_rows = $sheet->{'maxrow'};
-        my $max_cols = $sheet->{'maxcol'};
+        foreach my $dd (@{$args->{'data'}} ) {
 
-        #--Schleife über alle Zeilen 
-        for my $row_num (1..($max_rows))  {
-
-            #-- declare
-            my @data;
-            my $record;
-            my $sdata;
-            my $hs = {}; 
-            my $col='A';
-
-            #-- Schleife über alle Spalten       
-            for my $col_num (1..($max_cols)) {
-
-                #-- einen ";" String erzeugen  
-                push(@data, encode_utf8 $sheet->{$col.$row_num});
-            
-                $col++;
-            }
-      
+            my @data=@$dd;
+        
             #-- initialisieren mit '' 
-            map { if (!$_) {$_=''} } @data;
+            map { if (!defined $_) {$_=''} } @data;
+
+            #-- führende und endende Leerzeichen entfernen 
+            map { $_=~s/^\s+//g } @data;
+            map { $_=~s/\s+$//g } @data;
 
             #-- Daten sichern  
-            push( @{ $json->{ 'Bak' } },join(';',@data)); 
-            $sdata=join(';',@data);
-       
+            my $sdata=join(';',@data);
+            push( @{ $json->{ 'Bak' }},$sdata); 
+      
+            #-- skip first line 
             next if ($sdata=~/Merkmalsbezeichnung/);
 
-            push( @{ $json->{ 'Bak' } },$sdata); 
-    
             #-- define format for record 
             $record = {
+                    'No'                  => [ $counter++,'',[] ],
                     'ls_id'               => [ $data[0],'',[] ],
                     'trait_standard'      => [ $data[1],'',[] ],
                     'ext_code'            => [ $data[2],'',[] ],
@@ -144,8 +114,9 @@ sub LO_LS30_Merkmale {
         #-- Datei schließen
         close( IN );
 
-        $json->{ 'Header'}  ={'trait_standard'=>'trait_standard','db_trait'=>'merkmal','bezug'=>'Bezug','method'=>'Methode','name'=>'Merkmalsbezeichnung','label_kurz'=>'label_kurz','label_mittel'=>'label_mittel','unit'=>'einheit','decimals'=>'dezimalstelle','minimum'=>'min','maximum'=>'max','variant'=>'variant','herkunft'=>'herkunft','class'=>'class','type'=>'type'} ;
-        $json->{ 'Fields'}  = ['trait_standard','db_trait','bezug','methode','name','label_kurz','label_mittel','unit','decimals','minimum','maximum','variant','herkunft','class','type'];
+        $json->{ 'Fields'}  = ['No','ls_id','trait_standard','ext_code','variant','bezug','methode','label',
+                               'label_short','label_medium','unit','decimals','minimum','maximum','ext_unit',
+                               'herkunft','class','type'];
     }
     else {
 
@@ -161,6 +132,9 @@ sub LO_LS30_Merkmale {
     }
 
     my $z=0;
+    my $hs_errcnt={};
+    my $tbd=[];
+
     #-- Ab hier ist es egal, ob die Daten aus einer Datei
     #   oder aus einer Maske kommen
     #-- Schleife über alle Records und INFO füllen
@@ -170,6 +144,7 @@ sub LO_LS30_Merkmale {
         
         #Zähler für debugging 
         $z++;
+
 
         #-- Daten aus Hash holen
         foreach (keys %{ $record->{ 'Data' } }) {
@@ -184,6 +159,11 @@ sub LO_LS30_Merkmale {
             $args->{$_}=~s/\]/)/g;
         }
 
+        foreach (@{$json->{'Fields'}}) {    
+            $hs_fields->{$_} ={'error'=>[]}; 
+        }
+       
+
         #----- Merkmals definition ------------------
 
         $hs_insert{'traits'}='-';
@@ -196,19 +176,12 @@ sub LO_LS30_Merkmale {
 
         if ($apiis->status) {
 
-            my $msg=$apiis->errors->[0]->msg_long;
-            $msg=$apiis->errors->[0]->msg_short if (!$msg);
-
-            if ($msg=~/Found Foreign Key violation/) {
-                push(@{$record->{ 'Info'}},main::__('Schlüssel "[_1]" bereits vergegben.', $args->{'ext_code'}));
+            #-- wenn es db_unit nicht gibt, dann Fehler auslösen 
+            if ($apiis->status and ($apiis->status == 1)) {
+            
+                push(@{$hs_fields->{'ext_code'}->{'error'}}, $apiis->errors);
+                goto EXIT;
             }
-            else {
-                #-- Fehler in Info des Records schreiben
-                push(@{$record->{ 'Info'}},$apiis->errors->[0]->from.': '.$msg);
-            }
-            #-- Fehler in Info des Records schreiben
-            #-- weitere Bearbeitung des Datensatzes wird abgebrochen + rücksetzen 
-            goto EXIT;
         }
         
         ($args->{'db_bezug'}, $record->{ 'Insert' }->[0])=GetDbCode(
@@ -218,19 +191,12 @@ sub LO_LS30_Merkmale {
 
         if ($apiis->status) {
 
-            my $msg=$apiis->errors->[0]->msg_long;
-            $msg=$apiis->errors->[0]->msg_short if (!$msg);
-
-            if ($msg=~/Found Foreign Key violation/) {
-                push(@{$record->{ 'Info'}},main::__('Schlüssel "[_1]" bereits vergegben.', $args->{'ext_code'}));
+            #-- wenn es db_unit nicht gibt, dann Fehler auslösen 
+            if ($apiis->status and ($apiis->status == 1)) {
+            
+                push(@{$hs_fields->{'bezug'}->{'error'}}, $apiis->errors);
+                goto EXIT;
             }
-            else {
-                #-- Fehler in Info des Records schreiben
-                push(@{$record->{ 'Info'}},$apiis->errors->[0]->from.': '.$msg);
-            }
-            #-- Fehler in Info des Records schreiben
-            #-- weitere Bearbeitung des Datensatzes wird abgebrochen + rücksetzen 
-            goto EXIT;
         }
         
         ($args->{'db_method'}, $record->{ 'Insert' }->[0])=GetDbCode(
@@ -240,19 +206,12 @@ sub LO_LS30_Merkmale {
 
         if ($apiis->status) {
 
-            my $msg=$apiis->errors->[0]->msg_long;
-            $msg=$apiis->errors->[0]->msg_short if (!$msg);
-
-            if ($msg=~/Found Foreign Key violation/) {
-                push(@{$record->{ 'Info'}},main::__('Schlüssel "[_1]" bereits vergegben.', $args->{'ext_code'}));
+            #-- wenn es db_unit nicht gibt, dann Fehler auslösen 
+            if ($apiis->status and ($apiis->status == 1)) {
+            
+                push(@{$hs_fields->{'methode'}->{'error'}}, $apiis->errors);
+                goto EXIT;
             }
-            else {
-                #-- Fehler in Info des Records schreiben
-                push(@{$record->{ 'Info'}},$apiis->errors->[0]->from.': '.$msg);
-            }
-            #-- Fehler in Info des Records schreiben
-            #-- weitere Bearbeitung des Datensatzes wird abgebrochen + rücksetzen 
-            goto EXIT;
         }
         
         ($args->{'db_source'}, $record->{ 'Insert' }->[0])=GetDbUnit(
@@ -262,19 +221,12 @@ sub LO_LS30_Merkmale {
 
         if ($apiis->status) {
 
-            my $msg=$apiis->errors->[0]->msg_long;
-            $msg=$apiis->errors->[0]->msg_short if (!$msg);
-
-            if ($msg=~/Found Foreign Key violation/) {
-                push(@{$record->{ 'Info'}},main::__('Schlüssel "[_1]" bereits vergegben.', $args->{'ext_code'}));
+            #-- wenn es db_unit nicht gibt, dann Fehler auslösen 
+            if ($apiis->status and ($apiis->status == 1)) {
+            
+                push(@{$hs_fields->{'herkunft'}->{'error'}}, $apiis->errors);
+                goto EXIT;
             }
-            else {
-                #-- Fehler in Info des Records schreiben
-                push(@{$record->{ 'Info'}},$apiis->errors->[0]->from.': '.$msg);
-            }
-            #-- Fehler in Info des Records schreiben
-            #-- weitere Bearbeitung des Datensatzes wird abgebrochen + rücksetzen 
-            goto EXIT;
         }
 
 
@@ -293,6 +245,14 @@ sub LO_LS30_Merkmale {
             $args->{'traits_id'}    = $q->[1];
         }
 
+        #-- wenn es db_unit nicht gibt, dann Fehler auslösen 
+        if ($sql_ref->status and ($sql_ref->status == 1)) {
+        
+            $apiis->status(1);
+            push(@{$hs_fields->{'herkunft'}->{'error'}}, $sql_ref->errors);
+            goto EXIT;
+        }
+        
         #-- Wenn nicht, dann anlegen 
         if (!$guid) {
             
@@ -330,9 +290,9 @@ sub LO_LS30_Merkmale {
 
             #-- Fehlerbehandlung 
             if ( $traits->status ) {
+            
                 $apiis->status(1);
-                $apiis->errors( scalar $traits->errors );
-
+                push(@{$hs_fields->{'label'}->{'error'}}, $traits->errors);
                 goto EXIT;
             }
             else {
@@ -355,6 +315,14 @@ sub LO_LS30_Merkmale {
             $args->{'standard_traits_id'} = $q->[1];
         }
 
+        #-- wenn es db_unit nicht gibt, dann Fehler auslösen 
+        if ($sql_ref->status and ($sql_ref->status == 1)) {
+        
+            $apiis->status(1);
+            push(@{$hs_fields->{''}->{'trait_standard'}}, $sql_ref->errors);
+            goto EXIT;
+        }
+        
         #-- Wenn nicht, dann anlegen 
         if (!$guid) {
 
@@ -368,9 +336,9 @@ sub LO_LS30_Merkmale {
             #-- Fehlerbehandlung 
             if ( $table->status ) {
                 $apiis->status(1);
-                $apiis->errors( scalar $table->errors );
-
+                push(@{$hs_fields->{''}->{'trait_standard'}}, $table->errors);
                 goto EXIT;
+                
             }
             else {
                 $args->{'standard_traits_id'}=$table->column('standard_traits_id')->intdata()
@@ -389,6 +357,14 @@ sub LO_LS30_Merkmale {
             $guid=$q->[0];
         }
 
+        #-- wenn es db_unit nicht gibt, dann Fehler auslösen 
+        if ($sql_ref->status and ($sql_ref->status == 1)) {
+        
+            $apiis->status(1);
+            push(@{$hs_fields->{''}->{'label'}}, $sql_ref->errors);
+            goto EXIT;
+        }
+        
         #-- Wenn nicht, dann anlegen 
         if (!$guid) {
 
@@ -403,13 +379,14 @@ sub LO_LS30_Merkmale {
             #-- Fehlerbehandlung 
             if ( $table->status ) {
                 $apiis->status(1);
-                $apiis->errors( scalar $table->errors );
-
+                push(@{$hs_fields->{'label'}->{'error'}}, $table->errors);
                 goto EXIT;
             }
         }
 
 EXIT:
+        $tbd=Federvieh::CreateTBD($tbd, $hs_fields, $json, $hs_errcnt, $args, $z );
+        
         if ((!$apiis->status) and ($onlycheck eq 'off')) {
             $apiis->DataBase->commit;
         }
@@ -421,8 +398,12 @@ EXIT:
         $apiis->del_errors;
     }
      
+    ###### tr #######################################################################################
+    my $tr  =Federvieh::CreateTr( $json, $hs_errcnt );
+    my $data=Federvieh::CreateBody( $tbd, $tr, 'Ladestrom: LS30_Merkmale');
+
     if ($fileimport) {
-        return $json;
+        return JSON::to_json({'data'=>$data, 'tag'=>'body'});
     }
     else {
         return ( $self->status, $self->errors );

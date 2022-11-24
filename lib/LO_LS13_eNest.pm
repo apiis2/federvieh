@@ -26,18 +26,17 @@ sub LO_LS13_eNest {
     my ($json, $err_ref, $err_status, $fileimport);
     my $onlycheck='off';
     
+    $fileimport=1                           if (exists $args->{ 'fileimport'});
     $onlycheck=lc($args->{ 'onlycheck' })   if (exists $args->{ 'onlycheck' });
 
     #-- Wenn ein File geladen werden soll, dann zuerst umwandeln in
     #   einen JSON-String, damit einheitlich weiterverarbeitet werden kann
-    if ( exists $args->{ 'fileimport' }) {
+    if ( $fileimport) {
 
         $json = { 'Info'        => [],
                   'RecordSet'   => [],
                   'Bak'         => [],
                 };
-
-        $fileimport=$args->{ 'File' };
 
         my $counter=1;
 
@@ -105,7 +104,6 @@ sub LO_LS13_eNest {
     
     my $z=0;
     my $hs_errcnt={};
-
     my $tbd=[];
 
     #-- Ab hier ist es egal, ob die Daten aus einer Datei

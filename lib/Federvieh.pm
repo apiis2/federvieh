@@ -257,16 +257,29 @@ sub CreateTBD {
 
         my $style=[{'padding-right'=>'8px'}];
 
-        if (!$hs_fields->{ $field }->{'error'}->[0]) {
-            push(@{$trd},{'tag'=>'td', 'attr'=>[],'value'=>$args->{$field} });
+        #-- wenn kein Fehler im Datensatz, dann alles grün 
+        if (!$cerr) {
+            push(@{$trd},{'tag'=>'td', 'attr'=>[{'style'=>[{'background-color'=>$color}]}],'value'=>$args->{$field} });
         }
         else {
-            
-            $a={'data'=>[{'tag'=>'a','attr'=>[{'class'=>'tip'}, {'href'=>'javascript:void(0)'},{'onclick'=>"javascript:ToggleMe('".$field.$z."')"},{'style'=>[{'background-color'=>$color}]}],
+           
+            my $style=[];
+            if ($hs_fields->{ $field }->{'error'}->[0]) {
+                push(@{$style},{'background-color'=>$color});
+
+                $a={'data'=>[{'tag'=>'a','attr'=>[{'class'=>'tip'}, 
+                                                  {'href'=>'javascript:void(0)'},
+                                                  {'onclick'=>"javascript:ToggleMe('".$field.$z."')"},
+                                                  {'style'=>$style}],
                 'value'=>$args->{$field}}],
                 'attr'=>[{'style'=>[{'padding-right'=>'8px'}]}],
                 'tag'=>'td'};
-            push(@{$trd},$a);
+            
+                push(@{$trd},$a);
+            }
+            else {
+                push(@{$trd},{'tag'=>'td', 'attr'=>[],'value'=>$args->{$field} });
+            }
         }
         
     }
@@ -274,7 +287,7 @@ sub CreateTBD {
     push(@{$tbd},{'tag'=>'tr', 'attr'=>[],'data'=>$trd });
 
     #-- Fehlerbehandlung auf Recordebene 
-    for (my $i=0; $i<$#{$json->{'Fields'}}; $i++) { 
+    for (my $i=0; $i<=$#{$json->{'Fields'}}; $i++) { 
         
         my $pos=$i+1;
         if (exists $hs_fields->{ $json->{'Fields'}->[$i] }->{'error'}) {

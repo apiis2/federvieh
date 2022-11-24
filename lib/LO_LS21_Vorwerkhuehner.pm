@@ -314,7 +314,7 @@ sub LO_LS21_Vorwerkhuehner {
             
             if ($apiis->status) {                    
                 push(@{$hs_fields->{'ext_parent'}->{'error'}},$apiis->errors);
-                $apiis->status(0);
+                $apiis->status(1);
                 $apiis->del_errors;
             }
         }
@@ -324,7 +324,7 @@ sub LO_LS21_Vorwerkhuehner {
         
         if ($apiis->status) {                    
             push(@{$hs_fields->{'ext_id_location_fo'}->{'error'}},$apiis->errors);
-            $apiis->status(0);
+            $apiis->status(1);
             $apiis->del_errors;
         }
         
@@ -344,7 +344,7 @@ sub LO_LS21_Vorwerkhuehner {
 
         if ($apiis->status) {                    
             push(@{$hs_fields->{'schlupfdatum'}->{'error'}},$apiis->errors);
-            $apiis->status(0);
+            $apiis->status(1);
             $apiis->del_errors;
         }
         
@@ -385,7 +385,7 @@ sub LO_LS21_Vorwerkhuehner {
             if ($apiis->status) {
                 push(@{$hs_fields->{$ext_field}->{'error'}},$apiis->errors);
                
-                $apiis->status(0);
+                $apiis->status(1);
                 $apiis->del_errors;
             }
         }
@@ -407,13 +407,10 @@ sub LO_LS21_Vorwerkhuehner {
                         msg_short  =>"Kein Geschlecht bzw. keine Tiernummer definiert."
                     );
             
-            push(@{$hs_fields->{'text_sex'}->{'error'}},$a);
-            push(@{$hs_fields->{'ext_animal_ei'}->{'error'}},$a);
-            push(@{$hs_fields->{'ext_animal_kn'}->{'error'}},$a);
-            push(@{$hs_fields->{'ext_animal_br'}->{'error'}},$a);
-            
-            $apiis->status(0);
-            $apiis->del_errors;
+            push(@{$hs_fields->{'text_sex'}->{'warning'}},$a);
+            push(@{$hs_fields->{'ext_animal_ei'}->{'warning'}},$a);
+            push(@{$hs_fields->{'ext_animal_kn'}->{'warning'}},$a);
+            push(@{$hs_fields->{'ext_animal_br'}->{'warning'}},$a);
             
             goto EXIT;
         }
@@ -432,6 +429,14 @@ sub LO_LS21_Vorwerkhuehner {
         }
         $args->{'db_breed'}=$db_breedcolor;
 
+        push(@{$hs_fields->{'No'}->{'error'}}, Apiis::Errors->new(
+                        type       => 'DATA',
+                        severity   => 'CRIT',
+                        from       => 'LO_LS21_Vorwerkhuehner',
+                        ext_fields => ['No'],
+                        msg_short  =>"Rasse nicht gefunden ($args->{'ext_breed'})."
+                    ));
+            
         my $insert;
         $guid=undef;
 
@@ -443,8 +448,8 @@ sub LO_LS21_Vorwerkhuehner {
         foreach my $e ('ei','kn','br') {
      
             #-- Leerzeichen in der Nummer entfernen 
-            $args->{'ext_id_animal_'.$e}=~s/\s+//g;
-            $args->{'ext_animal_'.$e}=~s/\s+//g;
+            $args->{'ext_id_animal_'.$e}=~s/\s+//g if ($args->{'ext_id_animal_'.$e});
+            $args->{'ext_animal_'.$e}=~s/\s+//g    if ($args->{'ext_animal_'.$e}) ;
 
             #!! noch Check, wenn sich db_animal unterscheidet. Wie ist es bei verschiedenen Jahrgängen  
             #-- schauen, ob es eine Tiernummer auf einem der Kanäle gibt für eine gültige Nummer
@@ -484,6 +489,12 @@ sub LO_LS21_Vorwerkhuehner {
                                        ,'ext_id'=>$args->{'ext_id_animal_'.$e}}
                                        ,'y');
                     
+                    if ($apiis->status) {                    
+                        push(@{$hs_fields->{'ext_animal_'.$e}->{'error'}},$apiis->errors);
+                        $apiis->status(1);
+                        $apiis->del_errors;
+                    }
+                    
                     #-- wenn db_unit erzeugt wurde, dann zwischenspeichern
                     if ($db_unit) {
                         $hs_db_unit{$args->{'ext_unit_animal_'.$e}.':::'.$args->{'ext_id_animal_'.$e}}=$db_unit;
@@ -499,7 +510,7 @@ sub LO_LS21_Vorwerkhuehner {
 
                     $args->{'closing_dt'}=$args->{'schlupfdatum'}   if (($e eq 'ei') or ($e eq 'kn'));
                     
-                    CreateTransfer($apiis,
+                    my $guid=CreateTransfer($apiis,
                                        {'db_animal' =>$args->{'db_animal'},
                                         'db_unit'   =>$args->{'db_unit'},
                                         'ext_unit'  =>$args->{'ext_unit_animal_'.$e},
@@ -508,6 +519,11 @@ sub LO_LS21_Vorwerkhuehner {
                                         'opening_dt'=>$args->{'schlupfdatum'},
                                         'closing_dt'=>$args->{'closing_dt'} }
                                         );
+                    if ($apiis->status) {                    
+                        push(@{$hs_fields->{'ext_animal_'.$e}->{'error'}},$apiis->errors);
+                        $apiis->status(1);
+                        $apiis->del_errors;
+                    }
                 }
             }
 
@@ -519,7 +535,17 @@ sub LO_LS21_Vorwerkhuehner {
                 $args->{'db_selection'}=$q->[0];
 #                delete $args->{'ext_selection'};
             }
-            
+           
+            if ($args->{'ext_selection'} and (!exists $args->{'db_selection'})) {
+                push(@{$hs_fields->{'ext_selection'}->{'error'}}, Apiis::Errors->new(
+                                type       => 'DATA',
+                                severity   => 'CRIT',
+                                from       => 'LO_LS21_Vorwerkhuehner',
+                                ext_fields => ['ext_selection'],
+                                msg_short  =>"Kein Schlüssel für EINSTUFUNG: ".$args->{'ext_selection'}.' gefunden'
+                            ));
+            }
+
             #-- Da Klassenvariable, db_code von codes holen 
             $sql="select user_get_db_code('ABGANGSURSACHE','$args->{'ext_leaving'}')";
             $sql_ref = $apiis->DataBase->sys_sql( $sql);
@@ -527,6 +553,17 @@ sub LO_LS21_Vorwerkhuehner {
                 $args->{'db_leaving'}=$q->[0];
                 delete $args->{'ext_leaving'};
             }
+            
+            if ($args->{'ext_leaving'} and (!exists $args->{'db_leaving'})) {
+                push(@{$hs_fields->{'ext_leaving'}->{'error'}}, Apiis::Errors->new(
+                                type       => 'DATA',
+                                severity   => 'CRIT',
+                                from       => 'LO_LS21_Vorwerkhuehner',
+                                ext_fields => ['ext_leaving'],
+                                msg_short  =>"Kein Schlüssel für ABGANGSURSACHE: ".$args->{'ext_leaving'}.' gefunden'
+                            ));
+            }
+
             #-- Tier anlegen 
             my $animal = Apiis::DataBase::Record->new( tablename => 'animal', );
 
@@ -577,10 +614,9 @@ sub LO_LS21_Vorwerkhuehner {
 
             #-- Fehlerbehandlung 
             if ( $animal->status ) {
+                push(@{$hs_fields->{'No'}->{'error'}},$apiis->errors);
                 $apiis->status(1);
-                $apiis->errors( scalar $animal->errors );
-
-                goto EXIT;
+                $apiis->del_errors;
             }
         }
 
@@ -639,6 +675,12 @@ sub LO_LS21_Vorwerkhuehner {
                                        ,'ext_id'=>$args->{'ext_id_location_'.$e}}
                                        ,'y');
                     
+                    if ($apiis->status) {                    
+                        push(@{$hs_fields->{'ext_id_location_'.$e}->{'error'}},$apiis->errors);
+                        $apiis->status(1);
+                        $apiis->del_errors;
+                    }
+                    
                     #-- wenn db_unit erzeugt wurde, dann zwischenspeichern
                     if ($db_unit) {
                         $hs_db_unit{$args->{'ext_unit_location_'.$e}.':::'.$args->{'ext_id_location_'.$e}}=$db_unit;
@@ -657,7 +699,13 @@ sub LO_LS21_Vorwerkhuehner {
                                                       'ext_entry_action'=>$args->{'ext_entry_action_'.$e},
                                                       'ext_exit_action'=>$args->{'ext_exit_'.$e}
                 });
-            
+                
+                #-- Fehlerbehandlung 
+                if ( $apiis->status ) {
+                    push(@{$hs_fields->{'ext_id_location_'.$e}->{'error'}},$apiis->errors);
+                    $apiis->status(0);
+                    $apiis->del_errors;
+                }
             }
         }
 
@@ -787,7 +835,7 @@ sub LO_LS21_Vorwerkhuehner {
             
             if ($apiis->status) {                    
                 push(@{$hs_fields->{$ext_fielde}->{'error'}},$apiis->errors);
-                $apiis->status(0);
+                $apiis->status(1);
                 $apiis->del_errors;
             }
 
@@ -804,10 +852,10 @@ sub LO_LS21_Vorwerkhuehner {
                                 },
                                 'y');
             
-            if ($apiis->status) {
+            if (!$guid) {
                 push(@{$hs_fields->{$ext_field}->{'error'}},$apiis->errors);
                
-                $apiis->status(0);
+                $apiis->status(1);
                 $apiis->del_errors;
             }
         }
