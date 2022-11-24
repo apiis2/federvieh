@@ -13,8 +13,8 @@ sub Steckbrief {
     my $hs_daten = {};
     my $i        = 0;
     my ( $db_animal);
-    my $data     =[];
-
+    my $bodyd     =[];
+    my $table;
     #-- Tiernummer holen
     $sql="select user_get_db_animal('$ext_unit', '$ext_id', '$ext_animal')";
     
@@ -43,8 +43,6 @@ sub Steckbrief {
         while ( my $q = $sql_ref->handle->fetch ) {
             $db_animal= $q->[ 0 ];
         }
-        $hs_daten->{'head'}={};
-        $hs_daten->{'body'}={'data'=>[],style=>[]};
     } 
     
     #############################################################################
@@ -62,40 +60,48 @@ sub Steckbrief {
         goto ERR;
     }
 
-    #-- Tabellenkopf definieren
-    my $table={'thead'=>[[{'data'=>'Vater','style'=>[{'background-color'=>'lightgray'},{'text-align'=>'left'},{'border-collapse'=>'collapse'},{'border-bottom'=>'1px solid black'}]},{'data'=>'Mutter','style'=>[{'background-color'=>'lightgray'},{'text-align'=>'left'},{'border-collapse'=>'collapse'},{'border-bottom'=>'1px solid black'}]},{'data'=>'Zuchtstamm','style'=>[{'background-color'=>'lightgray'},{'text-align'=>'left'},{'border-collapse'=>'collapse'},{'border-bottom'=>'1px solid black'}]},{'data'=>'Geschlecht','style'=>[{'background-color'=>'lightgray'},{'text-align'=>'left'},{'border-collapse'=>'collapse'},{'border-bottom'=>'1px solid black'}]},{'data'=>'Rasse','style'=>[{'background-color'=>'lightgray'},{'text-align'=>'left'},{'border-collapse'=>'collapse'},{'border-bottom'=>'1px solid black'}]},{'data'=>'Geschlüpft','style'=>[{'background-color'=>'lightgray'},{'text-align'=>'left'},{'border-collapse'=>'collapse'},{'border-bottom'=>'1px solid black'}]},{'data'=>'Name','style'=>[{'background-color'=>'lightgray'},{'text-align'=>'left'},{'border-collapse'=>'collapse'},{'border-bottom'=>'1px solid black'}]},{'data'=>'Zuchtstatus','style'=>[{'background-color'=>'lightgray'},{'text-align'=>'left'},{'border-collapse'=>'collapse'},{'border-bottom'=>'1px solid black'}]},{'data'=>'Zuchtbuch seit','style'=>[{'background-color'=>'lightgray'},{'text-align'=>'left'},{'border-collapse'=>'collapse'},{'border-bottom'=>'1px solid black'}]}]],
-               'tbody'=>[],
-               'tfoot'=>[],
-               'caption'=>{'data'=>'Tierstammdaten','style'=>[{'font-size'=>'20px'},{'text-align'=>'left'}]},
-               'style'=>[{'border'=>'2px solid black'},{'width'=>'100%'},{'margin-top'=>'20px'}]};
 
-    my $tr=[];
-
+    my $td=[];
     while ( my $q = $sql_ref->handle->fetch ) {
-        my $td=[];
 
         #-- einzelne Zellen an Zeile anfüggen 
-        push( @$td, {'data'=>$q->[ 0 ]});
-        push( @$td, {'data'=>$q->[ 1 ]});
-        push( @$td, {'data'=>$q->[ 2 ]});
-        push( @$td, {'data'=>$q->[ 3 ]});
-        push( @$td, {'data'=>$q->[ 4 ]});
-        push( @$td, {'data'=>$q->[ 5 ]});
-        push( @$td, {'data'=>$q->[ 6 ]});
-        push( @$td, {'data'=>$q->[ 7 ]});
-        push( @$td, {'data'=>$q->[ 8 ]});
+        push( @$td, {'tag'=>'td','value'=>$q->[ 0 ]});
+        push( @$td, {'tag'=>'td','value'=>$q->[ 1 ]});
+        push( @$td, {'tag'=>'td','value'=>$q->[ 2 ]});
+        push( @$td, {'tag'=>'td','value'=>$q->[ 3 ]});
+        push( @$td, {'tag'=>'td','value'=>$q->[ 4 ]});
+        push( @$td, {'tag'=>'td','value'=>$q->[ 5 ]});
+        push( @$td, {'tag'=>'td','value'=>$q->[ 6 ]});
+        push( @$td, {'tag'=>'td','value'=>$q->[ 7 ]});
+        push( @$td, {'tag'=>'td','value'=>$q->[ 8 ]});
 
         #-- undef => '' 
-        map { if (!$_->{'data'}) { $_->{'data'}=''} } @$td;
+        map { if (!$_->{'value'}) { $_->{'value'}=''} } @$td;
 
         #-- Gesamte Zeile an Tabelle anfügen 
-        push(@$tr,$td); 
     }
 
-    #-- Zeilen in Tabelle hängen    
-    $table->{'tbody'}=$tr;
+    my $trt={'tag'=>'tr',    'data'=>$td,  'attr'=>[]};
+    my $trb={'tag'=>'tbody', 'data'=>[$trt], 'attr'=>[]};
 
-    push(@{$data},{'table'=>$table});
+    my $thd={'tag'=>'tr', 'data'=>[{'tag'=>'th','value'=>'Vater'},{'tag'=>'th','value'=>'Mutter'},
+                                   {'tag'=>'th','value'=>'Zuchtstamm'},{'tag'=>'th','value'=>'Geschlecht'},
+                                   {'tag'=>'th','value'=>'Rasse'},{'tag'=>'th','value'=>'Schlupfdatum'},
+                                   {'tag'=>'th','value'=>'Name'},{'tag'=>'th','value'=>'Status'},
+                                   {'tag'=>'th','value'=>'DatHerdbuch'}]};
+
+   my $cap={'tag'    =>'caption',
+                    'value' =>'Stammdaten',
+                    'attr'  =>[{'style'=>[{'font-size'=>'20px'},{'text-align'=>'left'}]}]};
+
+    my $trh={'tag'=>'thead', 'data'=>[$thd],        'attr'=>[{'style'=>[{'background-color'=>'lightgray'},{'text-align'=>'left'},
+                                        {'border-collapse'=>'collapse'},{'border-bottom'=>'1px solid black'}] }]};
+
+    my $tbl={'tag'=>'table', 'data'=>[$cap, $trh,$trb],   'attr'=>[{'rules'=>'groups'},{'border'=>'1'},{'style'=>[{'border'=>'2px solid black'},{'width'=>'100%'},{'margin-top'=>'20px'}]}]};
+
+
+    push(@{$bodyd},$tbl);
+
 
     #############################################################################
     #
@@ -113,23 +119,16 @@ sub Steckbrief {
         goto ERR;
     }
 
-    #-- Tabellenkopf definieren
-    $table={'thead'=>[[{'data'=>'Ort','style'=>[{'background-color'=>'lightgray'},{'text-align'=>'left'},{'border-collapse'=>'collapse'},{'border-bottom'=>'1px solid black'}]},{'data'=>'Event','style'=>[{'background-color'=>'lightgray'},{'text-align'=>'left'},{'border-collapse'=>'collapse'},{'border-bottom'=>'1px solid black'}]},{'data'=>'Datum','style'=>[{'background-color'=>'lightgray'},{'text-align'=>'left'},{'border-collapse'=>'collapse'},{'border-bottom'=>'1px solid black'}]},{'data'=>'Merkmal','style'=>[{'background-color'=>'lightgray'},{'text-align'=>'left'},{'border-collapse'=>'collapse'},{'border-bottom'=>'1px solid black'}]},{'data'=>'Ergebnis','style'=>[{'background-color'=>'lightgray'},{'text-align'=>'left'},{'border-collapse'=>'collapse'},{'border-bottom'=>'1px solid black'}]}]],
-               'tbody'=>[],
-               'tfoot'=>[],
-               'caption'=>{'data'=>'Events (einmalig)','style'=>[{'font-size'=>'20px'},{'text-align'=>'left'}]},
-               'style'=>[{'border'=>'2px solid black'},{'width'=>'100%'},{'margin-top'=>'20px'}]};
-
-    $tr=[];
+    my $tr=[];
 
     while ( my $q = $sql_ref->handle->fetch ) {
         my $td=[];
 
         #-- einzelne Zellen an Zeile anfüggen 
-        push( @$td, {'data'=>$q->[ 0 ]});
-        push( @$td, {'data'=>$q->[ 1 ]});
-        push( @$td, {'data'=>$q->[ 2 ]});
-        push( @$td, {'data'=>$q->[ 3 ]});
+        push( @$td, {'tag'=>'td','value'=>$q->[ 0 ]});
+        push( @$td, {'tag'=>'td','value'=>$q->[ 1 ]});
+        push( @$td, {'tag'=>'td','value'=>$q->[ 2 ]});
+        push( @$td, {'tag'=>'td','value'=>$q->[ 3 ]});
 
         #-- Einheit anfügen
         my $m;
@@ -140,20 +139,33 @@ sub Steckbrief {
             $m=$q->[ 4 ],
         }
 
-        push( @$td, {'data'=>$m});
+        push( @$td, {'tag'=>'td','value'=>$m});
 
         #-- undef => '' 
-        map { if (!$_->{'data'}) { $_->{'data'}=''} } @$td;
+        map { if (!$_->{'value'}) { $_->{'value'}=''} } @$td;
 
         #-- Gesamte Zeile an Tabelle anfügen 
-        push(@$tr,$td); 
+        push(@$tr,{'tag'=>'tr',    'data'=>$td,  'attr'=>[]});
     }
 
-    #-- Zeilen in Tabelle hängen    
-    $table->{'tbody'}=$tr;
+    $trb={'tag'=>'tbody', 'data'=>$tr, 'attr'=>[]};
 
-    push(@{$data},{'table'=>$table});
+    $thd={'tag'=>'tr', 'data'=>[{'tag'=>'th','value'=>'Ort'},{'tag'=>'th','value'=>'Event'},
+                                   {'tag'=>'th','value'=>'Datum'},{'tag'=>'th','value'=>'Merkmal'},
+                                   {'tag'=>'th','value'=>'Ergebnis'}]};
 
+    $cap={'tag'    =>'caption',
+                    'value' =>'Events (einmalig)',
+                    'attr'  =>[{'style'=>[{'font-size'=>'20px'},{'text-align'=>'left'}]}]};
+
+    $trh={'tag'=>'thead', 'data'=>[$thd],        'attr'=>[{'style'=>[{'background-color'=>'lightgray'},{'text-align'=>'left'},
+                                        {'border-collapse'=>'collapse'},{'border-bottom'=>'1px solid black'}] }]};
+
+    $tbl={'tag'=>'table', 'data'=>[$cap, $trh,$trb],   'attr'=>[{'rules'=>'groups'},{'border'=>'1'},{'style'=>[{'border'=>'2px solid black'},{'width'=>'100%'},{'margin-top'=>'20px'}]}]};
+
+
+    push(@{$bodyd},$tbl);
+    
     #############################################################################
     #
     # transfer
@@ -169,36 +181,42 @@ sub Steckbrief {
         goto ERR;
     }
 
-    #-- Tabellenkopf definieren
-    $table={'thead'=>[[{'data'=>'Nummernsystem','style'=>[{'background-color'=>'lightgray'},{'text-align'=>'left'},{'border-collapse'=>'collapse'},{'border-bottom'=>'1px solid black'}]},{'data'=>'Nummernkreis','style'=>[{'background-color'=>'lightgray'},{'text-align'=>'left'},{'border-collapse'=>'collapse'},{'border-bottom'=>'1px solid black'}]},{'data'=>'Tiernummer','style'=>[{'background-color'=>'lightgray'},{'text-align'=>'left'},{'border-collapse'=>'collapse'},{'border-bottom'=>'1px solid black'}]},{'data'=>'gültig seit','style'=>[{'background-color'=>'lightgray'},{'text-align'=>'left'},{'border-collapse'=>'collapse'},{'border-bottom'=>'1px solid black'}]},{'data'=>'inaktiv seit','style'=>[{'background-color'=>'lightgray'},{'text-align'=>'left'},{'border-collapse'=>'collapse'},{'border-bottom'=>'1px solid black'}]}]],
-               'tbody'=>[],
-               'tfoot'=>[],
-               'caption'=>{'data'=>'Tiernummern','style'=>[{'font-size'=>'20px'},{'text-align'=>'left'}]},
-               'style'=>[{'border'=>'2px solid black'},{'width'=>'100%'},{'margin-top'=>'20px'}]};
-
     $tr=[];
 
     while ( my $q = $sql_ref->handle->fetch ) {
         my $td=[];
 
         #-- einzelne Zellen an Zeile anfüggen 
-        push( @$td, {'data'=>$q->[ 0 ]});
-        push( @$td, {'data'=>$q->[ 1 ]});
-        push( @$td, {'data'=>$q->[ 2 ]});
-        push( @$td, {'data'=>$q->[ 3 ]});
-        push( @$td, {'data'=>$q->[ 4 ]});
+        push( @$td, {'tag'=>'td','value'=>$q->[ 0 ]});
+        push( @$td, {'tag'=>'td','value'=>$q->[ 1 ]});
+        push( @$td, {'tag'=>'td','value'=>$q->[ 2 ]});
+        push( @$td, {'tag'=>'td','value'=>$q->[ 3 ]});
+        push( @$td, {'tag'=>'td','value'=>$q->[ 4 ]});
 
         #-- undef => '' 
-        map { if (!$_->{'data'}) { $_->{'data'}=''} } @$td;
+        map { if (!$_->{'value'}) { $_->{'value'}=''} } @$td;
 
         #-- Gesamte Zeile an Tabelle anfügen 
-        push(@$tr,$td); 
+        push(@$tr,{'tag'=>'tr',    'data'=>$td,  'attr'=>[]});
     }
 
-    #-- Zeilen in Tabelle hängen    
-    $table->{'tbody'}=$tr;
-   
-    push(@{$data},{'table'=>$table});
+    $trb={'tag'=>'tbody', 'data'=>$tr, 'attr'=>[]};
+
+    $thd={'tag'=>'tr', 'data'=>[{'tag'=>'th','value'=>'Nummernsystem'},{'tag'=>'th','value'=>'Nummernkreis'},
+                                   {'tag'=>'th','value'=>'Tiernummer'},{'tag'=>'th','value'=>'aktiv seit'},
+                                   {'tag'=>'th','value'=>'inaktiv seit'}]};
+
+    $cap={'tag'    =>'caption',
+                    'value' =>'Tiernummern',
+                    'attr'  =>[{'style'=>[{'font-size'=>'20px'},{'text-align'=>'left'}]}]};
+
+    $trh={'tag'=>'thead', 'data'=>[$thd],        'attr'=>[{'style'=>[{'background-color'=>'lightgray'},{'text-align'=>'left'},
+                                        {'border-collapse'=>'collapse'},{'border-bottom'=>'1px solid black'}] }]};
+
+    $tbl={'tag'=>'table', 'data'=>[$cap, $trh,$trb],   'attr'=>[{'rules'=>'groups'},{'border'=>'1'},{'style'=>[{'border'=>'2px solid black'},{'width'=>'100%'},{'margin-top'=>'20px'}]}]};
+
+
+    push(@{$bodyd},$tbl);
     
     #############################################################################
     #
@@ -215,43 +233,48 @@ sub Steckbrief {
         goto ERR;
     }
 
-    #-- Tabellenkopf definieren
-    $table={'thead'=>[[{'data'=>'Kategorie','style'=>[{'background-color'=>'lightgray'},{'text-align'=>'left'},{'border-collapse'=>'collapse'},{'border-bottom'=>'1px solid black'}]},{'data'=>'Ort','style'=>[{'background-color'=>'lightgray'},{'text-align'=>'left'},{'border-collapse'=>'collapse'},{'border-bottom'=>'1px solid black'}]},{'data'=>'gültig seit','style'=>[{'background-color'=>'lightgray'},{'text-align'=>'left'},{'border-collapse'=>'collapse'},{'border-bottom'=>'1px solid black'}]},{'data'=>'Status','style'=>[{'background-color'=>'lightgray'},{'text-align'=>'left'},{'border-collapse'=>'collapse'},{'border-bottom'=>'1px solid black'}]},{'data'=>'inaktiv seit','style'=>[{'background-color'=>'lightgray'},{'text-align'=>'left'},{'border-collapse'=>'collapse'},{'border-bottom'=>'1px solid black'}]},{'data'=>'Status','style'=>[{'background-color'=>'lightgray'},{'text-align'=>'left'},{'border-collapse'=>'collapse'},{'border-bottom'=>'1px solid black'}]}]],
-               'tbody'=>[],
-               'tfoot'=>[],
-               'caption'=>{'data'=>'Züchter/Besitzer','style'=>[{'font-size'=>'20px'},{'text-align'=>'left'}]},
-               'style'=>[{'border'=>'2px solid black'},{'width'=>'100%'},{'margin-top'=>'20px'}]};
-
     $tr=[];
 
     while ( my $q = $sql_ref->handle->fetch ) {
         my $td=[];
 
         #-- einzelne Zellen an Zeile anfüggen 
-        push( @$td, {'data'=>$q->[ 0 ]});
-        push( @$td, {'data'=>$q->[ 1 ]});
-        push( @$td, {'data'=>$q->[ 2 ]});
-        push( @$td, {'data'=>$q->[ 3 ]});
-        push( @$td, {'data'=>$q->[ 4 ]});
-        push( @$td, {'data'=>$q->[ 5 ]});
-        push( @$td, {'data'=>$q->[ 6 ]});
+        push( @$td, {'tag'=>'td','value'=>$q->[ 0 ]});
+        push( @$td, {'tag'=>'td','value'=>$q->[ 1 ]});
+        push( @$td, {'tag'=>'td','value'=>$q->[ 2 ]});
+        push( @$td, {'tag'=>'td','value'=>$q->[ 3 ]});
+        push( @$td, {'tag'=>'td','value'=>$q->[ 4 ]});
+        push( @$td, {'tag'=>'td','value'=>$q->[ 5 ]});
+        push( @$td, {'tag'=>'td','value'=>$q->[ 6 ]});
 
         #-- undef => '' 
-        map { if (!$_->{'data'}) { $_->{'data'}=''} } @$td;
+        map { if (!$_->{'value'}) { $_->{'value'}=''} } @$td;
 
         #-- Gesamte Zeile an Tabelle anfügen 
-        push(@$tr,$td); 
+        push(@$tr,{'tag'=>'tr',    'data'=>$td,  'attr'=>[]});
     }
 
-    #-- Zeilen in Tabelle hängen    
-    $table->{'tbody'}=$tr;
-   
-    push(@{$data},{'table'=>$table});
+    $trb={'tag'=>'tbody', 'data'=>$tr, 'attr'=>[]};
+
+    $thd={'tag'=>'tr', 'data'=>[{'tag'=>'th','value'=>'Kategorie'},{'tag'=>'th','value'=>'Ort'},
+                                   {'tag'=>'th','value'=>'gültig seit'},{'tag'=>'th','value'=>'Status'},
+                                   {'tag'=>'th','value'=>'gültig bis'},{'tag'=>'th','value'=>'Status'}]};
+
+    $cap={'tag'    =>'caption',
+                    'value' =>'Züchter/Besitzer',
+                    'attr'  =>[{'style'=>[{'font-size'=>'20px'},{'text-align'=>'left'}]}]};
+
+    $trh={'tag'=>'thead', 'data'=>[$thd],        'attr'=>[{'style'=>[{'background-color'=>'lightgray'},{'text-align'=>'left'},
+                                        {'border-collapse'=>'collapse'},{'border-bottom'=>'1px solid black'}] }]};
+
+    $tbl={'tag'=>'table', 'data'=>[$cap, $trh,$trb],   'attr'=>[{'rules'=>'groups'},{'border'=>'1'},{'style'=>[{'border'=>'2px solid black'},{'width'=>'100%'},{'margin-top'=>'20px'}]}]};
+
+
+    push(@{$bodyd},$tbl);
+
+EXIT:    
     
-    #-- Tabelle wegschreiben 
-    push(@{ $hs_daten->{'body'}->{'data'} },{'id'=>$db_animal, 'data'=>$data}); 
-    
-    return JSON::to_json($hs_daten);
+    return JSON::to_json({'tag'=>'body', 'data'=>$bodyd});
 
 ERR:
     return;
