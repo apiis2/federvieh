@@ -73,16 +73,21 @@ sub GetDbUnit {
     }
     
     #-- wenn kein Datensatz gefunden wurden, dann Unit neu anlegen 
-    my $action;
+    my $action='';
 
     #-- if there es no unit 
     if (! @query_records) {
    
-        #-- wenn es unit nicht gibt, und auch nicht erstellt werden soll, dann undef zurück 
-        return undef if ($create and ($create eq 'no')) ;
     
         #-- wennn es unit nicht gibt, dann wird sie neu erstellt 
-        $action='insert';
+        if ($create and ($create=~/y/) or ($create eq 'insert')) {
+            $action='insert';
+        }
+        else {
+    
+            #-- wenn es unit nicht gibt, und auch nicht erstellt werden soll, dann undef zurück 
+            return undef ;
+        }
 
     } elsif ($create and ($create eq 'update')) {
 

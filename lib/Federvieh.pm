@@ -174,22 +174,24 @@ sub CreateTr {
     my $json = shift;
     my $hs_errcnt=shift;
 
+    return undef    if (!exists $json->{'fields'}); 
+
     my $tr={'data'=>[], 'tag'=>'tr'};
 
-    for (my $i=0; $i<=$#{$json->{'Fields'}}; $i++) { 
+    for (my $i=0; $i<=$#{$json->{'fields'}}; $i++) { 
 
         my $a;
         my $pos=$i+1;
-        if (!exists $json->{'Header'}) {
-            $json->{'Header'}=$json->{'Fields'};
+        if (!exists $json->{'header'}) {
+            $json->{'header'}=$json->{'fields'};
         }
 
-        if (!exists $hs_errcnt->{ $json->{'Fields'}->[$i]} ) {
-            $a={'value'=>$json->{'Header'}->[$i], 'tag'=>'th','attr'=>[{'style'=>[{'padding-right'=>'8px'}]}] };
+        if (!exists $hs_errcnt->{ $json->{'fields'}->[$i]} ) {
+            $a={'value'=>$json->{'header'}->[$i], 'tag'=>'th','attr'=>[{'style'=>[{'padding-right'=>'8px'}]}] };
         }
         else {
             $a={'data'=>[{'tag'=>'a','attr'=>[{'class'=>'tip'}, {'href'=>'javascript:void(0)'},{'onclick'=>"javascript:ToggleMeClass('S".$pos."')"}],
-                'value'=>$json->{'Header'}->[$i]}],
+                'value'=>$json->{'header'}->[$i]}],
                 'attr'=>[{'style'=>[{'padding-right'=>'8px'}]}],
                 'tag'=>'th'};
         }
@@ -213,20 +215,25 @@ sub CreateBody {
     push(@{$data},{'tag'=>'script', 'value'=>GetScript});
     
     my $tbld=[]; 
-    
-    push(@{$tbld}, {'tag'    =>'caption',
-                    'value' =>$caption,
-                    'attr'  =>[{'style'=>[{'font-size'=>'20px'},{'text-align'=>'left'}]}]});
-
    
-    #-- Daten für thead wegschreiben 
-    push(@{$tbld}, {'tag'=>'thead',
-                    'data'=>[$tr],
-                    'attr'=>[{'style'=>[{'background-color'=>'lightgray'},{'text-align'=>'left'},
-                                        {'border-collapse'=>'collapse'},{'border-bottom'=>'1px solid black'}] }]} );
+    if ($caption) {
+        push(@{$tbld}, {'tag'    =>'caption',
+                        'value' =>$caption,
+                        'attr'  =>[{'style'=>[{'font-size'=>'20px'},{'text-align'=>'left'}]}]});
+    }
 
-    #-- Zeilen in Tabelle hängen
-    push(@{$tbld},{'data'=>$tbd, 'attr'=>[], 'tag'=>'tbody'});
+    if ($tr) { 
+        #-- Daten für thead wegschreiben 
+        push(@{$tbld}, {'tag'=>'thead',
+                        'data'=>[$tr],
+                        'attr'=>[{'style'=>[{'background-color'=>'lightgray'},{'text-align'=>'left'},
+                                            {'border-collapse'=>'collapse'},{'border-bottom'=>'1px solid black'}] }]} );
+    }
+    
+    if ($tbd) {
+        #-- Zeilen in Tabelle hängen
+        push(@{$tbld},{'data'=>$tbd, 'attr'=>[], 'tag'=>'tbody'});
+    }
    
     push(@{$data},{'data'=>$tbld,
                    'attr'=>[{'rules'=>'groups'},{'border'=>'1'},{'style'=>[]}],
@@ -236,49 +243,60 @@ sub CreateBody {
 }
 
 sub CreateTBD {
-    my ($tbd, $hs_fields, $json, $hs_errcnt, $args,$z ) = @_;
+    my ($tbd, $json_glberror, $record, $args,$z ) = @_;
 
-    my $trd=[]; 
-    my $j=1;
+    my $trd     =[]; 
+    my $j       =1;
 
     #-- zuersten schauen, ob es im Record einen Fehler gab
     my $color='lightgreen';
     my $cerr;
-    foreach my $field (@{$json->{'Fields'}}) {
+    my $nrec=$#{$record->{'fields'}};
 
-        if ($hs_fields->{ $field }->{'error'}->[0]) {
-            $color='lightsalmon';
-            $hs_errcnt->{$field}++;
-            $cerr=1;
+    foreach my $field (@{$record->{'fields'}} ) {
+
+        if ($field->{'type'} eq 'data') {
+            if ($record->{ 'data' }->{$field->{'name'}}->{'errors'}[0]) {
+
+                $json_glberror->{$field->{'name'}}++;
+                $color='lightsalmon';
+                $cerr=1;
+            }
         }
     }
-
-    foreach my $field (@{$json->{'Fields'}}) {
+    
+    foreach my $field (@{$record->{'fields'}} ) {
 
         my $style=[{'padding-right'=>'8px'}];
+        my $err=[];
+        my $value=$field->{'value'};
+
+        if ($field->{'type'} eq 'data') {
+            $err  =$record->{ 'data' }->{$field->{'name'}}->{'errors'};
+        }
 
         #-- wenn kein Fehler im Datensatz, dann alles grün 
         if (!$cerr) {
-            push(@{$trd},{'tag'=>'td', 'attr'=>[{'style'=>[{'background-color'=>$color}]}],'value'=>$args->{$field} });
+            push(@{$trd},{'tag'=>'td', 'attr'=>[{'style'=>[{'background-color'=>$color}]}],'value'=>$value });
         }
         else {
            
             my $style=[];
-            if ($hs_fields->{ $field }->{'error'}->[0]) {
+            if ($err->[0]) {
                 push(@{$style},{'background-color'=>$color});
 
                 $a={'data'=>[{'tag'=>'a','attr'=>[{'class'=>'tip'}, 
                                                   {'href'=>'javascript:void(0)'},
                                                   {'onclick'=>"javascript:ToggleMe('".$field.$z."')"},
                                                   {'style'=>$style}],
-                'value'=>$args->{$field}}],
+                'value'=>$value}],
                 'attr'=>[{'style'=>[{'padding-right'=>'8px'}]}],
                 'tag'=>'td'};
             
                 push(@{$trd},$a);
             }
             else {
-                push(@{$trd},{'tag'=>'td', 'attr'=>[],'value'=>$args->{$field} });
+                push(@{$trd},{'tag'=>'td', 'attr'=>[],'value'=>$value });
             }
         }
         
@@ -286,36 +304,40 @@ sub CreateTBD {
 
     push(@{$tbd},{'tag'=>'tr', 'attr'=>[],'data'=>$trd });
 
+    my $i=0;
+
     #-- Fehlerbehandlung auf Recordebene 
-    for (my $i=0; $i<=$#{$json->{'Fields'}}; $i++) { 
+    foreach my $field (@{$record->{'fields'}} ) {
         
         my $pos=$i+1;
-        if (exists $hs_fields->{ $json->{'Fields'}->[$i] }->{'error'}) {
-    
-            my $color='lightsalmon';
+        my $color='lightsalmon';
 
-            foreach my $err (@{$hs_fields->{ $json->{'Fields'}->[$i] }->{'error'}}) {
-                
-                my $str= $err->msg_short; 
-                
-                push(@{$tbd}, {'tag'=>'tr', 
-                            'attr'=>[{'id'=>'Z'.$z},{'class'=>'S'.$pos}, {'style'=>[{'display'=>'none'}]}],
-                            'data'=>[{'tag'=>'td',
-                                        'attr'=>[{'colspan'=>$#{$json->{'Fields'}}},{'style'=>[{'background-color'=>$color},
-                                        {'border-bottom'=>'2px solid black'}]}],
-                                        'value'=>$str}] 
-                });
-                
-                $str= $err->sprint_html; 
-                
-                push(@{$tbd}, {'tag'=>'tr', 
-                            'attr'=>[{'id'=>$json->{'Fields'}->[$i].$z},{'style'=>[{'display'=>'none'}]}],
-                            'data'=>[{'tag'=>'td',
-                                        'attr'=>[{'colspan'=>$#{$json->{'Fields'}}},{'style'=>[{'background-color'=>$color},
-                                        {'border-bottom'=>'2px solid black'}]}],
-                                        'value'=>$str}] 
-                });
-            }
+        my $err=[];
+        if ($field->{'type'} eq 'data') {
+            $err  =$record->{ 'data' }->{$field->{'name'}}->{'errors'};
+        }
+
+        foreach my $err (@$err) {
+            
+            my $str= $err->msg_short; 
+            
+            push(@{$tbd}, {'tag'=>'tr', 
+                        'attr'=>[{'id'=>'Z'.$z},{'class'=>'S'.$pos}, {'style'=>[{'display'=>'none'}]}],
+                        'data'=>[{'tag'=>'td',
+                                    'attr'=>[{'colspan'=>$nrec},{'style'=>[{'background-color'=>$color},
+                                    {'border-bottom'=>'2px solid black'}]}],
+                                    'value'=>$str}] 
+            });
+            
+            $str= $err->sprint_html; 
+            
+            push(@{$tbd}, {'tag'=>'tr', 
+                        'attr'=>[{'id'=>$field.$z},{'style'=>[{'display'=>'none'}]}],
+                        'data'=>[{'tag'=>'td',
+                                    'attr'=>[{'colspan'=>$nrec},{'style'=>[{'background-color'=>$color},
+                                    {'border-bottom'=>'2px solid black'}]}],
+                                    'value'=>$str}] 
+            });
         }
     } 
     return $tbd;
