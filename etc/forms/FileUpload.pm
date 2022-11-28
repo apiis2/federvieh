@@ -1,5 +1,8 @@
 use strict;
 use warnings;
+use Spreadsheet::Read;
+use Encode;
+use Federvieh;
 
 sub CheckLO {
     
@@ -8,10 +11,17 @@ sub CheckLO {
     #-- loop over all date until match 
     foreach my $rec (@{ $js->{'data'} }) {
 
+        #-- undef mit '' definieren 
+        map { $_='' if (!$_) } @$rec;
+
+        #-- einen String daraus machen, damit der geprüft werden kann 
         my $v=join(',',@$rec);
 
-        return 'LO_LS13_eNest' if ($v=~/TransponderEPC/);
+        return 'LO_LS01_Zuchtstamm'     if ($v=~/Hähne.+?Kükennummer.+?ZuchtstammID.+?Väter/);
+        return 'LO_LS13_eNest'          if ($v=~/TransponderEPC/);
         return 'LO_LS21_Vorwerkhuehner' if ($v=~/ZuchtstammID.+?2=Klarei/); 
+        return 'LO_LS30_Merkmale'       if ($v=~/Variante.+?Bezug.+?Methode/);
+        return 'LO_LS31_Rasseschemas'   if ($v=~/Schemaname.+?Rassen/);
     }
     
     return undef;
@@ -37,10 +47,12 @@ sub FileUpload {
 
     #-- Check LO
     open( IN, "$filename" ) || die "error: kann $filename nicht öffnen";
-
+    
     if ($filename=~/\.xlsx$/) {
       
-        #-- Excel-Tabelle öffnen 
+        $args->{'filetype'}='xlsx';
+
+                #-- Excel-Tabelle öffnen 
         my $book = Spreadsheet::Read->new ($filename, dtfmt => "dd.mm.yyyy");
         my $sheet = $book->sheet(1);
 
@@ -74,6 +86,8 @@ sub FileUpload {
         }
     } 
     elsif ($filename=~/(\.csv$|\.txt$)/) {
+        
+        $args->{'filetype'}='csv';
         
         while (<IN>) {
 
