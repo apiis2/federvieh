@@ -470,14 +470,6 @@
             DATATYPE     = "BIGINT"/>
 
         <column 
-            name        = "db_trait" 
-            DATATYPE    = "BIGINT" 
-            LENGTH      = "20" 
-            DESCRIPTION = "Verweis auf das Merkmal in codes" 
-            CHECK       = "NotNull, ForeignKey codes db_code class=TRAITS"  >
-        </column>
-        
-        <column 
             name        = "db_method" 
             DATATYPE    = "BIGINT" 
             LENGTH      = "20" 
@@ -600,7 +592,7 @@
               
             <CONSTRAINTS 
                          SEQUENCE="seq_traits__traits_id" 
-                         INDEX="unique traits_id, unique db_trait variant db_method db_bezug">
+                         INDEX="unique traits_id, unique label variant db_method db_bezug">
             </CONSTRAINTS>
         </TABLE>
     </table>
