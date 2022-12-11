@@ -22,6 +22,7 @@ sub CheckLO {
         return 'LO_LS21_Vorwerkhuehner' if ($v=~/ZuchtstammID.+?2=Klarei/); 
         return 'LO_LS30_Merkmale'       if ($v=~/Variante.+?Bezug.+?Methode/);
         return 'LO_LS31_Rasseschemas'   if ($v=~/Schemaname.+?Rassen/);
+        return 'LO_LS32_Eventschemas'   if ($v=~/Merkmalsschema.+?Rasseschema/);
     }
     
     return undef;
