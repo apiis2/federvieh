@@ -272,6 +272,59 @@ sub Steckbrief {
 
     push(@{$bodyd},$tbl);
 
+    #############################################################################
+    #
+    # Zuchtstämme
+    #
+    #############################################################################
+
+    $sql="select user_get_ext_id_animal(a.db_parents), user_get_ext_animal(a.db_animal),user_get_ext_code(c.db_sex) from parents a inner join (select db_parents from parents where db_animal=$db_animal) b on a.db_parents=b.db_parents inner join animal c on a.db_animal=c.db_animal";
+
+    $sql_ref = $apiis->DataBase->sys_sql( $sql );
+    if ( $sql_ref->status and ($sql_ref->status == 1 )) {
+        $apiis->status( 1 );
+        $apiis->errors( $sql_ref->errors );
+        goto ERR;
+    }
+
+    $tr=[];
+
+    while ( my $q = $sql_ref->handle->fetch ) {
+        my $td=[];
+
+        #-- einzelne Zellen an Zeile anfüggen 
+        push( @$td, {'tag'=>'td','value'=>$q->[ 0 ]});
+        push( @$td, {'tag'=>'td','value'=>$q->[ 1 ]});
+        push( @$td, {'tag'=>'td','value'=>$q->[ 2 ]});
+        push( @$td, {'tag'=>'td','value'=>$q->[ 3 ]});
+        push( @$td, {'tag'=>'td','value'=>$q->[ 4 ]});
+        push( @$td, {'tag'=>'td','value'=>$q->[ 5 ]});
+        push( @$td, {'tag'=>'td','value'=>$q->[ 6 ]});
+
+        #-- undef => '' 
+        map { if (!$_->{'value'}) { $_->{'value'}=''} } @$td;
+
+        #-- Gesamte Zeile an Tabelle anfügen 
+        push(@$tr,{'tag'=>'tr',    'data'=>$td,  'attr'=>[]});
+    }
+
+    $trb={'tag'=>'tbody', 'data'=>$tr, 'attr'=>[]};
+
+    $thd={'tag'=>'tr', 'data'=>[{'tag'=>'th','value'=>'Kategorie'},{'tag'=>'th','value'=>'Ort'},
+                                   {'tag'=>'th','value'=>'gültig seit'},{'tag'=>'th','value'=>'Status'},
+                                   {'tag'=>'th','value'=>'gültig bis'},{'tag'=>'th','value'=>'Status'}]};
+
+    $cap={'tag'    =>'caption',
+                    'value' =>'Züchter/Besitzer',
+                    'attr'  =>[{'style'=>[{'font-size'=>'20px'},{'text-align'=>'left'}]}]};
+
+    $trh={'tag'=>'thead', 'data'=>[$thd],        'attr'=>[{'style'=>[{'background-color'=>'lightgray'},{'text-align'=>'left'},
+                                        {'border-collapse'=>'collapse'},{'border-bottom'=>'1px solid black'}] }]};
+
+    $tbl={'tag'=>'table', 'data'=>[$cap, $trh,$trb],   'attr'=>[{'rules'=>'groups'},{'border'=>'1'},{'style'=>[{'border'=>'2px solid black'},{'width'=>'100%'},{'margin-top'=>'20px'}]}]};
+
+
+    push(@{$bodyd},$tbl);
 EXIT:    
     
     return JSON::to_json({'tag'=>'body', 'data'=>$bodyd});
