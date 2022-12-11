@@ -51,7 +51,7 @@ sub Steckbrief {
     #
     #############################################################################
 
-    $sql="select db_sire, db_dam, db_parents, user_get_ext_code(db_sex), user_get_ext_code(b.db_breed), birth_dt, name, user_get_ext_code(db_selection), hb_ein_dt from animal a inner join breedcolor b on a.db_breed=b.db_breedcolor where db_animal=$db_animal";
+    $sql="select db_sire, db_dam, user_get_ext_id_animal(db_parents), user_get_ext_code(db_sex), user_get_ext_code(b.db_breed), birth_dt, name, user_get_ext_code(db_selection), hb_ein_dt from animal a inner join breedcolor b on a.db_breed=b.db_breedcolor where db_animal=$db_animal";
     
     $sql_ref = $apiis->DataBase->sys_sql( $sql );
     if ( $sql_ref->status and ($sql_ref->status == 1 )) {
@@ -110,7 +110,7 @@ sub Steckbrief {
     #############################################################################
 
     #-- Events-Einmalig holen
-    $sql="select user_get_event_location(c.db_location) as ext_location, user_get_ext_code(e.db_event_type,'s') as event_type,c.event_dt as edate,user_get_ext_code(d.db_trait),case when d.class isnull then a.result else user_get_ext_code(a.result::integer,'s') end, d.unit from performances a inner join standard_performances b on a.standard_performances_id=b.standard_performances_id inner join event c on b.db_event=c.db_event inner join traits d on a.traits_id=d.traits_id inner join standard_events e on c.standard_events_id=e.standard_events_id where b.db_animal=$db_animal";
+    $sql="select user_get_event_location(c.db_location) as ext_location, user_get_ext_code(e.db_event_type,'s') as event_type,c.event_dt as edate,d.label,case when d.class isnull then a.result else user_get_ext_code(a.result::integer,'s') end, d.unit from performances a inner join standard_performances b on a.standard_performances_id=b.standard_performances_id inner join event c on b.db_event=c.db_event inner join traits d on a.traits_id=d.traits_id inner join standard_events e on c.standard_events_id=e.standard_events_id where b.db_animal=$db_animal";
     
     $sql_ref = $apiis->DataBase->sys_sql( $sql );
     if ( $sql_ref->status and ($sql_ref->status == 1 )) {
@@ -245,7 +245,6 @@ sub Steckbrief {
         push( @$td, {'tag'=>'td','value'=>$q->[ 3 ]});
         push( @$td, {'tag'=>'td','value'=>$q->[ 4 ]});
         push( @$td, {'tag'=>'td','value'=>$q->[ 5 ]});
-        push( @$td, {'tag'=>'td','value'=>$q->[ 6 ]});
 
         #-- undef => '' 
         map { if (!$_->{'value'}) { $_->{'value'}=''} } @$td;

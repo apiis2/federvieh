@@ -17,7 +17,6 @@
       <Record TableName="traits"/>
       <Column DBName="traits_id"    Name="C10" Order="1" Type="DB"/>
 
-      <Column DBName="db_trait"     Name="C11" Order="2" Type="DB"/>
       <Column DBName="label"        Name="C12" Order="3" Type="DB"/>
       <Column DBName="label_short"  Name="C13" Order="4" Type="DB"/>
       <Column DBName="label_medium" Name="C14" Order="5" Type="DB"/>
@@ -52,22 +51,6 @@
       <Format/>
     </Field>
     
-    <Label Name="L126" Content="__('Merkmal'): ">
-      <Position Column="0" Position="absolute" Row="1"/>
-    </Label>
-
-    <Field Name="F11" DSColumn="C11" FlowOrder="0" InternalData="yes" LabelName="L126" ToolTip="__('Auswahl des Merkmals. Die Merkmalsbezeichnung muss bereits als Schlüssel in der Klasse Merkmale definiert sein.')">
-      <DataSource Name="DS11">
-        <SqlFunction Action="do_execute_sql" View="ScrollinglistGetMerkmale"/>
-      </DataSource>
-      <ScrollingList Size="1"/>
-      <Position Column="1" Position="absolute" Row="1"/>
-      <Miscellaneous />
-      <Text/>
-      <Color/>
-      <Format/>
-    </Field>
-
     <Label Name="Llabel" Content="__('Label (unique)'): ">
       <Position Column="0" Position="absolute" Row="2"/>
     </Label>

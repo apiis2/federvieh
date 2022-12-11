@@ -5,6 +5,7 @@
 # CATEGORY  TABLE                 COLUMN CONTENT                                                 NUMBER  
 #-----------------------------------------------------------------------------
 zuchtstamm   ''   '0'    ''                                                       1 'SYS' 
+rfid   ''   '0'    ''                                                       1 'BRZV' 
 pruefort     ''   '0'    ''                                                       1 'Zwönitz' 
 pruefort     ''   '0'    ''                                                       1 'K-dorf' 
 pruefort     ''   '0'    ''                                                       1 'Weißbach' 

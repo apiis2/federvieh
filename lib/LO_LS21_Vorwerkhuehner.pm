@@ -234,8 +234,8 @@ sub LO_LS21_Vorwerkhuehner {
                        'erledigt'               => undef
         } if (!exists ($zst->{$vzst}));
 
-        $zst->{$vzst}->{'Schlupf-Summe-Eigewicht'}+=$args->{'eigewicht'} if ($args->{'eigewicht'}); 
-        $zst->{$vzst}->{'Schlupf-Anzahl-Eigewicht'}++                     if ($args->{'schlupfergebnis'}==1); 
+        $zst->{$vzst}->{'Schlupf-Summe-Eigewicht'}+=$args->{'eigewicht'} if ($args->{'eigewicht'} ne ''); 
+        $zst->{$vzst}->{'Schlupf-Anzahl-Eigewicht'}++                    if ($args->{'eigewicht'} ne ''); 
         $zst->{$vzst}->{'Schlupf-Anzahl-Eiablage'}++; 
     
         $zst->{$vzst}->{'SchlupfDt'}=$args->{'schlupfdatum'} if ($args->{'schlupfdatum'} and !$zst->{$vzst}->{'SchlupfDt'});
@@ -247,6 +247,7 @@ sub LO_LS21_Vorwerkhuehner {
         $zst->{$vzst}->{'Schlupf-Anzahl-Unbekannt'}++                     if ($args->{'schlupfergebnis'}==9); 
     }
 
+    $z=0;
     #-- Schleife über alle Records und INFO füllen
     foreach my $record ( @{ $json->{ 'recordset' } } ) {
 
@@ -260,9 +261,9 @@ sub LO_LS21_Vorwerkhuehner {
             $args->{$_}=$record->{ 'data' }->{$_}->{'value'};
         }
 
-#if ($z==134) {
-#    print "kk";
-#}
+if ($z==109) {
+    print "kk";
+}
         #-- Datenbehandlung=Erweiterung um Jahr, wenn zweistellig  
         foreach my $vd ('schlupfdatum','abgangsdatum') {
             
@@ -320,11 +321,12 @@ sub LO_LS21_Vorwerkhuehner {
 
             $apiis->status(0);
             $apiis->del_errors;
+            my $exists;
         
             #-- wenn kein Tierstamm gefunden wurde, dann neu erzeugen  
             if (!$guid) {
                 
-                $args->{'db_unit_parent'}=GetDbUnit({'ext_unit'=>$args->{'ext_unit_parent'}
+                ($args->{'db_unit_parent'},$exists)=GetDbUnit({'ext_unit'=>$args->{'ext_unit_parent'}
                                                 ,'ext_id'=>$args->{'ext_id_parent'}}
                                                 ,'y');
                 if ($apiis->status) {                    
@@ -366,7 +368,8 @@ sub LO_LS21_Vorwerkhuehner {
                 $record->{'data'}->{'ext_parent'}->{'status'}='0';
             }
 
-            my $db_unit; my $exists;
+            my $db_unit; 
+            $exists=undef;
             ($db_unit, $exists)=GetDbUnit({'ext_unit'=>$args->{'ext_unit_location_fo'}
                     ,'ext_id'=>$args->{'ext_forster'}});
    
@@ -432,7 +435,8 @@ sub LO_LS21_Vorwerkhuehner {
             }
         }
         else {
-            $args->{'db_parents_db_unit'}=GetDbUnit({'ext_unit'=>$args->{'ext_unit_parent'}
+            my $exists;
+            ($args->{'db_parents_db_unit'}, $exists)=GetDbUnit({'ext_unit'=>$args->{'ext_unit_parent'}
                                                 ,'ext_id'=>$args->{'ext_id_parent'}}
                                                 ,'y');
             my $guid=CreateTransfer($apiis,
@@ -557,6 +561,7 @@ sub LO_LS21_Vorwerkhuehner {
                 next if ($guidt);
 
                 my $db_unit;
+                my $exists;
 
                 #-- wenn schon mal eine db_unit erzeugt wurde, dann aus dem hash nehmen 
                 if (exists $hs_db_unit{$args->{'ext_unit_animal_'.$e}.':::'.$args->{'ext_id_animal_'.$e}} and 
@@ -565,7 +570,7 @@ sub LO_LS21_Vorwerkhuehner {
                     $db_unit=$hs_db_unit{$args->{'ext_unit_animal_'.$e}.':::'.$args->{'ext_id_animal_'.$e}};
                 }
                 else {
-                    $db_unit=GetDbUnit({'ext_unit'=>$args->{'ext_unit_animal_'.$e}
+                   ($db_unit, $exists)=GetDbUnit({'ext_unit'=>$args->{'ext_unit_animal_'.$e}
                                        ,'ext_id'=>$args->{'ext_id_animal_'.$e}}
                                        ,'y');
                     
@@ -772,6 +777,7 @@ sub LO_LS21_Vorwerkhuehner {
                 $tt     ='ext_forster' if ($e eq 'fo');
 
                 my $db_unit;
+                my $exists;
                 
                 #-- wenn schon mal eine db_unit erzeugt wurde, dann aus dem hash nehmen 
                 if (exists $hs_db_unit{$args->{'ext_unit_location_'.$e}.':::'.$args->{'ext_id_location_'.$e}} and 
@@ -780,7 +786,7 @@ sub LO_LS21_Vorwerkhuehner {
                     $db_unit=$hs_db_unit{$args->{'ext_unit_location_'.$e}.':::'.$args->{'ext_id_location_'.$e}};
                 }
                 else {
-                    $db_unit=GetDbUnit({'ext_unit'=>$args->{'ext_unit_location_'.$e}
+                    ($db_unit, $exists)=GetDbUnit({'ext_unit'=>$args->{'ext_unit_location_'.$e}
                                        ,'ext_id'=>$args->{'ext_id_location_'.$e}}
                                        ,'y');
                     

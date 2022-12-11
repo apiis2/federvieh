@@ -64,9 +64,11 @@ sub CreateTransfer {
     if ( $transfer->status ) {
         $apiis->errors( scalar $transfer->errors );
         $apiis->status( 1 );
+        return undef;
     }
-    
-    return $transfer->column('guid')->intdata;
+    else {
+        return $transfer->column('guid')->intdata;
+    }
 }
 1;
 

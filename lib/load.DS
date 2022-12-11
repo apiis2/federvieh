@@ -10,9 +10,9 @@ BEGIN {
    use Env qw( APIIS_HOME );
    die "\n\tAPIIS_HOME is not set!\n\n" unless $APIIS_HOME;
    push @INC, "$APIIS_HOME/lib";
-   push @INC, "$APIIS_HOME/etc/reports";
+   push @INC, "$APIIS_HOME/federvieh/etc/forms";
+   push @INC, "$APIIS_HOME/federvieh/etc/reports";
 }
-
 use strict;
 use warnings;
 use Apiis;
@@ -22,7 +22,7 @@ use Data::Dumper;
 $Data::Dumper::Indent = 1;
 $Data::Dumper::Terse  = 1;
 
-my $LO = $ARGV[0];
+my $LO = 'FileUpload';
 
 ## create a user objec create a user object to save repeated user/pw typing during tests:
 my $testuser = Apiis::DataBase::User->new(
@@ -41,11 +41,12 @@ if ($@) {
   print $@;
 }
 my %data_hash;
-my ( $json,$stru ) = &$LO($apiis, {'FILE'=>$ARGV[1], 'importfilter'=>$ARGV[0], 'onlycheck'=>$ARGV[2],'action'=>'insert' }, $ARGV[3] );
+my ( $json,$stru ) = &$LO($apiis,$ARGV[1],$ARGV[0],$ARGV[2]);
+#my ($json,$stru ) = &$LO($apiis, {'FILE'=>$ARGV[1],'fileimport'=>$ARGV[0], '_importfilter'=>$ARGV[0], 'onlycheck'=>$ARGV[2]},'action'=>'insert' , $ARGV[3] );
 
 print "\n -----Result for $ARGV[1] ----\n\n";
 
-if (@{$json->{'Error'}}) {
+if ($json->{'Error'}) {
     foreach my $record (@{$json->{'Error'}} ) {
         print $record."\n";
     }

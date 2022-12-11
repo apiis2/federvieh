@@ -24,7 +24,7 @@ sub Zuchtbuch {
     # Eigewicht 
     #
     ########################################################################################################
-    my $sql=SQLStatements::GetPerformances({'trait'=>'Eigewicht', 'data'=>'01.01.2021', 'date'=>'31.12.2021',
+    my $sql=SQLStatements::GetPerformancesFormula({'trait'=>['Schlupf-Summe-Eigewicht','Schlupf-Anzahl-Eigewicht'], 'data'=>'01.01.2021', 'date'=>'31.12.2021',
             'f1'=>'a.long_name'});
 
     my $sql_ref = $apiis->DataBase->sys_sql( $sql );
@@ -61,7 +61,7 @@ sub Zuchtbuch {
     ########################################################################################################
     my $tr=[];
 
-    my $sql=SQLStatements::GetPerformances({'trait'=>'Eigewicht', 'data'=>'01.01.2021', 'date'=>'31.12.2021',
+    my $sql=SQLStatements::GetPerformancesFormula({'trait'=>['Schlupf-Summe-Eigewicht','Schlupf-Anzahl-Eigewicht'], 'data'=>'01.01.2021', 'date'=>'31.12.2021',
             'f1'=>"'Gesamt'"});
 
     my $sql_ref = $apiis->DataBase->sys_sql( $sql );
@@ -110,7 +110,7 @@ sub Zuchtbuch {
     #
     ########################################################################################################
 
-    my $sql=SQLStatements::GetPerformances({'trait'=>'Eigewicht', 'data'=>'01.01.2021', 'date'=>'31.12.2021',
+    my $sql=SQLStatements::GetPerformancesFormula({'trait'=>['Schlupf-Summe-Eigewicht','Schlupf-Anzahl-Eigewicht'], 'data'=>'01.01.2021', 'date'=>'31.12.2021',
             'f1'=>'a.long_name','f2'=>'b.ext_id'});
 
     my $sql_ref = $apiis->DataBase->sys_sql( $sql );

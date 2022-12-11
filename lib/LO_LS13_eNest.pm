@@ -35,7 +35,6 @@ sub LO_LS13_eNest {
 
         $json = { 'infos'        => [],
                   'recordset'   => [],
-                  'Bak'         => [],
                   'glberrors'   => {},
                 };
 
@@ -54,7 +53,6 @@ sub LO_LS13_eNest {
 
             #-- Daten sichern  
             my $sdata=join(';',@data);
-            push( @{ $json->{ 'Bak' }},$sdata); 
       
             #-- skip first line 
             next if ($sdata=~/TransponderEPC/);
@@ -62,7 +60,7 @@ sub LO_LS13_eNest {
             #-- define format for record 
             my $record = {
 
-       'No'                => {'type'=>'data','status'=>'1','pos'=>0, 'value'=> $counter,                  'errors'=>[]},
+       'No'                => {'type'=>'data','status'=>'1','pos'=>0, 'value'=> $counter++,                  'errors'=>[]},
        'Id'                => {'type'=>'data','status'=>'1','pos'=>1, 'value'=> $data[0],'origin'=>$data[0],'errors'=>[]},
        'TimestampVisit'    => {'type'=>'data','status'=>'1','pos'=>2, 'value'=> $data[1],'origin'=>$data[1],'errors'=>[]},
        'TimestampEgg'      => {'type'=>'data','status'=>'1','pos'=>3, 'value'=> $data[2],'origin'=>$data[2],'errors'=>[]},
@@ -188,7 +186,8 @@ sub LO_LS13_eNest {
             }
             else {
                
-                my $db_unit=GetDbUnit({'ext_unit'=>'rfid',
+                my $db_unit; my $exists;
+                ($db_unit, $exists)=GetDbUnit({'ext_unit'=>'rfid',
                                     'ext_id'=>'BRZV'},
                                     'n');                
                 
@@ -284,7 +283,7 @@ sub LO_LS13_eNest {
         ($guid)=GetDbPerformance({
                             'db_animal' => $db_animal,
                             'db_event'  => $db_event,
-                            'ext_trait' =>'Ei',
+                            'ext_trait' =>'Eiablage',
                             'ext_method'=> '3',
                             'ext_bezug' => '1',
                             'variant'   => '1',

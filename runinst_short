@@ -32,7 +32,6 @@ psql federvieh -U apiis_admin -c "CREATE  SEQUENCE seq_address__db_address START
 psql federvieh -U apiis_admin -c "CREATE EXTENSION tablefunc;";
 
 psql federvieh -U apiis_admin -c 'update unit set db_address=(select db_address from address where ext_address=ext_id);';
-psql federvieh -U apiis_admin -c 'create unique index idx_eggs_per_month_2 on eggs_per_month (db_animal, year, month);';
 
 psql federvieh -U apiis_admin <$PROJECT_HOME/etc/functions.sql;
 
@@ -59,12 +58,14 @@ psql federvieh -U apiis_admin -c "update unit set db_member=(select db_unit from
 perl lib/test.LO Vereine;
 perl lib/test.LO LO_ReorgMenuStructure;
 
-perl  lib/test.LO LO_LS12_Merkmale load/data/Merkmale_VWH.xlsx off;
-
-bash load_excel.bsh;
+perl lib/load.DS LO_LS30_Merkmale       load/data/LS30_Merkmale.xlsx                    off;
+perl lib/load.DS LO_LS31_Rasseschemas   load/data/LS31_Rasseschemas.xlsx                off;
+perl lib/load.DS LO_LS32_Eventschemas   load/data/LS32_Eventschemas.xlsx                off;
+perl lib/load.DS LO_LS21_Vorwerkhuehner load/data/Vorwerkhühner/2021/Zuchtbuch_Vorwerk_2021.txt   off;
+#bash load_excel.bsh;
 
 #perl $FEDERVIEH/lib/load.DS LO_LS01  $FEDERVIEH/doc/Beispiel_LS01.xlsx off ;
 #perl $FEDERVIEH/lib/load.DS LO_LS11  $FEDERVIEH/load/data/LS11_Events_2019.csv off ;
 
-firefox federvieh.local;
+firefox -new-window federvieh.local;
 
