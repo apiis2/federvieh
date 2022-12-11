@@ -174,24 +174,29 @@ sub CreateTr {
     my $json = shift;
     my $hs_errcnt=shift;
 
-    return undef    if (!exists $json->{'fields'}); 
+    my @record;
+    my $recdata=$json->{'recordset'}->[0]->{'data'};
+
+    foreach my $key  (keys %{$recdata}) {
+        $record[$recdata->{$key}->{'pos'}]=$key if (exists $recdata->{$key}->{'pos'}) ;
+    }
 
     my $tr={'data'=>[], 'tag'=>'tr'};
 
-    for (my $i=0; $i<=$#{$json->{'fields'}}; $i++) { 
+    for (my $i=0; $i<=$#record; $i++) { 
 
         my $a;
         my $pos=$i+1;
-        if (!exists $json->{'header'}) {
-            $json->{'header'}=$json->{'fields'};
+        if (!exists $json->{'headers'}) {
+            $json->{'headers'}=[@record];
         }
 
-        if (!exists $hs_errcnt->{ $json->{'fields'}->[$i]} ) {
-            $a={'value'=>$json->{'header'}->[$i], 'tag'=>'th','attr'=>[{'style'=>[{'padding-right'=>'8px'}]}] };
+        if (!$hs_errcnt->{ $record[$i]} ) {
+            $a={'value'=>$json->{'headers'}->[$i], 'tag'=>'th','attr'=>[{'style'=>[{'padding-right'=>'8px'}]}] };
         }
         else {
             $a={'data'=>[{'tag'=>'a','attr'=>[{'class'=>'tip'}, {'href'=>'javascript:void(0)'},{'onclick'=>"javascript:ToggleMeClass('S".$pos."')"}],
-                'value'=>$json->{'header'}->[$i]}],
+                'value'=>$json->{'headers'}->[$i]}],
                 'attr'=>[{'style'=>[{'padding-right'=>'8px'}]}],
                 'tag'=>'th'};
         }
@@ -243,37 +248,47 @@ sub CreateBody {
 }
 
 sub CreateTBD {
-    my ($tbd, $json_glberror, $record, $args,$z ) = @_;
+    my ($tbd, $json_glberror, $record, $z ) = @_;
 
     my $trd     =[]; 
     my $j       =1;
 
     #-- zuersten schauen, ob es im Record einen Fehler gab
-    my $color='lightgreen';
+    my $color;
     my $cerr;
-    my $nrec=$#{$record->{'fields'}};
+    my @record=();
+    my $recdata=$record->{'data'};
 
-    foreach my $field (@{$record->{'fields'}} ) {
+    foreach my $key  (keys %{$recdata}) {
+        $record[$recdata->{$key}->{'pos'}]=$key if (exists $recdata->{$key}->{'pos'}) ;
+    }
 
-        if ($field->{'type'} eq 'data') {
-            if ($record->{ 'data' }->{$field->{'name'}}->{'errors'}[0]) {
+    my $nrec=$#record;
 
-                $json_glberror->{$field->{'name'}}++;
+    foreach my $field ( @record ) {
+
+        if ($recdata->{$field}->{'type'} eq 'data') {
+            if ($recdata->{$field}->{'errors'}[0]) {
+
+                $json_glberror->{$field}++;
                 $color='lightsalmon';
                 $cerr=1;
             }
         }
     }
     
-    foreach my $field (@{$record->{'fields'}} ) {
+    foreach my $field ( @record ) {
 
         my $style=[{'padding-right'=>'8px'}];
-        my $err=[];
-        my $value=$field->{'value'};
+        my $value=$recdata->{$field}->{'value'};
 
-        if ($field->{'type'} eq 'data') {
-            $err  =$record->{ 'data' }->{$field->{'name'}}->{'errors'};
-        }
+        $color='lightyellow'  if ($recdata->{$field}->{'status'} == '3');
+        $color='lightsalmon'  if ($recdata->{$field}->{'status'} == '2');
+        $color='lightgray'    if ($recdata->{$field}->{'status'} == '1');
+        $color='lightgreen'   if ($recdata->{$field}->{'status'} == '0');
+
+        #-- Errorobject umladen 
+        my $err  =$recdata->{$field}->{'errors'}   if ($recdata->{$field}->{'type'} eq 'data');
 
         #-- wenn kein Fehler im Datensatz, dann alles grün 
         if (!$cerr) {
@@ -307,15 +322,12 @@ sub CreateTBD {
     my $i=0;
 
     #-- Fehlerbehandlung auf Recordebene 
-    foreach my $field (@{$record->{'fields'}} ) {
+    foreach my $field (@record ) {
         
         my $pos=$i+1;
         my $color='lightsalmon';
 
-        my $err=[];
-        if ($field->{'type'} eq 'data') {
-            $err  =$record->{ 'data' }->{$field->{'name'}}->{'errors'};
-        }
+        my $err  =$recdata->{$field}->{'errors'} if ($recdata->{$field}->{'type'} eq 'data');
 
         foreach my $err (@$err) {
             
@@ -339,7 +351,42 @@ sub CreateTBD {
                                     'value'=>$str}] 
             });
         }
+        $i++;
     } 
     return $tbd;
+}
+
+sub Fehlerbehandlung {
+    my $apiis=shift;
+    my $exists=shift;
+    my $record=shift;
+    my $name=shift;
+    my $err=shift; 
+    
+    #-- Fehlerbehandlung 
+    if ( $err ) { 
+
+        $apiis->status(1);
+        
+        map {
+            $record->{'data'}->{ $_ }->{'status'}='2';
+            push(@{$record->{'data'}->{ $_ }->{'errors'}},$err); 
+        } @$name;
+
+
+        $apiis->del_errors;
+
+        return 1;
+    }
+    else {
+        if ($exists) {
+            map {$record->{'data'}->{ $_ }->{'status'}='3'} @$name;
+        }
+        else {
+            map {$record->{'data'}->{ $_ }->{'status'}='0'} @$name;
+        }   
+    }
+        
+    return ;
 }
 1;

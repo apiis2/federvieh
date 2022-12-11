@@ -10,9 +10,9 @@
 use strict;
 use warnings;
 use Federvieh;
-use Spreadsheet::Read;
 use GetDbCode;
-use Encode;
+use JSON;
+
 our $apiis;
 
 sub LO_LS31_Rasseschemas {
@@ -20,135 +20,74 @@ sub LO_LS31_Rasseschemas {
     my $args     = shift;
  
     
-#TEST-DATA    
-#   $args->{'ext_unit_event'}       = ausstellungsort
-#   $args->{'ext_id_event'}         = Zwönitz
-#   $args->{'ext_event_type'}       = ausstellung
-#   $args->{'event_dt'}             = 10.02.2018
-#    };
+    my ($json, $fileimport);
 
-    use JSON;
-    use URI::Escape;
-
-    my $json;
-    my $err_ref;
-    my $err_status;
-    my @record;
-    my $extevent;
-    my $log;
-    my %hs_db;
-
-    my @field;
-    my $hs_fields={};
-    my %hs_insert;
-    my %hs_version=();
-    my %hs_event;
-    my $fileimport;
-    my ($kv);
-
-    if (exists $args->{ 'FILE' }) {
-        $fileimport=$args->{ 'FILE' };
-    }
     my $onlycheck='off';
-    if (exists $args->{ 'onlycheck' }) {
-        $onlycheck=lc($args->{ 'onlycheck' });
-    }
+    $fileimport=1                           if (exists $args->{ 'fileimport'});
+    $onlycheck=lc($args->{ 'onlycheck' })   if (exists $args->{ 'onlycheck' });
 
     #-- Wenn ein File geladen werden soll, dann zuerst umwandeln in
     #   einen JSON-String, damit einheitlich weiterverarbeitet werden kann
     if ( $fileimport ) {
 
-        $json = { 'Info'        => [],
-                  'RecordSet'   => [],
-                  'Bak'         => [],
+        $json = { 'infos'       => [],
+                  'recordset'   => [],
+                  'glberrors'   => {}
                 };
         
-        #-- Datei öffnen
-        open( IN, "$fileimport" ) || die "error: kann $fileimport nicht öffnen";
-
-        #-- Excel-Tabelle öffnen 
-        my $book = Spreadsheet::Read->new ($fileimport, dtfmt => "dd.mm.yyyy");
-        my $sheet = $book->sheet(1);
-
-        #-- Fehlermeldung, wenn es nicht geht 
-        if(defined $book->[0]{'error'}){
-            print "Error occurred while processing $fileimport:".
-                $book->[0]{'error'}."\n";
-            exit(-1);
-        }
+        my $counter=1;
         
-        my $max_rows = $sheet->{'maxrow'};
-        my $max_cols = $sheet->{'maxcol'};
+        foreach my $dd (@{$args->{'data'}} ) {
 
-        #--Schleife über alle Zeilen 
-        for my $row_num (1..($max_rows))  {
-
-            #-- declare
-            my @data;
-            my $record;
-            my $sdata;
-            my $hs = {}; 
-            my $col='A';
-
-            #-- Schleife über alle Spalten       
-            for my $col_num (1..($max_cols)) {
-
-                #-- einen ";" String erzeugen  
-                push(@data, encode_utf8 $sheet->{$col.$row_num});
-            
-                $col++;
-            }
+            my @data=@$dd;
       
             #-- initialisieren mit '' 
             map { if (!$_) {$_=''} } @data;
-
+            map { $_=~s/^\s+//g } @data;
+            map { $_=~s/\s+$//g } @data;
+            map { $_=~s/\[/(/g } @data;
+            map { $_=~s/\]/)/g } @data;
+            
             #-- Daten sichern  
             push( @{ $json->{ 'Bak' } },join(';',@data)); 
-            $sdata=join(';',@data);
+            my $sdata=join(';',@data);
        
             next if ($sdata=~/Ladestrom/);
 
-            push( @{ $json->{ 'Bak' } },$sdata); 
-    
             #-- define format for record 
-            $record = {
-                    'ls_id'               => [ $data[0],'',[] ],
-                    'schemaname'          => [ $data[1],'',[] ],
-                    'ext_code'            => [ $data[2],'',[] ],
+            my $record = {
+    'no'                  => {'type'=>'data','status'=>'1',                     'pos'=>0,'value'=> $counter++,'errors'=>[]},
+    'ls_id'               => {'type'=>'data','status'=>'1','origin'=> $data[0], 'pos'=>1,'value'=> $data[0]  ,'errors'=>[]},
+    'schemaname'          => {'type'=>'data','status'=>'1','origin'=> $data[1], 'pos'=>2,'value'=> $data[1]  ,'errors'=>[]},
+    'ext_code'            => {'type'=>'data','status'=>'1','origin'=> $data[2], 'pos'=>3,'value'=> $data[2]  ,'errors'=>[]}
             };
 
             #-- Datensatz mit neuem Zeiger wegschreiben
-            push( @{ $json->{ 'RecordSet' } },{ 'Info' => [], 
-                                                'Data' => { %{$record} },
-                                                'Insert'=>[],
-                                                'Tables'=>['codes']} 
-            );
+            push( @{ $json->{ 'recordset' } },{'infos' => [], 'errors'=>[], 'data' => { %{$record} }} );
         }
 
-        #-- Datei schließen
-        close( IN );
-
-        $json->{ 'Header'}  ={'ls_id'=>'Ladestrom','ext_code'=>'Rasse','schemaname'=>'Schemaname'};
-        $json->{ 'Fields'}  = ['ls_id','ext_code','schemaname'];
+        $json->{ 'headers'}      = ['No','ls_id','schemaname','ext_code'];
     }
     else {
 
         #-- String in einen Hash umwandeln
-        if (exists $args->{ 'JSON' }) {
-            $json = from_json( $args->{ 'JSON' } );
+        if (exists $args->{ 'json' }) {
+            $json = from_json( $args->{ 'json' } );
         }
         else {
-            $json={ 'RecordSet' => [{Info=>[],'Data'=>{}}]};
-            map { $json->{ 'RecordSet'}->[0]->{ 'Data' }->{$_}=[];
-                  $json->{ 'RecordSet'}->[0]->{ 'Data' }->{$_}[0]=$args->{$_}} keys %$args;
+            $json={ 'recordset' => [{infos=>[],'data'=>{}}]};
+            map { $json->{ 'recordset'}->[0]->{ 'data' }->{$_}=[];
+                  $json->{ 'recordset'}->[0]->{ 'data' }->{$_}[0]=$args->{$_}} keys %$args;
         }
     }
 
     my $z=0;
+    my $tbd=[];
+    
     #-- Ab hier ist es egal, ob die Daten aus einer Datei
     #   oder aus einer Maske kommen
     #-- Schleife über alle Records und INFO füllen
-    foreach my $record ( @{ $json->{ 'RecordSet' } } ) {
+    foreach my $record ( @{ $json->{ 'recordset' } } ) {
 
         my $args={};
         
@@ -156,56 +95,35 @@ sub LO_LS31_Rasseschemas {
         $z++;
 
         #-- Daten aus Hash holen
-        foreach (keys %{ $record->{ 'Data' } }) {
-            $args->{$_}=$record->{ 'Data' }->{$_}->[0];
-
-            #-- führende und endende Leerzeichen entfernen
-            $args->{$_}=~s/^\s+//g;
-            $args->{$_}=~s/\s+$//g;
-            
-            #-- eckige Klammern vesteht das Übersetzungssystem nicht 
-            $args->{$_}=~s/\[/(/g;
-            $args->{$_}=~s/\]/)/g;
+        foreach (keys %{ $record->{ 'data' } }) {
+            $args->{$_}=$record->{ 'data' }->{$_}->{'value'};
         }
 
-        #----- Merkmals definition ------------------
+        #----- Rassestandard definieren ------------------
+        my $exists;
+        my $guid;
 
-        $hs_insert{'standard_breeds'}='-';
-        $record->{ 'Insert' }->[0]= '-';
-    
-        ($args->{'db_breed'}, $record->{ 'Insert' }->[0])=GetDbCode(
+        ($args->{'db_breed'}, $exists)=GetDbCode(
                 {'class'=>'BREED',
                  'ext_code'=>$args->{'ext_code'},
                 },'n');
 
-        if ($apiis->status) {
-
-            my $msg=$apiis->errors->[0]->msg_long;
-            $msg=$apiis->errors->[0]->msg_short if (!$msg);
-
-            if ($msg=~/Found Foreign Key violation/) {
-                push(@{$record->{ 'Info'}},main::__('Schlüssel "[_1]" bereits vergegben.', $args->{'ext_code'}));
-            }
-            else {
-                #-- Fehler in Info des Records schreiben
-                push(@{$record->{ 'Info'}},$apiis->errors->[0]->from.': '.$msg);
-            }
-            #-- Fehler in Info des Records schreiben
-            #-- weitere Bearbeitung des Datensatzes wird abgebrochen + rücksetzen 
+        #-- Fehlerbehandlung 
+        if (Federvieh::Fehlerbehandlung($apiis,$exists, $record, ['ext_code'] , $apiis->errors)) {
             goto EXIT;
         }
-        
-        my $insert=undef;
-        my $guid=undef;
 
         #-- prüfen, ob es das Rasse-Schema schon gibt    
-
         my $sql="select guid, standard_breeds_id from standard_breeds where label='".$args->{'schemaname'}."'";
 
         my $sql_ref = $apiis->DataBase->sys_sql( $sql);
         while ( my $q = $sql_ref->handle->fetch ) { 
             $guid                         = $q->[0];
             $args->{'standard_breeds_id'} = $q->[1];
+        }
+        
+        #-- wenn es db_unit nicht gibt, dann Fehler auslösen 
+        if (Federvieh::Fehlerbehandlung($apiis,undef, $record, ['schemaname'] , $apiis->errors)) {
         }
 
         #-- Wenn nicht, dann anlegen 
@@ -218,33 +136,47 @@ sub LO_LS31_Rasseschemas {
 
             $table->insert();
 
-            #-- Fehlerbehandlung 
-            if ( $table->status ) {
-                $apiis->status(1);
-                $apiis->errors( scalar $table->errors );
+            #-- wenn es db_unit nicht gibt, dann Fehler auslösen 
+            
+            $exists=undef;
 
-                goto EXIT;
+            if (Federvieh::Fehlerbehandlung($apiis,$exists, $record, ['schemaname'] , $table->errors)) {
             }
             else {
                 $args->{'standard_breeds_id'}=$table->column('standard_breeds_id')->intdata()
             }
         }
             
-        $insert=undef;
         $guid=undef;
+        $exists=undef;
 
+        if (!$args->{'standard_breeds_id'} or !$args->{'db_breed'}) {
+            my $a= Apiis::Errors->new(
+                    type       => 'DATA',
+                    severity   => 'CRIT',
+                    from       => 'LS01_Zuchtstamm',
+                    ext_fields => ['ext_breeder'],
+                    msg_short  =>"Es ist kein Rassestandard und keine Rasse definiert."
+                );
+
+            if (Federvieh::Fehlerbehandlung($apiis,$exists, $record, ['schemaname'] , $a)) {
+                goto EXIT;
+            }
+        }
+        
         #-- prüfen, ob es die Rasse schon im Rassestandard gibt    
 
         $sql="select guid from standard_breeds_content where standard_breeds_id=".$args->{'standard_breeds_id'}." and db_breed=".$args->{'db_breed'};
 
-        if (!$args->{'standard_breeds_id'} or !$args->{'db_breed'}) {
-            print "kk";
-        }
         $sql_ref = $apiis->DataBase->sys_sql( $sql);
         while ( my $q = $sql_ref->handle->fetch ) { 
             $guid=$q->[0];
         }
 
+        #-- wenn es db_unit nicht gibt, dann Fehler auslösen 
+        if (Federvieh::Fehlerbehandlung($apiis,$guid, $record, ['schemaname'] , $apiis->errors)) {
+        }
+        
         #-- Wenn nicht, dann anlegen 
         if (!$guid) {
 
@@ -257,15 +189,13 @@ sub LO_LS31_Rasseschemas {
             $table->insert();
             
             #-- Fehlerbehandlung 
-            if ( $table->status ) {
-                $apiis->status(1);
-                $apiis->errors( scalar $table->errors );
-
-                goto EXIT;
+            if (Federvieh::Fehlerbehandlung($apiis,$exists, $record, ['schemaname'] , $table->errors)) {
             }
         }
 
 EXIT:
+        $tbd=Federvieh::CreateTBD($tbd, $json->{'glberrors'}, $record,$z );
+        
         if ((!$apiis->status) and ($onlycheck eq 'off')) {
             $apiis->DataBase->commit;
         }
@@ -277,8 +207,12 @@ EXIT:
         $apiis->del_errors;
     }
      
+    ###### tr #######################################################################################
+    my $tr  =Federvieh::CreateTr( $json, $json->{'glberrors'} );
+    my $data=Federvieh::CreateBody( $tbd, $tr, 'Ladestrom: LS31_Rasseschemas');
+
     if ($fileimport) {
-        return $json;
+        return JSON::to_json({'data'=>$data, 'tag'=>'body'});
     }
     else {
         return ( $self->status, $self->errors );

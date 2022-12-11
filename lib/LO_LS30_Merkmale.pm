@@ -10,43 +10,18 @@
 use strict;
 use warnings;
 use Federvieh;
-use Spreadsheet::Read;
 use GetDbCode;
 use GetDbUnit;
-use Encode;
+use JSON;
+use GetDbEvent;
+
 our $apiis;
 
 sub LO_LS30_Merkmale {
     my $self     = shift;
     my $args     = shift;
  
-    
-#TEST-DATA    
-#   $args->{'ext_unit_event'}       = ausstellungsort
-#   $args->{'ext_id_event'}         = Zwönitz
-#   $args->{'ext_event_type'}       = ausstellung
-#   $args->{'event_dt'}             = 10.02.2018
-#    };
-
-    use JSON;
-    use URI::Escape;
-    use GetDbEvent;
-
-    my $json;
-    my $err_ref;
-    my $err_status;
-    my @record;
-    my $extevent;
-    my $log;
-    my %hs_db;
-
-    my @field;
-    my $hs_fields={};
-    my %hs_insert;
-    my %hs_version=();
-    my %hs_event;
-    my $fileimport;
-    my ($kv, $record);
+    my ($json, $record, $fileimport);
 
     my $onlycheck='off';
     $fileimport=1                           if (exists $args->{ 'fileimport'});
@@ -56,9 +31,9 @@ sub LO_LS30_Merkmale {
     #   einen JSON-String, damit einheitlich weiterverarbeitet werden kann
     if ( $fileimport ) {
 
-        $json = { 'Info'        => [],
-                  'RecordSet'   => [],
-                  'Bak'         => [],
+        $json = { 'infos'        => [],
+                  'recordset'   => [],
+                  'glberrors'   => {},
                 };
         
         my $counter=1;
@@ -73,168 +48,116 @@ sub LO_LS30_Merkmale {
             #-- führende und endende Leerzeichen entfernen 
             map { $_=~s/^\s+//g } @data;
             map { $_=~s/\s+$//g } @data;
+            map { $_=~s/\[/(/g } @data;
+            map { $_=~s/\]/)/g } @data;
 
             #-- Daten sichern  
             my $sdata=join(';',@data);
-            push( @{ $json->{ 'Bak' }},$sdata); 
       
             #-- skip first line 
             next if ($sdata=~/Merkmalsbezeichnung/);
 
             #-- define format for record 
             $record = {
-                    'No'                  => [ $counter++,'',[] ],
-                    'ls_id'               => [ $data[0],'',[] ],
-                    'trait_standard'      => [ $data[1],'',[] ],
-                    'ext_code'            => [ $data[2],'',[] ],
-                    'variant'             => [ $data[3],'',[] ],
-                    'bezug'               => [ $data[4],'',[] ],
-                    'methode'             => [ $data[5],'',[] ],
-                    'label'               => [ $data[6],'',[] ],
-                    'label_short'         => [ $data[7],'',[] ],
-                    'label_medium'        => [ $data[8],'',[] ],
-                    'unit'                => [ $data[9],'',[] ],
-                    'decimals'            => [ $data[10],'',[] ],
-                    'minimum'             => [ $data[11],'',[] ],
-                    'maximum'             => [ $data[12],'',[] ],
-                    'ext_unit'            => [ $data[13],'',[] ],
-                    'herkunft'            => [ $data[14],'',[] ],
-                    'class'               => [ $data[15],'',[] ],
-                    'type'                => [ $data[16],'',[] ],
+    'no'                  => {'type'=>'data','status'=>'1',            'pos'=>0,    'value'=> $counter++,'errors'=>[]},
+    'ls_id'               => {'type'=>'data','status'=>'1','origin'=>$data[0],'pos'=>1, 'value'=> $data[0],'errors'=>[]},
+    'trait_standard'      => {'type'=>'data','status'=>'1','origin'=>$data[1],'pos'=>2, 'value'=> $data[1],'errors'=>[]},
+    'beschreibung'        => {'type'=>'data','status'=>'1','origin'=>$data[2],'pos'=>3, 'value'=> $data[2],'errors'=>[]},
+    'variant'             => {'type'=>'data','status'=>'1','origin'=>$data[3],'pos'=>4, 'value'=> $data[3],'errors'=>[]},
+    'bezug'               => {'type'=>'data','status'=>'1','origin'=>$data[4],'pos'=>5, 'value'=> $data[4],'errors'=>[]},
+    'methode'             => {'type'=>'data','status'=>'1','origin'=>$data[5],'pos'=>6, 'value'=> $data[5],'errors'=>[]},
+    'label'               => {'type'=>'data','status'=>'1','origin'=>$data[6],'pos'=>7, 'value'=> $data[6],'errors'=>[]},
+    'label_short'         => {'type'=>'data','status'=>'1','origin'=>$data[7],'pos'=>8, 'value'=> $data[7],'errors'=>[]},
+    'label_medium'        => {'type'=>'data','status'=>'1','origin'=>$data[8],'pos'=>9, 'value'=> $data[8],'errors'=>[]},
+    'unit'                => {'type'=>'data','status'=>'1','origin'=>$data[9],'pos'=>10,'value'=> $data[9],'errors'=>[]},
+    'decimals'            => {'type'=>'data','status'=>'1','origin'=>$data[10],'pos'=>11, 'value'=> $data[10],'errors'=>[]},
+    'minimum'             => {'type'=>'data','status'=>'1','origin'=>$data[11],'pos'=>12, 'value'=> $data[11],'errors'=>[]},
+    'maximum'             => {'type'=>'data','status'=>'1','origin'=>$data[12],'pos'=>13, 'value'=> $data[12],'errors'=>[]},
+    'ext_unit'            => {'type'=>'data','status'=>'1','origin'=>$data[13],'pos'=>14, 'value'=> $data[13],'errors'=>[]},
+    'herkunft'            => {'type'=>'data','status'=>'1','origin'=>$data[14],'pos'=>15, 'value'=> $data[14],'errors'=>[]},
+    'class'               => {'type'=>'data','status'=>'1','origin'=>$data[15],'pos'=>16, 'value'=> $data[15],'errors'=>[]},
+    'type'                => {'type'=>'data','status'=>'1','origin'=>$data[16],'pos'=>17, 'value'=> $data[16],'errors'=>[]}
             };
 
             #-- Datensatz mit neuem Zeiger wegschreiben
-            push( @{ $json->{ 'RecordSet' } },{ 'Info' => [], 
-                                                'Data' => { %{$record} },
-                                                'Insert'=>[],
-                                                'Tables'=>['codes','traits']} 
-            );
+            push( @{ $json->{ 'recordset' } },{'infos' => [], 'errors'=>[], 'data' => { %{$record} }} );
         }
 
-        #-- Datei schließen
-        close( IN );
-
-        $json->{ 'Fields'}  = ['No','ls_id','trait_standard','ext_code','variant','bezug','methode','label',
-                               'label_short','label_medium','unit','decimals','minimum','maximum','ext_unit',
-                               'herkunft','class','type'];
+        $json->{ 'headers'}      =['No','ls_id','trait_standard','beschreibung','variant','bezug','methode','label','label_short',
+        'label_medium','unit','decimals','minimum','maximum','ext_unit','herkunft','class','type'];
     }
     else {
 
         #-- String in einen Hash umwandeln
-        if (exists $args->{ 'JSON' }) {
-            $json = from_json( $args->{ 'JSON' } );
+        if (exists $args->{ 'json' }) {
+            $json = from_json( $args->{ 'json' } );
         }
         else {
-            $json={ 'RecordSet' => [{Info=>[],'Data'=>{}}]};
-            map { $json->{ 'RecordSet'}->[0]->{ 'Data' }->{$_}=[];
-                  $json->{ 'RecordSet'}->[0]->{ 'Data' }->{$_}[0]=$args->{$_}} keys %$args;
+            $json={ 'recordset' => [{infos=>[],'data'=>{}}]};
+            map { $json->{ 'recordset'}->[0]->{ 'data' }->{$_}=[];
+                  $json->{ 'recordset'}->[0]->{ 'data' }->{$_}[0]=$args->{$_}} keys %$args;
         }
     }
 
     my $z=0;
-    my $hs_errcnt={};
     my $tbd=[];
 
     #-- Ab hier ist es egal, ob die Daten aus einer Datei
     #   oder aus einer Maske kommen
     #-- Schleife über alle Records und INFO füllen
-    foreach my $record ( @{ $json->{ 'RecordSet' } } ) {
+    foreach my $record ( @{ $json->{ 'recordset' } } ) {
 
         my $args={};
         
         #Zähler für debugging 
         $z++;
 
-
         #-- Daten aus Hash holen
-        foreach (keys %{ $record->{ 'Data' } }) {
-            $args->{$_}=$record->{ 'Data' }->{$_}->[0];
-
-            #-- führende und endende Leerzeichen entfernen
-            $args->{$_}=~s/^\s+//g;
-            $args->{$_}=~s/\s+$//g;
-            
-            #-- eckige Klammern vesteht das Übersetzungssystem nicht 
-            $args->{$_}=~s/\[/(/g;
-            $args->{$_}=~s/\]/)/g;
+        foreach (keys %{ $record->{ 'data' } }) {
+            $args->{$_}=$record->{ 'data' }->{$_}->{'value'};
         }
-
-        foreach (@{$json->{'Fields'}}) {    
-            $hs_fields->{$_} ={'error'=>[]}; 
-        }
-       
 
         #----- Merkmals definition ------------------
 
-        $hs_insert{'traits'}='-';
-        $record->{ 'Insert' }->[0]= '-';
+        my $exists;
     
-        ($args->{'db_trait'}, $record->{ 'Insert' }->[0])=GetDbCode(
-                {'class'=>'MERKMAL',
-                 'ext_code'=>$args->{'ext_code'},
-                },'y');
-
-        if ($apiis->status) {
-
-            #-- wenn es db_unit nicht gibt, dann Fehler auslösen 
-            if ($apiis->status and ($apiis->status == 1)) {
-            
-                push(@{$hs_fields->{'ext_code'}->{'error'}}, $apiis->errors);
-                goto EXIT;
-            }
-        }
-        
-        ($args->{'db_bezug'}, $record->{ 'Insert' }->[0])=GetDbCode(
+        ($args->{'db_bezug'}, $exists)=GetDbCode(
                 {'class'=>'BEZUG',
                  'long_name'=>$args->{'bezug'},
                 },'n');
 
-        if ($apiis->status) {
-
-            #-- wenn es db_unit nicht gibt, dann Fehler auslösen 
-            if ($apiis->status and ($apiis->status == 1)) {
-            
-                push(@{$hs_fields->{'bezug'}->{'error'}}, $apiis->errors);
-                goto EXIT;
-            }
+        #-- Fehlerbehandlung 
+        if (Federvieh::Fehlerbehandlung($apiis,$exists, $record, ['bezug'] , $apiis->errors)) {
+            $apiis->del_errors;
+            goto EXIT;
         }
-        
-        ($args->{'db_method'}, $record->{ 'Insert' }->[0])=GetDbCode(
+
+        ($args->{'db_method'}, $exists)=GetDbCode(
                 {'class'=>'METHODE',
                  'long_name'=>$args->{'methode'},
                 },'n');
 
-        if ($apiis->status) {
-
-            #-- wenn es db_unit nicht gibt, dann Fehler auslösen 
-            if ($apiis->status and ($apiis->status == 1)) {
-            
-                push(@{$hs_fields->{'methode'}->{'error'}}, $apiis->errors);
-                goto EXIT;
-            }
+        #-- Fehlerbehandlung 
+        if (Federvieh::Fehlerbehandlung($apiis,$exists, $record, ['methode'] , $apiis->errors)) {
+            $apiis->del_errors;
+            goto EXIT;
         }
         
-        ($args->{'db_source'}, $record->{ 'Insert' }->[0])=GetDbUnit(
+        ($args->{'db_source'}, $exists)=GetDbUnit(
                 {'ext_unit'=>$args->{'ext_unit'},
                  'ext_id'=>$args->{'herkunft'},
                 },'y');
 
-        if ($apiis->status) {
-
-            #-- wenn es db_unit nicht gibt, dann Fehler auslösen 
-            if ($apiis->status and ($apiis->status == 1)) {
-            
-                push(@{$hs_fields->{'herkunft'}->{'error'}}, $apiis->errors);
-                goto EXIT;
-            }
+        #-- Fehlerbehandlung 
+        if (Federvieh::Fehlerbehandlung($apiis,$exists, $record, ['ext_unit','herkunft'] , $apiis->errors)) {
+            $apiis->del_errors;
+            goto EXIT;
         }
-
 
         $apiis->status(0);
         $apiis->del_errors;
         
         my $guid  = undef;
-        my $insert= undef;
 
         my $sql="select guid, traits_id from traits where label='".$args->{'label'}."' and variant='".$args->{'variant'}
                ."' and db_bezug=".$args->{'db_bezug'}." and db_method=".$args->{'db_method'};
@@ -245,11 +168,8 @@ sub LO_LS30_Merkmale {
             $args->{'traits_id'}    = $q->[1];
         }
 
-        #-- wenn es db_unit nicht gibt, dann Fehler auslösen 
-        if ($sql_ref->status and ($sql_ref->status == 1)) {
-        
-            $apiis->status(1);
-            push(@{$hs_fields->{'herkunft'}->{'error'}}, $sql_ref->errors);
+        #-- Fehlerbehandlung 
+        if (Federvieh::Fehlerbehandlung($apiis,$guid, $record, ['ext_code', 'no'] , $sql_ref->errors)) {
             goto EXIT;
         }
         
@@ -289,20 +209,21 @@ sub LO_LS30_Merkmale {
             $traits->insert();
 
             #-- Fehlerbehandlung 
-            if ( $traits->status ) {
-            
-                $apiis->status(1);
-                push(@{$hs_fields->{'label'}->{'error'}}, $traits->errors);
+            if (Federvieh::Fehlerbehandlung($apiis,undef, $record, ['ext_code','variant','bezug','methode','label','label_short',
+            'label_medium','unit','decimals','minimum','maximum','class','type'] , $traits->errors)) {
                 goto EXIT;
             }
             else {
                 $args->{'traits_id'}=$traits->column('traits_id')->intdata();
             }
         }
+        else {
+            map {$record->{'data'}->{ $_ }->{'status'}='3'} ('ext_code','variant','bezug','methode','label','label_short',
+            'label_medium','unit','decimals','minimum','maximum','class','type');
+        }
 
         #---------   traits_standard
 
-        $insert=undef;
         $guid=undef;
 
         #-- prüfen, ob es das Rasse-Schema schon gibt    
@@ -315,11 +236,8 @@ sub LO_LS30_Merkmale {
             $args->{'standard_traits_id'} = $q->[1];
         }
 
-        #-- wenn es db_unit nicht gibt, dann Fehler auslösen 
-        if ($sql_ref->status and ($sql_ref->status == 1)) {
-        
-            $apiis->status(1);
-            push(@{$hs_fields->{''}->{'trait_standard'}}, $sql_ref->errors);
+        #-- Fehlerbehandlung 
+        if (Federvieh::Fehlerbehandlung($apiis,$guid, $record, ['trait_standard'], $sql_ref->errors)) {
             goto EXIT;
         }
         
@@ -334,18 +252,14 @@ sub LO_LS30_Merkmale {
             $table->insert();
 
             #-- Fehlerbehandlung 
-            if ( $table->status ) {
-                $apiis->status(1);
-                push(@{$hs_fields->{''}->{'trait_standard'}}, $table->errors);
+            if (Federvieh::Fehlerbehandlung($apiis,undef, $record, ['trait_standard'], $table->errors)) {
                 goto EXIT;
-                
             }
             else {
                 $args->{'standard_traits_id'}=$table->column('standard_traits_id')->intdata()
             }
         }
             
-        $insert=undef;
         $guid=undef;
 
         #-- prüfen, ob es das Merkmals schom im Merkmalsstandard gibt    
@@ -357,11 +271,8 @@ sub LO_LS30_Merkmale {
             $guid=$q->[0];
         }
 
-        #-- wenn es db_unit nicht gibt, dann Fehler auslösen 
-        if ($sql_ref->status and ($sql_ref->status == 1)) {
-        
-            $apiis->status(1);
-            push(@{$hs_fields->{''}->{'label'}}, $sql_ref->errors);
+        #-- Fehlerbehandlung 
+        if (Federvieh::Fehlerbehandlung($apiis,$guid, $record, ['trait_standard'], $sql_ref->errors)) {
             goto EXIT;
         }
         
@@ -377,15 +288,13 @@ sub LO_LS30_Merkmale {
             $table->insert();
 
             #-- Fehlerbehandlung 
-            if ( $table->status ) {
-                $apiis->status(1);
-                push(@{$hs_fields->{'label'}->{'error'}}, $table->errors);
+            if (Federvieh::Fehlerbehandlung($apiis,undef, $record, ['label'], $table->errors)) {
                 goto EXIT;
             }
         }
 
 EXIT:
-        $tbd=Federvieh::CreateTBD($tbd, $hs_fields, $json, $hs_errcnt, $args, $z );
+        $tbd=Federvieh::CreateTBD($tbd, $json->{'glberrors'}, $record,$z );
         
         if ((!$apiis->status) and ($onlycheck eq 'off')) {
             $apiis->DataBase->commit;
@@ -399,7 +308,7 @@ EXIT:
     }
      
     ###### tr #######################################################################################
-    my $tr  =Federvieh::CreateTr( $json, $hs_errcnt );
+    my $tr  =Federvieh::CreateTr( $json, $json->{'glberrors'} );
     my $data=Federvieh::CreateBody( $tbd, $tr, 'Ladestrom: LS30_Merkmale');
 
     if ($fileimport) {

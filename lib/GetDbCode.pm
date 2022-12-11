@@ -19,6 +19,7 @@ sub GetDbCode {
     my $args        =shift;
     my $create      =shift;
     my $db_code;
+    my $exists;
 
     if (exists $args->{'db_code'} and $args->{'db_code'}) {
         if ($create and ($create ne 'update')) {
@@ -75,7 +76,24 @@ sub GetDbCode {
     if (! @query_records) {
    
         #-- wenn es code nicht gibt, und auch nicht erstellt werden soll, dann undef zurück 
-        return undef if ($create and ($create=~/n/)) ;
+        if ($create and ($create=~/n/)) {
+        
+            $apiis->status(1);
+            $apiis->errors(
+                Apiis::Errors->new(
+                    type       => 'DATA',
+                    severity   => 'CRIT',
+                    from       => 'LO::GetDbCode',
+                    ext_fields => [ $args->{ 'ext_field'}],
+                    msg_short  => "Keinen Schlüssel für folgende Angaben gefunden: Klasse: ". $args->{'class'} 
+                    .", Schlüssel: " . $args->{'ext_code'} 
+                    .", Kurzname: ".$args->{'short_name'}
+                    .", Langname: ". $args->{'long_name'} 
+                )
+            );
+
+            return (undef, undef);
+        };
     
         #-- wennn es code nicht gibt, dann wird sie neu erstellt 
         $action='insert';
@@ -86,11 +104,12 @@ sub GetDbCode {
         $action='update';
 
         $args->{'guid'}=$query_records[0]->column('guid')->intdata;
+        $exists=1;
 
     } else {
 
         #-- wenn es code gibt, aber nicht geändert werden soll, dann nur db_code zurückgeben 
-        return $query_records[0]->column('db_code')->intdata;
+        return ($query_records[0]->column('db_code')->intdata, '1');
     }
 
     #-- Recordobject für insert bzw. update füllen 
@@ -141,10 +160,10 @@ sub GetDbCode {
         goto ERR;
     }
     
-    return $db_code;
+    return ($db_code, $exists);
     
 ERR:
 
-    return undef;
+    return (undef, undef);
 }
 1;

@@ -25,7 +25,7 @@ sub GetDbEvent {
 
     my $args        =shift;
     my $create      =shift;
-    my $insert;
+    my $exists;
 
     if (exists $args->{'db_event'} and $args->{'db_event'}) {
         return $args->{'db_event'};
@@ -131,7 +131,6 @@ sub GetDbEvent {
         }
     
         $db_event = $event->column('db_event')->intdata;
-        $insert='Insert';
 
 	}
     #-- event gibt es, $db_event füllen
@@ -139,13 +138,14 @@ sub GetDbEvent {
 
         #-- interne db_event aus Recordobject holen 
         $db_event = $args->{'db_event'};
+        $exists=1;
     }
 
     if ( $apiis->status ) {
         goto ERR;
     }
     
-    return  ($db_event,$insert);
+    return  ($db_event,$exists);
     
 ERR:
 

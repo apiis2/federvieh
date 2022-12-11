@@ -541,5 +541,46 @@ order by c1
   return $sql;
 }
 
+sub GetPerformances {
+
+    my $args=shift;
+    
+    my $sql;
+
+    $sql="
+select $args->{'f1'} as f1, ";
+
+    if (exists $args->{'f2'}) {
+        $sql.="$args->{'f2'} as f2, ";
+    }
+
+    $sql.="
+    count(z.result), round(avg(z.result::numeric),1), round(stddev(z.result::numeric),1), min(z.result::numeric), max(z.result::numeric) from
+(
+select 
+    c.db_location,
+    e.db_event_type,
+    case when d.class isnull then a.result else user_get_ext_code(a.result::integer,'s') end as result
+from performances a
+inner join standard_performances b on a.standard_performances_id=b.standard_performances_id
+inner join event c on b.db_event=c.db_event
+inner join traits d on a.traits_id=d.traits_id
+inner join standard_events e on c.standard_events_id=e.standard_events_id
+inner join codes f on d.db_trait=f.db_code
+where f.class='MERKMAL' and f.ext_code='$args->{'trait'}' and c.event_dt>='$args->{'data'}' and c.event_dt <='$args->{'date'}'
+) z inner join codes a on a.db_code=z.db_event_type ";
+
+    if (exists $args->{'f2'}) {
+        $sql.=" inner join unit b on z.db_location=b.db_unit ";
+    }
+
+    if (exists $args->{'f2'}) {
+        $sql.="group by f1,f2 order by f1,f2"
+    }
+    else {
+        $sql.="group by f1 order by f1"
+    };
+    return $sql;
+}
 1;
 

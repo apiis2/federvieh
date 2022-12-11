@@ -19,6 +19,7 @@ sub GetDbUnit {
     my $args        =shift;
     my $create      =shift;
     my $db_unit;
+    my $exists;
 
     if (exists $args->{'db_unit'} and $args->{'db_unit'}) {
         if ($create and ($create ne 'update')) {
@@ -86,7 +87,7 @@ sub GetDbUnit {
         else {
     
             #-- wenn es unit nicht gibt, und auch nicht erstellt werden soll, dann undef zurück 
-            return undef ;
+            return (undef, undef) ;
         }
 
     } elsif ($create and ($create eq 'update')) {
@@ -94,12 +95,14 @@ sub GetDbUnit {
         #--wenn es Unit gibt, dann update, wenn es explizit gefordert ist
         $action='update';
 
+        $exists=1;
         $args->{'guid'}=$query_records[0]->column('guid')->intdata;
 
     } else {
 
         #-- wenn es unit gibt, aber nicht geändert werden soll, dann nur db_unit zurückgeben 
-        return $query_records[0]->column('db_unit')->intdata;
+        $exists=1;
+        return ($query_records[0]->column('db_unit')->intdata, $exists) ;
     }
 
     #-- Recordobject für insert bzw. update füllen 
@@ -154,10 +157,10 @@ sub GetDbUnit {
         goto ERR;
     }
     
-    return $db_unit;
+    return  ($db_unit,$exists);
     
 ERR:
 
-    return undef;
+    return (undef, undef);
 }
 1;

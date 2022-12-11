@@ -33,9 +33,10 @@ sub LO_LS13_eNest {
     #   einen JSON-String, damit einheitlich weiterverarbeitet werden kann
     if ( $fileimport) {
 
-        $json = { 'Info'        => [],
-                  'RecordSet'   => [],
+        $json = { 'infos'        => [],
+                  'recordset'   => [],
                   'Bak'         => [],
+                  'glberrors'   => {},
                 };
 
         my $counter=1;
@@ -61,30 +62,25 @@ sub LO_LS13_eNest {
             #-- define format for record 
             my $record = {
 
-                    'No'                => [ $counter++,'',[] ],
-                    'Id'                => [ $data[0],'',[] ],
-                    'TimestampVisit'    => [ $data[1],'',[] ],
-                    'TimestampEgg'      => [ $data[2],'',[] ],
-                    'NestNo'            => [ $data[3],'',[] ],
-                    'TransponderId'     => [ $data[4],'',[] ],
-                    'TransponderEPC'    => [ $data[5],'',[] ],
-                    'ChickenRingNo'     => [ $data[6],'',[] ],
-                    'ChickenRingName'   => [ $data[7],'',[] ],
-
-                    'ext_unit_animal_r' => [ 'rfid','',[] ], 
-                    'ext_unit_animal_br'=> [ 'bundesring','',[] ], 
+       'No'                => {'type'=>'data','status'=>'1','pos'=>0, 'value'=> $counter,                  'errors'=>[]},
+       'Id'                => {'type'=>'data','status'=>'1','pos'=>1, 'value'=> $data[0],'origin'=>$data[0],'errors'=>[]},
+       'TimestampVisit'    => {'type'=>'data','status'=>'1','pos'=>2, 'value'=> $data[1],'origin'=>$data[1],'errors'=>[]},
+       'TimestampEgg'      => {'type'=>'data','status'=>'1','pos'=>3, 'value'=> $data[2],'origin'=>$data[2],'errors'=>[]},
+       'NestNo'            => {'type'=>'data','status'=>'1','pos'=>4, 'value'=> $data[3],'origin'=>$data[3],'errors'=>[]},
+       'TransponderId'     => {'type'=>'data','status'=>'1','pos'=>5, 'value'=> $data[4],'origin'=>$data[4],'errors'=>[]},
+       'TransponderEPC'    => {'type'=>'data','status'=>'1','pos'=>6, 'value'=> $data[5],'origin'=>$data[5],'errors'=>[]},
+       'ChickenRingNo'     => {'type'=>'data','status'=>'1','pos'=>7, 'value'=> $data[6],'origin'=>$data[6],'errors'=>[]},
+       'ChickenRingName'   => {'type'=>'data','status'=>'1','pos'=>8, 'value'=> $data[7],'origin'=>$data[7],'errors'=>[]},
+       'ext_unit_animal_r' => {'type'=>'data','status'=>'1',          'value'=> 'rfid',                     'errors'=>[]},
+       'ext_unit_animal_br'=> {'type'=>'data','status'=>'1',          'value'=> 'bundesring',               'errors'=>[]}
             };
 
             #-- Datensatz mit neuem Zeiger wegschreiben
-            push( @{ $json->{ 'RecordSet' } },{ 'Info' => [], 
-                                                'Data' => { %{$record} },
-                                                'Insert'=>[],
-                                                'Error'=>[],
-                                                'Tables'=>[]} 
-            );
+            push( @{ $json->{ 'recordset' } },{'infos' => [], 'errors'=>[], 'data' => { %{$record} }} );
         }
 
-        $json->{ 'Fields'}  = [
+
+        $json->{ 'headers'}  = [
                    'No', 'Id','TimestampVisit','TimestampEgg','NestNo','TransponderId',
                     'TransponderEPC','ChickenRingNo','ChickenRingName'
         ];
@@ -92,40 +88,33 @@ sub LO_LS13_eNest {
     else {
 
         #-- String in einen Hash umwandeln
-        if (exists $args->{ 'JSON' }) {
-            $json = from_json( $args->{ 'JSON' } );
+        if (exists $args->{ 'json' }) {
+            $json = from_json( $args->{ 'json' } );
         }
         else {
-            $json={ 'RecordSet' => [{Info=>[],'Data'=>{}}]};
-            map { $json->{ 'RecordSet'}->[0]->{ 'Data' }->{$_}=[];
-                  $json->{ 'RecordSet'}->[0]->{ 'Data' }->{$_}[0]=$args->{$_}} keys %$args;
+            $json={ 'recordset' => [{infos=>[],'data'=>{}}]};
+            map { $json->{ 'recordset'}->[0]->{ 'data' }->{$_}=[];
+                  $json->{ 'recordset'}->[0]->{ 'data' }->{$_}[0]=$args->{$_}} keys %$args;
         }
     }
     
     my $z=0;
-    my $hs_errcnt={};
     my $tbd=[];
 
     #-- Ab hier ist es egal, ob die Daten aus einer Datei
     #   oder aus einer Maske kommen
     #-- Schleife über alle Records und INFO füllen
-    foreach my $record ( @{ $json->{ 'RecordSet' } } ) {
+    foreach my $record ( @{ $json->{ 'recordset' } } ) {
 
         my $args        ={};
         my %reverse;
-        my $hs_fields   ={};
 
         #Zähler für debugging 
         $z++;
         
-        $hs_fields->{'ChickenRingNo'} ={'error'=>[]}; 
-        $hs_fields->{'TransponderEPC'}={'error'=>[]}; 
-        $hs_fields->{'TimestampEgg'}  ={'error'=>[]}; 
-
-
         #-- Daten aus Hash holen
-        foreach (keys %{ $record->{ 'Data' } }) {
-            $args->{$_}=$record->{ 'Data' }->{$_}->[0];
+        foreach (keys %{ $record->{ 'data' } }) {
+            $args->{$_}=$record->{ 'data' }->{$_}->{'value'};
         }
 
         if ($args->{'ChickenRingNo'}) {
@@ -135,7 +124,7 @@ sub LO_LS13_eNest {
                 Federvieh::CheckRingNo($args->{'ChickenRingNo'});
         
             if ($err) {
-                push(@{$hs_fields->{'ChickenRingNo'}->{'error'}}, $err);
+                push(@{$record->{'data'}->{ 'ChickenRingNo' }->{'errors'}},$err); 
                 goto Err;
             }
         }
@@ -162,7 +151,7 @@ sub LO_LS13_eNest {
 
 
             if (!$args->{'ChickenRingNo'}) {
-                push(@{$hs_fields->{'TransponderEPC'}->{'error'}},
+                push(@{$record->{'data'}->{ 'TransponderEPC' }->{'errors'}},  
                         Apiis::Errors->new(
                         type       => 'DATA',
                         severity   => 'CRIT',
@@ -170,6 +159,7 @@ sub LO_LS13_eNest {
                         ext_fields => ['TransponderEPC'],
                         msg_short  =>"RFID ist nicht in der Datenbank registriert. Datensatz wird ignoriert, weil es auch keine Bundesringnummer gibt."
                     ));
+                $record->{'data'}->{'TransponderEPC'}->{'status'}='2';
             
                 goto Err;
             }
@@ -185,7 +175,7 @@ sub LO_LS13_eNest {
 
             #-- wenn Bundesringnummer nicht gefunden, dann gibt es kein Tier und Fehler auslösen 
             if (!$db_animal) {
-                push(@{$hs_fields->{'ChickenRingNo'}->{'error'}},
+                push(@{$record->{'data'}->{ 'ChickenRingNo' }->{'errors'}},  
                     Apiis::Errors->new(
                         type       => 'DATA',
                         severity   => 'CRIT',
@@ -198,10 +188,6 @@ sub LO_LS13_eNest {
             }
             else {
                
-                $hs_fields->{'ChickenRingNo'}->{'table'} = 'transfer';
-                $hs_fields->{'ChickenRingNo'}->{'field'} = 'ext_animal';
-                $hs_fields->{'ChickenRingNo'}->{'guid'}  = $guid;
-
                 my $db_unit=GetDbUnit({'ext_unit'=>'rfid',
                                     'ext_id'=>'BRZV'},
                                     'n');                
@@ -209,7 +195,7 @@ sub LO_LS13_eNest {
                 #-- wenn es db_unit nicht gibt, dann Fehler auslösen 
                 if ($apiis->status and ($apiis->status == 1)) {
                 
-                    push(@{$hs_fields->{'TransponderEPC'}->{'error'}}, $apiis->errors);
+                    push(@{$record->{'data'}->{ 'TransponderEPC' }->{'errors'}}, $apiis->errors); 
                     goto Err;
                 }
                 else {
@@ -224,13 +210,8 @@ sub LO_LS13_eNest {
                     
                     if ($apiis->status and ($apiis->status == 1)) {
                     
-                        push(@{$hs_fields->{'TransponderEPC'}->{'error'}},$apiis->errors);
+                        push(@{$record->{'data'}->{ 'TransponderEPC' }->{'errors'}}, $apiis->errors); 
                         goto Err;
-                    }
-                    else {
-                        $hs_fields->{'TransponderEPC'}->{'table'} = 'transfer';
-                        $hs_fields->{'TransponderEPC'}->{'field'} = 'ext_animal';
-                        $hs_fields->{'TransponderEPC'}->{'guid'}  = $guid;
                     }
                 }
             }
@@ -247,11 +228,8 @@ sub LO_LS13_eNest {
             });
 
             if ($db_animal eq $db_animal1) {
-                $hs_fields->{'TransponderEPC'}->{'table'} = 'transfer';
-                $hs_fields->{'TransponderEPC'}->{'field'} = 'ext_animal';
-                $hs_fields->{'TransponderEPC'}->{'guid'}  = $guid;
             } else {
-                push(@{$hs_fields->{'ChickenRingNo'}->{'error'}},
+                push(@{$record->{'data'}->{ 'ChickenRingNo' }->{'errors'}},  
                     Apiis::Errors->new(
                         type       => 'DATA',
                         severity   => 'CRIT',
@@ -274,7 +252,7 @@ sub LO_LS13_eNest {
         ($args->{'ext_id_location_fo'}, $err)=Federvieh::GetLocation($apiis, $db_animal);
 
         if ($err) {
-            push(@{$hs_fields->{'TimestampEgg'}->{'error'}},$err);
+            push(@{$record->{'data'}->{ 'TimestampEgg' }->{'errors'}},$err);  
             goto Err;
         }
         else {
@@ -292,7 +270,7 @@ sub LO_LS13_eNest {
                                             'y'
             );
             if ($apiis->status) {
-                push(@{$hs_fields->{'TimestampEgg'}->{'error'}},$apiis->errors);
+                push(@{$record->{'data'}->{ 'TimestampEgg' }->{'errors'}}, $apiis->errors); 
                 goto Err;
             }
         }
@@ -315,11 +293,11 @@ sub LO_LS13_eNest {
                             'y');
 
         if ($apiis->status) {
-            push(@{$hs_fields->{'Id'}->{'error'}},$apiis->errors);
+            push(@{$record->{'data'}->{ 'Id' }->{'errors'}}, $apiis->errors); 
             goto Err;
         }
 Err:       
-        $tbd=Federvieh::CreateTBD($tbd, $hs_fields, $json, $hs_errcnt, $args, $z );
+        $tbd=Federvieh::CreateTBD($tbd, $json->{'glberrors'}, $record, $args, $z );
         
         if ((!$apiis->status) and ($onlycheck eq 'off')) {
             $apiis->DataBase->commit;
@@ -329,7 +307,7 @@ Err:
 
             if ($apiis->status) {
                 foreach my $err (@{$apiis->errors}) {
-                    push(@{$record->{'Error'}},$err->hash_print);
+                    push(@{$record->{'errors'}},$err->hash_print);
                 }
             }
         }
@@ -339,7 +317,7 @@ Err:
     }    
     
     ###### tr #######################################################################################
-    my $tr  =Federvieh::CreateTr( $json, $hs_errcnt );
+    my $tr  =Federvieh::CreateTr( $json, $json->{'glberrors'} );
     my $data=Federvieh::CreateBody( $tbd, $tr, 'Ladestrom: LS13_eNest');
 
     if ($fileimport) {

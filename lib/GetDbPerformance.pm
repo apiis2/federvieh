@@ -102,8 +102,8 @@ sub GetDbPerformance {
     # 
     ###########################################################################################
 
-    $sql="select a.traits_id,a.class from traits a inner join codes b on a.db_method=b.db_code inner join codes c on a.db_bezug=c.db_code inner join codes d on a.db_trait=d.db_code
-             where d.ext_code='".$args->{'ext_trait'}."' and a.variant='".$args->{'variant'}
+    $sql="select a.traits_id,a.class from traits a inner join codes b on a.db_method=b.db_code inner join codes c on a.db_bezug=c.db_code 
+             where a.label='".$args->{'ext_trait'}."' and a.variant='".$args->{'variant'}
             ."' and (b.ext_code  ='".$args->{'ext_method'}."' or 
                      b.short_name='".$args->{'ext_method'}."' or 
                      b.long_name ='".$args->{'ext_method'}."') 
@@ -138,7 +138,8 @@ sub GetDbPerformance {
                             from       => 'GetDbPerformance',
                             ext_fields => [ 'ext_trait' ],
                             msg_short  => "Merkmal "
-                                . $args->{'ext_trait'}.'/'.$args->{'variant'}.'/'.$args->{'ext_method'}.'/'.$args->{'ext_bezug'}
+                                . $args->{'ext_trait'}.'/'.$args->{'variant'}.'/'.$args->{'ext_method'}
+                                .'/'.$args->{'ext_bezug'}
                                 . " nicht definiert."
                             )
         );
@@ -170,6 +171,7 @@ sub GetDbPerformance {
         goto EXIT;
     }
 
+    my $exists;
     my $guid;
     if (! @query_records) {
         
@@ -234,10 +236,11 @@ sub GetDbPerformance {
         }
     } 
     else {
+        $exists=1;
         $guid=$query_records[0]->column('guid')->intdata
     }
 
-    return $guid;
+    return ($guid, $exists);
     
 EXIT:
 

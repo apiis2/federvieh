@@ -10,9 +10,9 @@
 use strict;
 use warnings;
 use Federvieh;
-use Spreadsheet::Read;
 use GetDbCode;
-use Encode;
+use JSON;
+
 our $apiis;
 
 sub LO_LS32_Eventschemas {
@@ -20,39 +20,11 @@ sub LO_LS32_Eventschemas {
     my $args     = shift;
  
     
-#TEST-DATA    
-#   $args->{'ext_unit_event'}       = ausstellungsort
-#   $args->{'ext_id_event'}         = Zwönitz
-#   $args->{'ext_event_type'}       = ausstellung
-#   $args->{'event_dt'}             = 10.02.2018
-#    };
+    my ($json, $record, $fileimport);
 
-    use JSON;
-    use URI::Escape;
-
-    my $json;
-    my $err_ref;
-    my $err_status;
-    my @record;
-    my $extevent;
-    my $log;
-    my %hs_db;
-
-    my @field;
-    my $hs_fields={};
-    my %hs_insert;
-    my %hs_version=();
-    my %hs_event;
-    my $fileimport;
-    my ($kv);
-
-    if (exists $args->{ 'FILE' }) {
-        $fileimport=$args->{ 'FILE' };
-    }
     my $onlycheck='off';
-    if (exists $args->{ 'onlycheck' }) {
-        $onlycheck=lc($args->{ 'onlycheck' });
-    }
+    $fileimport=1                           if (exists $args->{ 'fileimport'});
+    $onlycheck=lc($args->{ 'onlycheck' })   if (exists $args->{ 'onlycheck' });
 
     #-- Wenn ein File geladen werden soll, dann zuerst umwandeln in
     #   einen JSON-String, damit einheitlich weiterverarbeitet werden kann
@@ -60,78 +32,46 @@ sub LO_LS32_Eventschemas {
 
         $json = { 'Info'        => [],
                   'RecordSet'   => [],
-                  'Bak'         => [],
+                  'glberrors'   => {}
                 };
         
-        #-- Datei öffnen
-        open( IN, "$fileimport" ) || die "error: kann $fileimport nicht öffnen";
-
-        #-- Excel-Tabelle öffnen 
-        my $book = Spreadsheet::Read->new ($fileimport, dtfmt => "dd.mm.yyyy");
-        my $sheet = $book->sheet(1);
-
-        #-- Fehlermeldung, wenn es nicht geht 
-        if(defined $book->[0]{'error'}){
-            print "Error occurred while processing $fileimport:".
-                $book->[0]{'error'}."\n";
-            exit(-1);
-        }
-        
-        my $max_rows = $sheet->{'maxrow'};
-        my $max_cols = $sheet->{'maxcol'};
-
-        #--Schleife über alle Zeilen 
-        for my $row_num (1..($max_rows))  {
-
-            #-- declare
-            my @data;
-            my $record;
-            my $sdata;
-            my $hs = {}; 
-            my $col='A';
-
-            #-- Schleife über alle Spalten       
-            for my $col_num (1..($max_cols)) {
-
-                #-- einen ";" String erzeugen  
-                push(@data, encode_utf8 $sheet->{$col.$row_num});
             
-                $col++;
-            }
-      
+        my $counter=1;
+        
+        foreach my $dd (@{$args->{'data'}} ) {
+
+            my @data=@$dd;
+        
             #-- initialisieren mit '' 
-            map { if (!$_) {$_=''} } @data;
+            map { if (!defined $_) {$_=''} } @data;
+
+            #-- führende und endende Leerzeichen entfernen 
+            map { $_=~s/^\s+//g } @data;
+            map { $_=~s/\s+$//g } @data;
+            map { $_=~s/\[/(/g } @data;
+            map { $_=~s/\]/)/g } @data;
 
             #-- Daten sichern  
-            push( @{ $json->{ 'Bak' } },join(';',@data)); 
-            $sdata=join(';',@data);
-       
+            my $sdata=join(';',@data);
+      
+            #-- skip first line 
             next if ($sdata=~/Ladestrom/);
 
-            push( @{ $json->{ 'Bak' } },$sdata); 
-    
             #-- define format for record 
             $record = {
-                    'ls_id'               => [ $data[0],'',[] ],
-                    'schemaname'          => [ $data[1],'',[] ],
-                    'ext_eventtype'       => [ $data[2],'',[] ],
-                    'label_traitsscheme'  => [ $data[3],'',[] ],
-                    'label_breedsscheme'  => [ $data[4],'',[] ],
+    'no'                  => {'type'=>'data','status'=>'1',                   'pos'=>0, 'value'=> $counter++,'errors'=>[]},
+    'ls_id'               => {'type'=>'data','status'=>'1','origin'=>$data[0],'pos'=>1, 'value'=> $data[0],'errors'=>[]},
+    'schemaname'          => {'type'=>'data','status'=>'1','origin'=>$data[1],'pos'=>2, 'value'=> $data[1],'errors'=>[]},
+    'ext_eventtype'       => {'type'=>'data','status'=>'1','origin'=>$data[2],'pos'=>3, 'value'=> $data[2],'errors'=>[]},
+    'label_traitsscheme'  => {'type'=>'data','status'=>'1','origin'=>$data[3],'pos'=>4, 'value'=> $data[3],'errors'=>[]},
+    'label_breedsscheme'  => {'type'=>'data','status'=>'1','origin'=>$data[4],'pos'=>5, 'value'=> $data[4],'errors'=>[]}
             };
 
             #-- Datensatz mit neuem Zeiger wegschreiben
-            push( @{ $json->{ 'RecordSet' } },{ 'Info' => [], 
-                                                'Data' => { %{$record} },
-                                                'Insert'=>[],
-                                                'Tables'=>['standard_events']} 
-            );
+            push( @{ $json->{ 'recordset' } },{'infos' => [], 'errors'=>[], 'data' => { %{$record} }} );
         }
 
-        #-- Datei schließen
-        close( IN );
-
-        $json->{ 'Header'}  ={'ls_id'=>'Ladestrom','schemaname'=>'Schema-Name','ext_eventtype'=>'Event-Klasse','label_traitsscheme'=>'Merkmalsschema','label_breedsscheme'=>'Rasseschema'};
-        $json->{ 'Fields'}  = ['ls_id','schemaname','ext_eventtype','label_traitsscheme','label_breedsscheme'];
+        $json->{ 'headers'}  = ['No','ls_id','schemaname','ext_eventtype','label_traitsscheme','label_breedsscheme'];
     }
     else {
 
@@ -147,10 +87,12 @@ sub LO_LS32_Eventschemas {
     }
 
     my $z=0;
+    my $tbd=[];
+
     #-- Ab hier ist es egal, ob die Daten aus einer Datei
     #   oder aus einer Maske kommen
     #-- Schleife über alle Records und INFO füllen
-    foreach my $record ( @{ $json->{ 'RecordSet' } } ) {
+    foreach my $record ( @{ $json->{ 'recordset' } } ) {
 
         my $args={};
         
@@ -158,70 +100,64 @@ sub LO_LS32_Eventschemas {
         $z++;
 
         #-- Daten aus Hash holen
-        foreach (keys %{ $record->{ 'Data' } }) {
-            $args->{$_}=$record->{ 'Data' }->{$_}->[0];
-
-            #-- führende und endende Leerzeichen entfernen
-            $args->{$_}=~s/^\s+//g;
-            $args->{$_}=~s/\s+$//g;
-            
-            #-- eckige Klammern vesteht das Übersetzungssystem nicht 
-            $args->{$_}=~s/\[/(/g;
-            $args->{$_}=~s/\]/)/g;
+        foreach (keys %{ $record->{ 'data' } }) {
+            $args->{$_}=$record->{ 'data' }->{$_}->{'value'};
         }
 
         #----- Merkmals definition ------------------
 
-        $hs_insert{'standard_events'}='-';
-        $record->{ 'Insert' }->[0]= '-';
-    
-        ($args->{'db_event_type'}, $record->{ 'Insert' }->[0])=GetDbCode(
+        my $exists;
+        my $guid=undef;
+
+        ($args->{'db_event_type'}, $exists)=GetDbCode(
                 {'class'=>'EVENT',
                  'long_name'=>$args->{'ext_eventtype'},
                 },'n');
 
-        if ($apiis->status) {
-
-            my $msg=$apiis->errors->[0]->msg_long;
-            $msg=$apiis->errors->[0]->msg_short if (!$msg);
-
-            if ($msg=~/Found Foreign Key violation/) {
-                push(@{$record->{ 'Info'}},main::__('Schlüssel "[_1]" bereits vergegben.', $args->{'ext_code'}));
-            }
-            else {
-                #-- Fehler in Info des Records schreiben
-                push(@{$record->{ 'Info'}},$apiis->errors->[0]->from.': '.$msg);
-            }
-            #-- Fehler in Info des Records schreiben
-            #-- weitere Bearbeitung des Datensatzes wird abgebrochen + rücksetzen 
-            goto EXIT;
+        #-- Fehlerbehandlung 
+        if (Federvieh::Fehlerbehandlung($apiis,$exists, $record, ['ext_eventtype'] , $apiis->errors)) {
+            $apiis->del_errors;     
         }
-        
+        $guid=undef;
         my $sql="select standard_traits_id from standard_traits where label='".$args->{'label_traitsscheme'}."'";
 
         my $sql_ref = $apiis->DataBase->sys_sql( $sql);
         while ( my $q = $sql_ref->handle->fetch ) { 
             $args->{'standard_traits_id'} = $q->[0];
+            $guid=$q->[0];
         }
 
+        #-- Fehlerbehandlung 
+        if (Federvieh::Fehlerbehandlung($apiis,$guid, $record, ['label_traitsscheme'] , $apiis->errors)) {
+            $apiis->del_errors;
+        }
+        $guid=undef;
         $sql="select standard_breeds_id from standard_breeds where label='".$args->{'label_breedsscheme'}."'";
 
         $sql_ref = $apiis->DataBase->sys_sql( $sql);
         while ( my $q = $sql_ref->handle->fetch ) { 
             $args->{'standard_breeds_id'} = $q->[0];
+            $guid=$q->[0];
         }
         
-        my $insert=undef;
-        my $guid=undef;
+        #-- Fehlerbehandlung 
+        if (Federvieh::Fehlerbehandlung($apiis,$guid, $record, ['label_breedsscheme'] , $apiis->errors)) {
+            $apiis->del_errors;
+        }
 
         #-- prüfen, ob es das Event-Schema schon gibt    
-
+        $guid=undef;    
         $sql="select guid, standard_events_id from standard_events where label='".$args->{'schemaname'}."'";
 
         $sql_ref = $apiis->DataBase->sys_sql( $sql);
         while ( my $q = $sql_ref->handle->fetch ) { 
             $guid                         = $q->[0];
             $args->{'standard_events_id'} = $q->[1];
+        }
+
+        #-- Fehlerbehandlung 
+        if (Federvieh::Fehlerbehandlung($apiis,$guid, $record, ['schemaname'] , $apiis->errors)) {
+            $apiis->del_errors;
         }
 
         #-- Wenn nicht, dann anlegen 
@@ -242,11 +178,8 @@ sub LO_LS32_Eventschemas {
             $table->insert();
 
             #-- Fehlerbehandlung 
-            if ( $table->status ) {
-                $apiis->status(1);
-                $apiis->errors( scalar $table->errors );
-
-                goto EXIT;
+            if (Federvieh::Fehlerbehandlung($apiis,undef, $record, ['schemaname'] , $table->errors)) {
+                $apiis->del_errors;
             }
             else {
                 $args->{'standard_events_id'}=$table->column('standard_events_id')->intdata()
@@ -254,6 +187,8 @@ sub LO_LS32_Eventschemas {
         }
             
 EXIT:
+        $tbd=Federvieh::CreateTBD($tbd, $json->{'glberrors'}, $record,$z );
+
         if ((!$apiis->status) and ($onlycheck eq 'off')) {
             $apiis->DataBase->commit;
         }
@@ -265,8 +200,13 @@ EXIT:
         $apiis->del_errors;
     }
      
+     
+    ###### tr #######################################################################################
+    my $tr  =Federvieh::CreateTr( $json, $json->{'glberrors'} );
+    my $data=Federvieh::CreateBody( $tbd, $tr, 'Ladestrom: LS32_Eventschemas');
+
     if ($fileimport) {
-        return $json;
+        return JSON::to_json({'data'=>$data, 'tag'=>'body'});
     }
     else {
         return ( $self->status, $self->errors );
