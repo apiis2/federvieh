@@ -270,6 +270,7 @@ sub Zuchtbuch {
             goto ERR;
         }
        
+        $sql=Federvieh::AddAnimalToSql($sql);
         $link=Federvieh::PrintSQLRecordset($apiis, $sql);
         $linkf=Federvieh::PrintSQLRecordset($apiis, $sqlf);
         
@@ -349,6 +350,7 @@ sub Zuchtbuch {
             goto ERR;
         }
         
+        $sql=Federvieh::AddAnimalToSql($sql);
         $link=Federvieh::PrintSQLRecordset($apiis, $sql);
         $linkf=Federvieh::PrintSQLRecordset($apiis, $sqlf);
         
@@ -410,6 +412,8 @@ sub Zuchtbuch {
     $trb=[];
     $tr=[];
     $atag=[];
+    my $hs={};
+    my $k=0;
 
     foreach my $trait ('Eindruck', 'Phänotyp') {
 
@@ -430,6 +434,7 @@ sub Zuchtbuch {
             goto ERR;
         }
         
+        $sql=Federvieh::AddAnimalToSql($sql);
         $link=Federvieh::PrintSQLRecordset($apiis, $sql);
         $linkf=Federvieh::PrintSQLRecordset($apiis, $sqlf);
         
@@ -437,43 +442,95 @@ sub Zuchtbuch {
         push(@$atag, {'tag'=>'a','value'=>$trait.' (Tabelle) ','attr'=>[{'href'=>$linkf}]});
         
         while ( my $q = $sql_ref->handle->fetch ) {
-            my $td=[];
 
-            #-- einzelne Zellen an Zeile anfüggen 
-            for (my $i=0; $i<2; $i++) {
-                #-- einzelne Zellen an Zeile anfüggen 
-                push( @$td, {'tag'=>'td','value'=>$q->[ $i ]});
-            }
-
-            #-- undef => '' 
-            map { if (!$_->{'value'}) { $_->{'value'}=''} } @$td;
-
-            #-- Gesamte Zeile an Tabelle anfügen 
-            push(@$tr,{'tag'=>'tr',    'data'=>$td,  'attr'=>[]});
+            $hs->{$q->[0]}=[] if (!exists $hs->{$q->[0]});
+            $hs->{$q->[0]}->[$k]=$q->[1];
         }
-
+    
+        $k++;
     }
     
+    ########################################################################################################
+    #
+    # Bewertungen 
+    #
+    ########################################################################################################
+  
+    $trb=[];
+    $tr=[];
+
+    foreach my $trait ('Eindruck', 'Phänotyp') {
+
+        my ($sql, $sqlf);
+        ($sql, $sqlf)=SQLStatements::GetPerformances({
+                'groups'=>[
+                           {'field'=>'result'}],
+                'wheres'=>[{'field'=>'event_dt', 'value'=>'01.01.2021', 'operator'=>'>='},
+                           {'field'=>'event_dt', 'value'=>'31.12.2021', 'operator'=>'<='},
+                           {'field'=>'label', 'value'=>"$trait", 'operator'=>'='},
+                           {'field'=>'db_selection', 'value'=>"user_get_db_code('EINSTUFUNG','Z')", 'operator'=>'=', 'ticks'=>'no'},
+                ],
+                'functs'=>[{'field'=>'count(result)'} ]           
+        });
+
+        my $sql_ref = $apiis->DataBase->sys_sql( $sqlf );
+        if ( $sql_ref->status and ($sql_ref->status == 1 )) {
+            $apiis->status( 1 );
+            $apiis->errors( $sql_ref->errors );
+            goto ERR;
+        }
+        
+        $sql=Federvieh::AddAnimalToSql($sql);
+        $link=Federvieh::PrintSQLRecordset($apiis, $sql);
+        $linkf=Federvieh::PrintSQLRecordset($apiis, $sqlf);
+        
+        push(@$atag, {'tag'=>'a','value'=>$trait.' (Tiere) ','attr'=>[{'href'=>$link}]});
+        push(@$atag, {'tag'=>'a','value'=>$trait.' (Tabelle) ','attr'=>[{'href'=>$linkf}]});
+        
+        while ( my $q = $sql_ref->handle->fetch ) {
+
+            $hs->{$q->[0]}=[] if (!exists $hs->{$q->[0]});
+            $hs->{$q->[0]}->[$k]=$q->[1];
+        }
+        $k++;
+    }
+
+    #-- einzelne Zellen an Zeile anfüggen 
+    foreach my $key (sort {$b<=>$a} keys %$hs) {
+    
+        my $td=[];
+        push( @$td, {'tag'=>'td','value'=>$key});
+        
+        for (my $i=0; $i<4; $i++) {
+            #-- einzelne Zellen an Zeile anfüggen 
+            push( @$td, {'tag'=>'td','value'=>$hs->{$key}->[ $i ]});
+        }
+        
+        #-- undef => '' 
+        map { if (!$_->{'value'}) { $_->{'value'}=''} } @$td;
+
+        #-- Gesamte Zeile an Tabelle anfügen 
+        push(@$tr,{'tag'=>'tr',    'data'=>$td,  'attr'=>[]});
+    }
+
     $trb={'tag'=>'tbody', 'data'=>$tr, 'attr'=>[]};
 
     my $thd={'tag'=>'tr', 'data'=>[
-                                {'tag'=>'th','value'=>'Event'},
-                                {'tag'=>'th','value'=>'Geschlecht'},
-                                {'tag'=>'th','value'=>'Prüfort'},
-                                {'tag'=>'th','value'=>'N'},
-                                {'tag'=>'th','value'=>'Mittelwert'},
-                                {'tag'=>'th','value'=>'Min'},
-                                {'tag'=>'th','value'=>'Max'},
+                                {'tag'=>'th','value'=>'Punkte'},
+                                {'tag'=>'th','value'=>'Eindruck alle Tiere'},
+                                {'tag'=>'th','value'=>'Phänotyp alle Tiere'},
+                                {'tag'=>'th','value'=>'Eindruck nur Zuchttiere'},
+                                {'tag'=>'th','value'=>'Phänotyp nur Zuchttiere'},
                                 ]};
 
     my $cap={'tag'    =>'caption',
-                    'value' =>'Aufstellung der Gewichtserfassung für Hähne',
+                    'value' =>'Tierbewertungen',
                     'attr'  =>[{'style'=>[{'font-size'=>'20px'},{'text-align'=>'left'}]}]};
 
     my $trh={'tag'=>'thead', 'data'=>[$thd],        'attr'=>[{'style'=>[{'background-color'=>'lightgray'},{'text-align'=>'left'},
                                         {'border-collapse'=>'collapse'},{'border-bottom'=>'1px solid black'}] }]};
 
-    my $tbl={'tag'=>'table', 'data'=>[$cap, $trh,$trb],   'attr'=>[{'rules'=>'groups'},{'border'=>'1'},{'style'=>[{'border'=>'2px solid black'},{'width'=>'100%'},{'margin-top'=>'20px'}]}]};
+    my $tbl={'tag'=>'table', 'data'=>[$cap, $trh,$trb],   'attr'=>[{'rules'=>'groups'},{'border'=>'1'},{'style'=>[{'border'=>'2px solid black'},{'width'=>'50%'},{'margin-top'=>'20px'}]}]};
 
     push(@{$bodyd},$tbl);
 

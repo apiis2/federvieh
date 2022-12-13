@@ -643,6 +643,10 @@ sub GetPerformances {
                 $alias='animal.';
                 $ht->{'inner join animal on sp.db_animal=animal.db_animal'} = 1
             }
+            elsif ($trait->{'field'} eq 'db_selection') {
+                $alias='animal.';
+                $ht->{'inner join animal on sp.db_animal=animal.db_animal'} = 1
+            }
             elsif ($trait->{'field'} eq 'db_breed') {
                 $alias='breed_color.';
                 $ht->{'inner join animal on sp.db_animal=animal.db_animal 
