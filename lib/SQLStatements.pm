@@ -546,40 +546,147 @@ sub GetPerformances {
     my $args=shift;
     
     my $sql;
+    my $ht={};
 
-    $sql="
-select $args->{'f1'} as f1, ";
+#    $sql="
+#select $args->{'f1'} as f1, ";
+#
+#    if (exists $args->{'f2'}) {
+#        $sql.="$args->{'f2'} as f2, ";
+#    }
+    sub GetSQLGroupTraits {
+        my $tt=shift;
+        my @gr; my @ord;
+        my $i=1;
 
-    if (exists $args->{'f2'}) {
-        $sql.="$args->{'f2'} as f2, ";
+        foreach my $trait (@$tt) {
+            if ($trait->{'type'} eq 'long_name') {
+                push( @gr, "user_get_ext_code(z.f".$i.", 'l') as f".$i);
+            }
+            elsif ($trait->{'type'} eq 'ext_id') {
+                push( @gr, "user_get_ext_id(z.f".$i.") as f".$i);
+            }
+            else {
+                push( @gr, "result as f".$i);
+            }
+            $i++
+        }
+
+        return ' '.join(',',@gr).' ';
+    }
+    
+    sub GetSQLFuncts {
+        my $tt=shift;
+        my @gr; 
+
+        foreach my $trait (@$tt) {
+            push(@gr,$trait->{'field'});
+        }
+
+        return ' '.join(',',@gr).' ';
+    }
+    
+    sub GetSQLGroup {
+        my $tt=shift;
+        my @gr; my @ord;
+        my $i=1;
+
+        foreach my $trait (@$tt) {
+            push(@gr,'f'.$i);
+            push(@ord,'f'.$i);
+            $i++;
+        }
+
+        return ' group by '.join(',',@gr).' order by '.join(',',@ord);
     }
 
+    sub GetSQLField {
+        my $tt=shift;
+        my $ht=shift; 
+        my @tt; my $i=1;
+        
+        foreach my $trait (@$tt) {
+            if ($trait->{'field'} eq 'db_sex') {
+                push(@tt, 'animal.db_sex as f'.$i);
+                $ht->{'inner join animal on sp.db_animal=animal.db_animal'} = 1
+            }
+            elsif ($trait->{'field'} eq 'db_breed') {
+                push(@tt, 'breed_color.db_breed as f'.$i);
+                $ht->{'inner join animal on sp.db_animal=animal.db_animal 
+                       inner join breedcolor on animal.db_breed=breedcolor.db_breedcolor'}=1;
+            }
+            elsif ($trait->{'field'} eq 'db_event_type') {
+                push(@tt, 'standard_events.db_event_type  as f'.$i);
+            }
+            if ($trait->{'field'} eq 'db_location') {
+                push(@tt, 'event.db_location as f'.$i);
+            }
+            
+            $i++;
+        }
+
+        return join(', ',@tt);
+    }
+
+    sub GetSQLWheres {
+        my $tt=shift;
+        my $ht=shift;
+        my @tt; 
+        
+        foreach my $trait (@$tt) {
+            my $alias='';
+            
+            if ($trait->{'field'} eq 'event_dt') {
+                $alias='event.';
+            }
+            elsif ($trait->{'field'} eq 'db_sex') {
+                $alias='animal.';
+                $ht->{'inner join animal on sp.db_animal=animal.db_animal'} = 1
+            }
+            elsif ($trait->{'field'} eq 'db_breed') {
+                $alias='breed_color.';
+                $ht->{'inner join animal on sp.db_animal=animal.db_animal 
+                       inner join breedcolor on animal.db_breed=breedcolor.db_breedcolor'}=1;
+            }
+            elsif($trait->{'field'} eq 'label') {
+                $alias='traits.';
+            }
+
+            my $ticks="'";
+            $ticks='' if (exists $trait->{'ticks'} and ($trait->{'ticks'} eq 'no'));
+
+            push(@tt, '('.$alias.$trait->{'field'}.' '.$trait->{'operator'}."$ticks".$trait->{'value'}."$ticks)" );
+        }
+
+        if (@tt) {
+            return join(' and ',@tt);
+        }
+        else {
+            return ' 1=1 ';
+        }
+    }
+
+    my $where=' where '.GetSQLWheres( $args->{'wheres'}, $ht) ;
+
+    $sql="select ";
+    
+    $sql.=GetSQLField( $args->{'groups'},$ht).',' if (GetSQLField( $args->{'groups'},$ht));
+    
     $sql.="
-    count(z.result), round(avg(z.result::numeric),1), round(stddev(z.result::numeric),1), min(z.result::numeric), max(z.result::numeric) from
-(
-select 
-    c.db_location,
-    e.db_event_type,
-    case when d.class isnull then a.result else user_get_ext_code(a.result::integer,'s') end as result
-from performances a
-inner join standard_performances b on a.standard_performances_id=b.standard_performances_id
-inner join event c on b.db_event=c.db_event
-inner join traits d on a.traits_id=d.traits_id
-inner join standard_events e on c.standard_events_id=e.standard_events_id
-where d.label='$args->{'trait'}' and c.event_dt>='$args->{'data'}' and c.event_dt <='$args->{'date'}'
-) z inner join codes a on a.db_code=z.db_event_type ";
+        (case when traits.class isnull then p.result::numeric else user_get_ext_code(p.result::integer,'s')::numeric end) as result
+from performances p
+inner join traits on p.traits_id=traits.traits_id
+inner join standard_performances sp on p.standard_performances_id=sp.standard_performances_id
+inner join event as event on sp.db_event=event.db_event
+inner join standard_events on event.standard_events_id=standard_events.standard_events_id ";
 
-    if (exists $args->{'f2'}) {
-        $sql.=" inner join unit b on z.db_location=b.db_unit ";
-    }
+    $sql.= join(' ', (keys %$ht));
+    
+    $sql.=$where;
 
-    if (exists $args->{'f2'}) {
-        $sql.="group by f1,f2 order by f1,f2"
-    }
-    else {
-        $sql.="group by f1 order by f1"
-    };
-    return $sql;
+    my $sqlf='select '.GetSQLGroupTraits($args->{'groups'}).', '.GetSQLFuncts($args->{'functs'}).' from ('.$sql.') as z '. GetSQLGroup($args->{'groups'});
+
+    return ($sql, $sqlf);
 }
 
 sub GetPerformancesFormula {

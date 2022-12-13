@@ -389,4 +389,47 @@ sub Fehlerbehandlung {
         
     return ;
 }
+
+sub PrintSQLRecordset {
+    my $apiis=shift;
+    my $sql=shift;
+
+    my $filename=sprintf "%08X", rand(0xfffffffffffff);
+    $filename='/tmp/tmp_fv_'.$filename.'.csv';
+
+    my $sql_ref = $apiis->DataBase->sys_sql( $sql );
+    my $ff=$apiis->APIIS_LOCAL.$filename;
+
+    open(OUT, ">$ff");
+
+    while ( my $q = $sql_ref->handle->fetch ) { 
+        print OUT join('|', @$q)."\n";
+    }
+    close(OUT);
+
+    return $filename;
+}
+
+sub AddAnimalToSql {
+    my $sql=shift;
+
+    if ($sql!~/traits.label.+from/) {
+        $sql=~s/select (.*)/select traits.label, $1/;
+    }
+
+    if ($sql!~/event.event_dt.+from/) {
+        $sql=~s/select (.*)/select event.event_dt as event_dt, $1/;
+    }
+
+    if ($sql=~/standard_events.db_event_type.+from/) {
+        $sql=~s/(standard_events.db_event_type)/user_get_ext_code($1,'l')/;
+    }
+    else {
+        $sql=~s/select (.*)/select user_get_ext_code(standard_events.db_event_type,'l') as ext_event_type, $1/;
+    }
+
+    $sql=~s/select (.*)/select user_get_ext_id_animal(sp.db_animal) as ext_animal, $1/;
+
+    return $sql;
+}
 1;

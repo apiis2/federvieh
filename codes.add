@@ -93,4 +93,6 @@ METHODE  ''             ''       ''      2111 '4' 'K' 'Klassifizieren'
 METHODE  ''             ''       ''      2111 '5' 'B' 'Bonitieren'
 METHODE  ''             ''       ''      2111 '6' 'E' 'Erfassen'
 METHODE  ''             ''       ''      2111 '7' 'S' 'Summe'
+METHODE  ''             ''       ''      2111 '8' 'A' 'Anzahl'
+METHODE  ''             ''       ''      2111 '9' 'MW' 'Mittelwert'
 #-----------------------------------------------------------------------------
