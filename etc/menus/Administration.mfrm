@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Form PUBLIC "1" "form.dtd">
+<Form Name="Administration_m2">
+  <General Description="Menu" Name="General_0a2" StyleSheet="/etc/apiis.css"/>
+  <Block Description="Administration" Name="Block_0a2" NavigationBar="no">
+    
+    <DataSource Name="DataSource_0a2">
+      <none/>
+    </DataSource>
+    
+    <Label Name="Label_0a2" Content="Administration">
+      <Position Row="0" Column="0-6"/>
+      <Text FontSize="34px" TextAlign="center"/>
+    </Label>
+ 
+    <Label Name="Label_1a2" Content="Eingabe">
+      <Position Column="3" Row="1"/>
+      <Text FontSize="16px" TextAlign="center"/>
+    </Label>
+   
+
+
+    <Image Name="Image_71aa2" Alt="Test" Src="/icons/blank1.gif">
+       <Position Column="0" Row="2" Width="1px"/>
+       <Color BackGround="white" />
+       <Format MarginTop="30px"/>
+    </Image>
+<!--    
+    <Field Name="NeuerNutzer">
+      <Button ButtonLabel="Ersterfassung eines neuen Nutzers" URL="Ladestroeme/LS10_NeuerNutzer.frm" Command="do_open_form"/>
+      <Position Row="2" Column="1"/>
+      <Miscellaneous/>
+      <Text FontSize="12px" TextAlign="center"/>
+      <Color BackGround="#ffc600"/>
+      <Format BorderStyle="groove" BorderColor="lightgray"/>
+    </Field>
+-->
+    <Image Name="Image_71ca2" Alt="Test" Src="/icons/blank1.gif">
+       <Position Column="2" Row="2" Width="1px"/>
+       <Color BackGround="white" />
+       <Format MarginTop="30px"/>
+    </Image>
+    <Image Name="Image_31a2" Alt="Test" Src="/icons/blank1.gif">
+      <Position Column="3" Row="2" Width="1px"/>
+      <Color BackGround="black" />
+      <Format MarginRight="20px"/>
+    </Image>
+    <Image Name="Image_71da2" Alt="Test" Src="/icons/blank1.gif">
+       <Position Column="4" Row="2" Width="1px"/>
+       <Color BackGround="white" />
+       <Format MarginTop="30px"/>
+    </Image>
+    <Field Name="Field_82ea2">
+      <Button ButtonLabel="Nutzerliste" URL="/etc/reports/NutzerListe.rpt" Command="do_open_report"/>
+      <Position Column="6" Row="2"/>
+      <Miscellaneous/>
+      <Text FontSize="12px" TextAlign="center"/>
+      <Color BackGround="#c5ffff"/>
+      <Format BorderStyle="groove" BorderColor="lightgray"/>
+    </Field>
+    
+    <Image Name="Image_71fa2" Alt="Test" Src="/icons/blank1.gif">
+       <Position Column="6" Row="2" Width="1px"/>
+       <Color BackGround="white" />
+       <Format MarginTop="30px"/>
+    </Image>
+<!--
+    <Field Name="Field_82ba2">
+      <Button ButtonLabel="Nutzer &amp;Auml;ndern" URL="Login.frm" Command="do_open_form"/>
+      <Position Column="1" Row="3"/>
+      <Miscellaneous/>
+      <Text FontSize="12px" TextAlign="center"/>
+      <Color BackGround="#ffc600"/>
+      <Format BorderStyle="groove" BorderColor="lightgray"/>
+    </Field>
+-->
+    <Label Name="Label_s1a2" Content="Schema">
+      <Position Column="3" Row="5"/>
+      <Text FontSize="16px" TextAlign="center"/>
+    </Label>
+
+    <Field Name="Field_s82ba2">
+      <Button ButtonLabel="Merkmalschema anlegen" URL="standard_traits.frm" Command="do_open_form"/>
+      <Position Column="1" Row="6"/>
+      <Miscellaneous/>
+      <Text FontSize="12px" TextAlign="center"/>
+      <Color BackGround="#ffc600"/>
+      <Format BorderStyle="groove" BorderColor="lightgray"/>
+    </Field>
+    <Field Name="Field_s182ba2">
+      <Button ButtonLabel="Merkmal zuordnen" URL="standard_traits_content.frm" Command="do_open_form"/>
+      <Position Column="3" Row="6"/>
+      <Miscellaneous/>
+      <Text FontSize="12px" TextAlign="center"/>
+      <Color BackGround="#ffc600"/>
+      <Format BorderStyle="groove" BorderColor="lightgray"/>
+    </Field>
+    <Field Name="Field_s282ba2">
+      <Button ButtonLabel="Merkmal definieren" URL="traits.frm" Command="do_open_form"/>
+      <Position Column="5" Row="6"/>
+      <Miscellaneous/>
+      <Text FontSize="12px" TextAlign="center"/>
+      <Color BackGround="#ffc600"/>
+      <Format BorderStyle="groove" BorderColor="lightgray"/>
+    </Field>
+    <Field Name="Field_82ea2a">
+      <Button ButtonLabel="Merkmalsschemaliste" URL="/etc/reports/Merkmalsschemas.rpt" Command="do_open_report"/>
+      <Position Column="6" Row="6"/>
+      <Miscellaneous/>
+      <Text FontSize="12px" TextAlign="center"/>
+      <Color BackGround="#c5ffff"/>
+      <Format BorderStyle="groove" BorderColor="lightgray"/>
+    </Field>
+    
+    <Field Name="Field_b82ba2">
+      <Button ButtonLabel="Rasseschema anlegen" URL="standard_breeds.frm" Command="do_open_form"/>
+      <Position Column="1" Row="7"/>
+      <Miscellaneous/>
+      <Text FontSize="12px" TextAlign="center"/>
+      <Color BackGround="#ffc600"/>
+      <Format BorderStyle="groove" BorderColor="lightgray"/>
+    </Field>
+    <Field Name="Field_b182ba2">
+      <Button ButtonLabel="Rasse zuordnen" URL="standard_breeds_content.frm" Command="do_open_form"/>
+      <Position Column="3" Row="7"/>
+      <Miscellaneous/>
+      <Text FontSize="12px" TextAlign="center"/>
+      <Color BackGround="#ffc600"/>
+      <Format BorderStyle="groove" BorderColor="lightgray"/>
+    </Field>
+    <Field Name="Field_b282ba2">
+      <Button ButtonLabel="Rasse definieren" URL="Schluessel/Codes.frm" Command="do_open_form"/>
+      <Position Column="5" Row="7"/>
+      <Miscellaneous/>
+      <Text FontSize="12px" TextAlign="center"/>
+      <Color BackGround="#ffc600"/>
+      <Format BorderStyle="groove" BorderColor="lightgray"/>
+    </Field>
+    <Field Name="Field_82ea2ar">
+      <Button ButtonLabel="Rasseschemaliste" URL="/etc/reports/Rasseschemas.rpt" Command="do_open_report"/>
+      <Position Column="6" Row="7"/>
+      <Miscellaneous/>
+      <Text FontSize="12px" TextAlign="center"/>
+      <Color BackGround="#c5ffff"/>
+      <Format BorderStyle="groove" BorderColor="lightgray"/>
+    </Field>
+
+    <Field Name="Field_e82ba2">
+      <Button ButtonLabel="Eventschemas anlegen" URL="standard_events.frm" Command="do_open_form"/>
+      <Position Column="1" Row="8"/>
+      <Miscellaneous/>
+      <Text FontSize="12px" TextAlign="center"/>
+      <Color BackGround="#ffc600"/>
+      <Format BorderStyle="groove" BorderColor="lightgray"/>
+    </Field>
+<!--
+    <Field Name="Field_e282ba2">
+      <Button ButtonLabel="Event definieren" URL="scheme_event_definition" Command="do_open_form"/>
+      <Position Column="5" Row="8"/>
+      <Miscellaneous/>
+      <Text FontSize="12px" TextAlign="center"/>
+      <Color BackGround="#ffc600"/>
+      <Format BorderStyle="groove" BorderColor="lightgray"/>
+    </Field>
+
+    <Field Name="Field_f82ba2">
+      <Button ButtonLabel="Rechteschema anlegen" URL="scheme_function_definition.frm" Command="do_open_form"/>
+      <Position Column="1" Row="9"/>
+      <Miscellaneous/>
+      <Text FontSize="12px" TextAlign="center"/>
+      <Color BackGround="#ffc600"/>
+      <Format BorderStyle="groove" BorderColor="lightgray"/>
+    </Field>
+    <Field Name="Field_f182ba2">
+      <Button ButtonLabel="Rechte zuordnen" URL="scheme_function_connect" Command="do_open_form"/>
+      <Position Column="3" Row="9"/>
+      <Miscellaneous/>
+      <Text FontSize="12px" TextAlign="center"/>
+      <Color BackGround="#ffc600"/>
+      <Format BorderStyle="groove" BorderColor="lightgray"/>
+    </Field>
+    <Field Name="Field_f282ba2">
+      <Button ButtonLabel="Recht definieren" URL="scheme_function_definition" Command="do_open_form"/>
+      <Position Column="5" Row="9"/>
+      <Miscellaneous/>
+      <Text FontSize="12px" TextAlign="center"/>
+      <Color BackGround="#ffc600"/>
+      <Format BorderStyle="groove" BorderColor="lightgray"/>
+    </Field>
+-->
+    <Color BackGround="#ffffdd"/>
+    <Format BorderStyle="ridge" BorderColor="#004ce4" Padding="10px"/>
+ 
+  </Block>
+</Form>
