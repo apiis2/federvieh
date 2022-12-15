@@ -1,9 +1,9 @@
-<!ENTITY NavigationButtons_Fields SYSTEM "http://federvieh.local/etc/navigationbuttons.xml">
-<!ENTITY ActionButtons_Fields     SYSTEM "http://federvieh.local/etc/actionbuttons.xml">
-<!ENTITY StatusLine_Block         SYSTEM "http://federvieh.local/etc/statusbar.xml">
-<!ENTITY DumpButton_Block         SYSTEM "http://federvieh.local/etc/dumpbutton_block.xml">
-<!ENTITY StatusLine2_Block        SYSTEM "http://federvieh.local/etc/statusbar.xml">
-<!ENTITY CallForm_Block           SYSTEM "http://federvieh.local/etc/callform_button_block.xml">
+<!ENTITY NavigationButtons_Fields SYSTEM "navigationbuttons.xml">
+<!ENTITY ActionButtons_Fields     SYSTEM "actionbuttons.xml">
+<!ENTITY StatusLine_Block         SYSTEM "statusbar.xml">
+<!ENTITY DumpButton_Block         SYSTEM "dumpbutton_block.xml">
+<!ENTITY StatusLine2_Block        SYSTEM "statusbar.xml">
+<!ENTITY CallForm_Block           SYSTEM "callform_button_block.xml">
 
 <!-- #########################
    Root element Form

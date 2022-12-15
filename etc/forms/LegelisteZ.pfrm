@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE Form PUBLIC "1" "http://federvieh.local/etc/form3.dtd">
+<!DOCTYPE Form PUBLIC "1" "../form3.dtd">
 <Form Name="FORM_LegelisteZüchter">
   <General Name="General_515" StyleSheet="/etc/apiis.css" Description="PM-Legelilste Züchter" MenuID="M1" AR="user" Difficulty="basic"
            ToolTip="__('Parametrisierung zur Erzeugung einer Legeliste (Züchter)')" Help="/doc/LegelisteZüchter.html"/>

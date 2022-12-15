@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--DOCTYPE Form PUBLIC "1" "file:///home/qs/federvieh/etc/form3.dtd"-->
-<!DOCTYPE Form PUBLIC "1" "http://federvieh.local/etc/form3.dtd">
+<!DOCTYPE Form PUBLIC "1" "../form3.dtd">
 <Form Name="FPZuchtbuch">
   <General Name="General_515" StyleSheet="/etc/apiis.css" Description="Zuchtbuch"/>
 
