@@ -1,1 +1,6 @@
-/home/b08mueul/apiis/etc/statusbar.xml
+    <Label Name="__statusbar" Content="Ok">
+      <Position Column="0" Row="20"/>
+      <Text VerticalAlign="sub"/>
+      <Color />
+      <Format MarginLeft="10px" MarginTop="30px"/>
+    </Label>
