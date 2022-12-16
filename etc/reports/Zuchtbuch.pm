@@ -164,8 +164,8 @@ sub Zuchtbuch {
     #
     ########################################################################################################
   
-    my $trb=[];
-    my $tr=[];
+    $trb=[];
+    $tr=[];
     my $atag=[];
     
     my ($sql, $sqlf, $link, $linkf);
@@ -538,6 +538,88 @@ sub Zuchtbuch {
         push(@$bodyd, $_);
     } @$atag;
 
+
+    ################################################################################################
+    #
+    # Zuchtstämmme
+    #  
+    ################################################################################################
+    
+    $trb=[];
+    $tr=[];
+
+    $sql="select b.ext_id as owner, 
+                 a.ext_animal as zuchtstamm, 
+                 user_get_ext_id_animal(c.db_animal) as ext_animal,
+                 user_get_ext_code(d.db_sex,'e') as ext_sex,
+                 user_get_ext_breeder_of(d.db_animal) as ext_breeder
+          from v_transfer a 
+          inner join unit b on a.db_unit=b.db_unit  
+          left outer join parents c on a.db_animal=c.db_parents 
+          inner join animal d on c.db_animal=d.db_animal
+          where ext_id like 'VWH%' and b.ext_unit='zuchtstamm'";
+
+    $sql_ref = $apiis->DataBase->sys_sql( $sql );
+    
+    if ( $sql_ref->status and ($sql_ref->status == 1 )) {
+        $apiis->status( 1 );
+        $apiis->errors( $sql_ref->errors );
+        goto ERR;
+    }
+
+    my $hs={};
+    while ( my $q = $sql_ref->handle->fetch ) {
+        
+        my $z;
+        ($z)=($q->[0]=~/\D+?(\d+)$/);
+
+        $z=$q->[1];
+        $hs->{$z}={'züchter'=>'', 'zstid'=>'', 'sire'=>[], 'dam'=>[] } if (!exists $hs->{$z});
+
+        $hs->{$z}->{'züchter'}  =$q->[0];
+        $hs->{$z}->{'zstid'}    =$q->[1];
+        push(@{$hs->{$z}->{'sire'}},$q->[2]. ' ('.$q->[4].')') if ($q->[3] eq '1');
+        push(@{$hs->{$z}->{'dam'}},$q->[2]                   ) if ($q->[3] eq '2');
+    }
+
+    #-- einzelne Zellen an Zeile anfüggen 
+    foreach my $key (sort  keys %$hs) {
+    
+        my $td=[];
+        push( @$td, {'tag'=>'td','value'=>$hs->{$key}->{'züchter'}});
+        push( @$td, {'tag'=>'td','value'=>$hs->{$key}->{'zstid'}});
+        push( @$td, {'tag'=>'td','value'=>join(', ', @{$hs->{$key}->{'sire'}})});
+        push( @$td, {'tag'=>'td','value'=>join(', ', @{$hs->{$key}->{'dam'}})});
+        
+        #-- Gesamte Zeile an Tabelle anfügen 
+        push(@$tr,{'tag'=>'tr',    'data'=>$td,  'attr'=>[]});
+    }
+
+    $trb={'tag'=>'tbody', 'data'=>$tr, 'attr'=>[]};
+
+    my $thd={'tag'=>'tr', 'data'=>[
+                                {'tag'=>'th','value'=>'Züchter'},
+                                {'tag'=>'th','value'=>'Zuchtstamm'},
+                                {'tag'=>'th','value'=>'Zuchthahn (aus Bruteiern von)'},
+                                {'tag'=>'th','value'=>'Zuchthennen'},
+                                ]};
+
+    my $cap={'tag'    =>'caption',
+                    'value' =>'Zuchtstämme',
+                    'attr'  =>[{'style'=>[{'font-size'=>'20px'},{'text-align'=>'left'}]}]};
+
+    my $trh={'tag'=>'thead', 'data'=>[$thd],        'attr'=>[{'style'=>[{'background-color'=>'lightgray'},{'text-align'=>'left'},
+                                        {'border-collapse'=>'collapse'},{'border-bottom'=>'1px solid black'}] }]};
+
+    my $tbl={'tag' =>'table',
+             'data'=>[$cap, $trh,$trb],
+             'attr'=>[{'rules'=>'groups'},
+                      {'border'=>'1'},
+                      {'style'=>[{'border'=>'2px solid black'},{'width'=>'100%'},{'margin-top'=>'20px'}]}
+                     ]
+    };
+
+    push(@{$bodyd},$tbl);
 
     #-- Tabelle wegschreiben 
     return JSON::to_json({'tag'=>'body', 'data'=>$bodyd});
