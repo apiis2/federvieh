@@ -1,5 +1,7 @@
 CREATE OR REPLACE FUNCTION user_get_ext_breedcolor(int) RETURNS text AS $$ select b3.ext_code || case when c3.ext_code isnull then '' else ', ' || c3.ext_code end from breedcolor a3 inner join codes b3 on a3.db_breed=b3.db_code left outer join codes c3 on a3.db_color=c3.db_code where a3.db_breedcolor=$1; $$ LANGUAGE SQL;
 
+CREATE OR REPLACE FUNCTION user_get_ext_breeder_of(int) RETURNS text AS $$  select ext_id from unit a inner join locations  b on a.db_unit=b.db_location where b.db_animal=$1 and a.ext_unit='breeder' limit 1; $$ LANGUAGE SQL;
+
 CREATE OR REPLACE FUNCTION user_get_db_code(text, text) RETURNS int AS $$ select db_code from codes where class=$1 and (ext_code=$2 or short_name=$2 or long_Name=$2); $$ LANGUAGE SQL;
 
 CREATE OR REPLACE FUNCTION user_get_db_code_class(text) RETURNS int AS $$ select db_code from codes where class=$1; $$ LANGUAGE SQL;
