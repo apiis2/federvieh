@@ -389,6 +389,14 @@
             LENGTH       = "20">
         </column>
 
+        <column
+            name         = "sample"
+            DATATYPE     = "BIGINT"
+            CHECK        = "NotNull"
+            DESCRIPTION  = "no of sample"
+            LENGTH       = "20">
+        </column>
+
         &GlobalColumns;
         
         <TABLE>
@@ -404,9 +412,9 @@
                                'SetUser last_change_user'">
             </TRIGGER>
               
-            <CONSTRAINTS PRIMARYKEY="REF_COL:standard_performances_id;CONCAT:db_event, db_animal" 
+            <CONSTRAINTS PRIMARYKEY="REF_COL:standard_performances_id;CONCAT:db_event, db_animal, sample" 
                          SEQUENCE="seq_standard_performances__standard_performances_id" 
-                         INDEX="unique standard_performances_id, unique db_event db_animal">
+                         INDEX="unique standard_performances_id, unique db_event db_animal sample">
             </CONSTRAINTS>
         </TABLE>
     </table>
