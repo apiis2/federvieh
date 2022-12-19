@@ -214,14 +214,13 @@ sub LO_LS21_Vorwerkhuehner {
         my $vzst=$args->{ 'ext_forster' }.':::'.$args->{'ext_parent'}.':::'.$args->{'schlupf'};
 
         #-- Zuchtstamm initialisieren 
-        $zst->{$vzst}={'Schlupf-Anzahl-Geschlüpft'    =>undef,
-                       'Schlupf-Anzahl-Klarei'        =>undef, 
-                       'Schlupf-Anzahl-Absterber'     =>undef, 
-                       'Schlupf-Anzahl-Steckenbleiber'=>undef, 
-                       'Schlupf-Anzahl-Unbekannt'     =>undef, 
-                       'Schlupf-Summe-Eigewicht' =>0,
-                       'Schlupf-Anzahl-Eigewicht'=>0,
-                       'Schlupf-Anzahl-Eiablage' =>0,
+        $zst->{$vzst}={'ZSt-Schlupf-Anzahl-Geschlüpft'    =>undef,
+                       'ZSt-Schlupf-Anzahl-Klarei'        =>undef, 
+                       'ZSt-Schlupf-Anzahl-Absterber'     =>undef, 
+                       'ZSt-Schlupf-Anzahl-Steckenbleiber'=>undef, 
+                       'ZSt-Schlupf-Anzahl-Unbekannt'     =>undef, 
+                       'ZSt-Schlupf-Eigewicht'            =>0,
+                       'ZSt-Schlupf-Anzahl-Eiablage'      =>0,
                        'SchlupfDt'              =>undef,
                        'event'                  =>undef,
                        'ext_unit'               =>$args->{'ext_unit_parent'},
@@ -234,17 +233,15 @@ sub LO_LS21_Vorwerkhuehner {
                        'erledigt'               => undef
         } if (!exists ($zst->{$vzst}));
 
-        $zst->{$vzst}->{'Schlupf-Summe-Eigewicht'}+=$args->{'eigewicht'} if ($args->{'eigewicht'} ne ''); 
-        $zst->{$vzst}->{'Schlupf-Anzahl-Eigewicht'}++                    if ($args->{'eigewicht'} ne ''); 
-        $zst->{$vzst}->{'Schlupf-Anzahl-Eiablage'}++; 
+        $zst->{$vzst}->{'ZSt-Schlupf-Anzahl-Eiablage'}++; 
     
         $zst->{$vzst}->{'SchlupfDt'}=$args->{'schlupfdatum'} if ($args->{'schlupfdatum'} and !$zst->{$vzst}->{'SchlupfDt'});
 
-        $zst->{$vzst}->{'Schlupf-Anzahl-Geschlüpft'}++                     if ($args->{'schlupfergebnis'}==1); 
-        $zst->{$vzst}->{'Schlupf-Anzahl-Klarei'}++                     if ($args->{'schlupfergebnis'}==2); 
-        $zst->{$vzst}->{'Schlupf-Anzahl-Absterber'}++                     if ($args->{'schlupfergebnis'}==3); 
-        $zst->{$vzst}->{'Schlupf-Anzahl-Steckenbleiber'}++                     if ($args->{'schlupfergebnis'}==4); 
-        $zst->{$vzst}->{'Schlupf-Anzahl-Unbekannt'}++                     if ($args->{'schlupfergebnis'}==9); 
+        $zst->{$vzst}->{'ZSt-Schlupf-Anzahl-Geschlüpft'}++     if ($args->{'schlupfergebnis'}==1); 
+        $zst->{$vzst}->{'ZSt-Schlupf-Anzahl-Klarei'}++         if ($args->{'schlupfergebnis'}==2); 
+        $zst->{$vzst}->{'ZSt-Schlupf-Anzahl-Absterber'}++      if ($args->{'schlupfergebnis'}==3); 
+        $zst->{$vzst}->{'ZSt-Schlupf-Anzahl-Steckenbleiber'}++ if ($args->{'schlupfergebnis'}==4); 
+        $zst->{$vzst}->{'ZSt-Schlupf-Anzahl-Unbekannt'}++      if ($args->{'schlupfergebnis'}==9); 
     }
 
     $z=0;
@@ -291,14 +288,16 @@ sub LO_LS21_Vorwerkhuehner {
             }
         }
 
+        my $vzst=$args->{ 'ext_forster' }.':::'.$args->{'ext_parent'}.':::'.$args->{'schlupf'};
+
+        $args->{'schlupfdatum'}=$zst->{$vzst}->{'SchlupfDt'} if ($args->{'schlupfdatum'} eq '');
+
         #-- Predefinition 
         $args->{'entry_dt_br'}  = $args->{'schlupfdatum'};
         $args->{'birth_dt'}     = $args->{'schlupfdatum'};
         $args->{'db_sire'}=1;
         $args->{'db_dam'}=2;
         $args->{'db_animal'}=undef;
-
-        my $vzst=$args->{ 'ext_forster' }.':::'.$args->{'ext_parent'}.':::'.$args->{'schlupf'};
 
         $args->{'db_parents'}=$zst->{$vzst}->{'db_parents'};
         $args->{'db_parents_db_unit'}=$zst->{$vzst}->{'db_parents_db_unit'};
@@ -362,6 +361,8 @@ sub LO_LS21_Vorwerkhuehner {
                 if ($guid) {
                     $record->{'data'}->{'ext_parent'}->{'status'}='0';
                 }
+            
+                $zst->{$vzst}->{'db_parents'}=$args->{'db_parents'};
             }
             else {
                 $zst->{$vzst}->{'db_parents'}=$args->{'db_parents'};
@@ -396,26 +397,21 @@ sub LO_LS21_Vorwerkhuehner {
             if (Federvieh::Fehlerbehandlung($apiis,$exists, $record, ['schlupfdatum'] , $apiis->errors)) {
                 goto EXIT;
             }
-                
+            
+            #-- sichern 
+            $zst->{$vzst}->{ 'db_event' }=$db_event;
+
             #-- Schleife über alle Merkmale
             #-- animal-event-Verbindung erzeugen und mit Schlüssel die Leistunge wegschreiben
-            foreach my $trait ('Schlupf-Anzahl-Geschlüpft','Schlupf-Anzahl-Klarei','Schlupf-Anzahl-Absterber',
-                               'Schlupf-Anzahl-Steckenbleiber','Schlupf-Anzahl-Unbekannt','Schlupf-Summe-Eigewicht',
-                               'Schlupf-Anzahl-Eigewicht','Schlupf-Anzahl-Eiablage') {
+            foreach my $trait ('ZSt-Schlupf-Anzahl-Geschlüpft','ZSt-Schlupf-Anzahl-Klarei','ZSt-Schlupf-Anzahl-Absterber',
+                               'ZSt-Schlupf-Anzahl-Steckenbleiber','ZSt-Schlupf-Anzahl-Unbekannt') {
                
                 next if (!$zst->{$vzst}->{ $trait });
-
-                if ($trait eq 'Schlupf-Summe-Eigewicht') {
-                    $args->{'ext_methode'}  = 'Summe';
-                }
-                else {
-                    $args->{'ext_methode'}  = 'Anzahl';
-                }
 
                 my ($guid,$exists)=GetDbPerformance({
                                     'db_animal' => $args->{'db_parents'},
                                     'db_event'  => $db_event,
-                                    'ext_method'=> $args->{'ext_methode'},
+                                    'ext_method'=> 'Anzahl',
                                     'ext_bezug' => 'Zuchtstamm',
                                     'variant'   => 1,
                                     'ext_trait' => $trait,
@@ -428,7 +424,6 @@ sub LO_LS21_Vorwerkhuehner {
                     goto EXIT;
                 }
                 else {
-                    $record->{'data'}->{'eigewicht'}->{'status'}='0';
                     $record->{'data'}->{'schlupfergebnis'}->{'status'}='0';
                     $record->{'data'}->{'schlupf'}->{'status'}='0';
                 }
@@ -448,11 +443,39 @@ sub LO_LS21_Vorwerkhuehner {
                                 'opening_dt'=>$zst->{$vzst}->{'SchlupfDt'}}
                                 );
         
-            $record->{'data'}->{'eigewicht'}->{'status'}='0';
             $record->{'data'}->{'schlupfergebnis'}->{'status'}='0';
             $record->{'data'}->{'schlupf'}->{'status'}='0';
         }
     
+        my $guid; my $exists;
+        ($guid,$exists)=GetDbPerformance({
+                            'db_animal' => $zst->{$vzst}->{'db_parents'},
+                            'db_event'  => $zst->{$vzst}->{ 'db_event' },
+                            'ext_method'=> 'Wiegen',
+                            'ext_bezug' => 'Zuchtstamm',
+                            'variant'   => '1',
+                            'ext_trait' => 'ZSt-Schlupf-Eigewicht',
+                            'result'    => $args->{'eigewicht'},
+                            'sample'    => $args->{'ext_animal_ei'}
+                            },
+                            'y');
+        
+        if (!$guid) {
+            push(@{$record->{'data'}->{ 'eigewicht' }->{'errors'}},$apiis->errors); 
+            
+            $record->{'data'}->{'eigewicht'}->{'status'}='2';
+            $apiis->status(1);
+            $apiis->del_errors;
+        }
+        if ($guid) {
+            if ($exists) {
+                $record->{'data'}->{ 'eigewicht'}->{'status'}='3';
+            }
+            else {
+                $record->{'data'}->{ 'eigewicht' }->{'status'}='0';
+            }
+        }
+
         #######################################################################################
         #
         #  Einzeltierdaten speichern
@@ -509,7 +532,7 @@ sub LO_LS21_Vorwerkhuehner {
         }
 
         my $found;
-        my $guid=undef;
+        $guid=undef;
 
         #########################################################################################
         # 
@@ -584,7 +607,6 @@ sub LO_LS21_Vorwerkhuehner {
                     if ($db_unit) {
                         $hs_db_unit{$args->{'ext_unit_animal_'.$e}.':::'.$args->{'ext_id_animal_'.$e}}=$db_unit;
                         $reverse{$args->{'ext_unit_animal_'.$e}.':::'.$args->{'ext_id_animal_'.$e}}=1;
-                        $record->{'data'}->{'no'}->{'status'}='0';
                     }
                 }
 
@@ -838,17 +860,22 @@ sub LO_LS21_Vorwerkhuehner {
         my ($dd,$mm,$yy)=($vdate=~/^(\d+?)\.(\d+?).(\d+)/);
         my $t = timelocal(0,0,0,$dd,$mm-1,$yy-1900);
 
+
         #-- Schleife über alle Merkmale
         #-- animal-event-Verbindung erzeugen und mit Schlüssel die Leistunge wegschreiben
         foreach my $trait ('Schlupfgewicht','Körpergewicht 2. LW',
                            'Körpergewicht 10.LW','Körpergewicht 20.LW',
                            'Eindruck','Phänotyp','Körpergewicht am Bewertungstag','Einstufung') {
             
-            my $result= ''; my $ext_field; my $ext_fielde;
-            my $targs = {};
+            my $result      = ''; 
+            my $ext_field   = ''; 
+            my $ext_fielde  = '';
+            my $targs       = {};
+            my $db_animal   = $args->{'db_animal'};
 
             $targs->{'ext_bezug'}= 'Tier';
             $targs->{'variant'}  = '1';
+            $targs->{'sample'}   = '1';
             $targs->{'ext_trait'}    = $trait;
             
             ######################################################################## 
@@ -962,14 +989,15 @@ sub LO_LS21_Vorwerkhuehner {
 
             my $guid;
             ($guid,$exists)=GetDbPerformance({
-                                'db_animal' => $args->{'db_animal'},
+                                'db_animal' => $db_animal,
                                 'db_event'  => $db_event,
                                 'ext_trait' => $trait,
                                 'ext_method'=> $targs->{'ext_methode'},
                                 'ext_bezug' => $targs->{'ext_bezug'},
                                 'variant'   => $targs->{'variant'},
                                 'ext_trait' => $targs->{'ext_trait'},
-                                'result'    => $result
+                                'result'    => $result,
+                                'sample'    => $targs->{'sample'}
                                 },
                                 'y');
             
