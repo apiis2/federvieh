@@ -22,7 +22,7 @@ sub GetDbPerformance {
     $args->{'db_animal'}    ='' if (!exists $args->{'db_animal'} or !$args->{'db_animal'});
     $args->{'db_event'}     ='' if (!exists $args->{'db_event'}  or !$args->{'db_event'} );
 
-    $args->{'ext_sample'}   =1  if (!exists $args->{'ext_sample'} or (!$args->{'ext_sample'}));
+    $args->{'sample'}       =1  if (!exists $args->{'sample'} or (!$args->{'sample'}));
 
     #-- Wenn Nummer unvollstndig ist, dann Fehlerobject erzeugen
     if (($args->{'db_animal'}        eq '') or 
@@ -224,7 +224,7 @@ sub GetDbPerformance {
         
             $performances->column('result')->intdata( $args->{'result'} );
             
-            $performances->column('sample')->extdata( $args->{'ext_sample'} );
+            $performances->column('sample')->extdata( $args->{'sample'} );
 
             #-- Datensatz in der DB anlegen 
             $performances->insert();
