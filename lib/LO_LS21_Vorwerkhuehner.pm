@@ -258,9 +258,9 @@ sub LO_LS21_Vorwerkhuehner {
             $args->{$_}=$record->{ 'data' }->{$_}->{'value'};
         }
 
-#if ($z==109) {
-#    print "kk";
-#}
+if ($z==101) {
+    print "kk";
+}
         #-- Datenbehandlung=Erweiterung um Jahr, wenn zweistellig  
         foreach my $vd ('schlupfdatum','abgangsdatum') {
             
@@ -366,7 +366,7 @@ sub LO_LS21_Vorwerkhuehner {
             }
             else {
                 $zst->{$vzst}->{'db_parents'}=$args->{'db_parents'};
-                $record->{'data'}->{'ext_parent'}->{'status'}='0';
+                $record->{'data'}->{'ext_parent'}->{'status'}='3';
             }
 
             my $db_unit; 
@@ -403,7 +403,8 @@ sub LO_LS21_Vorwerkhuehner {
 
             #-- Schleife über alle Merkmale
             #-- animal-event-Verbindung erzeugen und mit Schlüssel die Leistunge wegschreiben
-            foreach my $trait ('ZSt-Schlupf-Anzahl-Geschlüpft','ZSt-Schlupf-Anzahl-Klarei','ZSt-Schlupf-Anzahl-Absterber',
+            foreach my $trait ('ZSt-Schlupf-Anzahl-Eiablage', 'ZSt-Schlupf-Anzahl-Geschlüpft',
+                               'ZSt-Schlupf-Anzahl-Klarei',   'ZSt-Schlupf-Anzahl-Absterber',
                                'ZSt-Schlupf-Anzahl-Steckenbleiber','ZSt-Schlupf-Anzahl-Unbekannt') {
                
                 next if (!$zst->{$vzst}->{ $trait });
@@ -429,23 +430,6 @@ sub LO_LS21_Vorwerkhuehner {
                 }
             }
         }
-        else {
-            my $exists;
-            ($args->{'db_parents_db_unit'}, $exists)=GetDbUnit({'ext_unit'=>$args->{'ext_unit_parent'}
-                                                ,'ext_id'=>$args->{'ext_id_parent'}}
-                                                ,'y');
-            my $guid=CreateTransfer($apiis,
-                                {'db_animal'=>$args->{'db_parents'},
-                                'db_unit'=>$args->{'db_parents_db_unit'},
-                                'ext_unit'=>$args->{'ext_unit_parent'},
-                                'ext_id'=>$args->{'ext_id_parent'},
-                                'ext_animal'=>$args->{'ext_parent'},
-                                'opening_dt'=>$zst->{$vzst}->{'SchlupfDt'}}
-                                );
-        
-            $record->{'data'}->{'schlupfergebnis'}->{'status'}='0';
-            $record->{'data'}->{'schlupf'}->{'status'}='0';
-        }
     
         my $guid; my $exists;
         ($guid,$exists)=GetDbPerformance({
@@ -460,7 +444,7 @@ sub LO_LS21_Vorwerkhuehner {
                             },
                             'y');
         
-        if (!$guid) {
+        if ($apiis->errors) {
             push(@{$record->{'data'}->{ 'eigewicht' }->{'errors'}},$apiis->errors); 
             
             $record->{'data'}->{'eigewicht'}->{'status'}='2';
