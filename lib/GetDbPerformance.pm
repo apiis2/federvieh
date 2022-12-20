@@ -159,6 +159,7 @@ sub GetDbPerformance {
     
     $performances->column('standard_performances_id')->extdata( $args->{'standard_performances_id'} );
     $performances->column('traits_id')->extdata($args->{'traits_id'}  );
+    $performances->column('sample')->extdata($args->{'sample'}  );
 
     # Query starten:
     my @query_records = $performances->fetch(
@@ -224,8 +225,6 @@ sub GetDbPerformance {
         
             $performances->column('result')->intdata( $args->{'result'} );
             
-            $performances->column('sample')->extdata( $args->{'sample'} );
-
             #-- Datensatz in der DB anlegen 
             $performances->insert();
 
