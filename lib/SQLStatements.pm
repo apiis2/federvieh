@@ -566,6 +566,12 @@ sub GetPerformances {
             elsif ($trait->{'type'} eq 'ext_id') {
                 push( @gr, "user_get_ext_id(z.f".$i.") as f".$i);
             }
+            elsif ($trait->{'type'} eq 'year') {
+                push( @gr, "z.f".$i." as f".$i);
+            }
+            elsif ($trait->{'field'} eq 'Gesamt') {
+                push( @gr, "'Gesamt' as f".$i);
+            }
             else {
                 push( @gr, "result as f".$i);
             }
@@ -618,6 +624,9 @@ sub GetPerformances {
             elsif ($trait->{'field'} eq 'db_event_type') {
                 push(@tt, 'standard_events.db_event_type  as f'.$i);
             }
+            elsif ($trait->{'type'} eq 'year') {
+                push( @tt, "date_part('year', event.event_dt) as f".$i);
+            }
             if ($trait->{'field'} eq 'db_location') {
                 push(@tt, 'event.db_location as f'.$i);
             }
@@ -646,6 +655,9 @@ sub GetPerformances {
             elsif ($trait->{'field'} eq 'db_selection') {
                 $alias='animal.';
                 $ht->{'inner join animal on sp.db_animal=animal.db_animal'} = 1
+            }
+            elsif ($trait->{'field'} eq 'db_event_type') {
+                $alias='standard_events.';
             }
             elsif ($trait->{'field'} eq 'db_breed') {
                 $alias='breed_color.';
@@ -699,17 +711,15 @@ sub GetPerformancesFormula {
     
     my $sql;
 
-    $sql="
-select $args->{'f1'} as f1, ";
-
-    if (exists $args->{'f2'}) {
-        $sql.="$args->{'f2'} as f2, ";
-    }
+    $sql="select ";
+    $sql.="$args->{'f1'} as f1, " if (exists $args->{'f1'});
+    $sql.="$args->{'f2'} as f2, " if (exists $args->{'f2'});
 
     $sql.="
-    sum(z1.result::numeric), round(avg(z.result::numeric/z1.result::numeric),1), round(stddev(z.result::numeric/z1.result::numeric),1), round(min(z.result::numeric/z1.result::numeric),1), round(max(z.result::numeric/z1.result::numeric),1) from
+    sum(z1.result::numeric), round(sum(z1.result::numeric)/sum(z.result::numeric)*100,1) from
 (
 select 
+    c.event_dt as event_dt,
     c.db_location as db_location,
     e.db_event_type as db_event_type,
     case when d.class isnull then a.result else user_get_ext_code(a.result::integer,'s') end as result
@@ -720,9 +730,10 @@ inner join traits d on a.traits_id=d.traits_id
 inner join standard_events e on c.standard_events_id=e.standard_events_id
 where d.label='$args->{'trait'}->[0]' and c.event_dt>='$args->{'data'}' and c.event_dt <='$args->{'date'}'
 ) z 
-inner join 
+left outer join 
 (
 select 
+    c.event_dt as event_dt,
     c.db_location as db_location,
     e.db_event_type as db_event_type,
     case when d.class isnull then a.result else user_get_ext_code(a.result::integer,'s') end as result
@@ -743,7 +754,7 @@ inner join codes a on a.db_code=z.db_event_type ";
     if (exists $args->{'f2'}) {
         $sql.="group by f1,f2 order by f1,f2"
     }
-    else {
+    elsif (exists $args->{'f1'}) {
         $sql.="group by f1 order by f1"
     };
     return $sql;
