@@ -2,6 +2,7 @@ use lib $apiis->APIIS_LOCAL . "/lib";
 use SQLStatements;
 use Federvieh;
 use Apiis::Misc;
+use r_plot;
 use strict;
 use warnings;
 
@@ -25,7 +26,7 @@ sub Zuchtbuch {
 
     push(@$bodyd, {'tag'=>'div','value'=>'Zuchtbuch - Vorwerkhühner 2021','attr'=>[{'style'=>[{'font-size'=>'30px'}]}]});
    
-    push(@$bodyd, {'tag'=>'img','value'=>'','attr'=>[{'width'=>'250px'},{'src'=>'http://federvieh.local/etc/titel_vwh.png'}]});
+    push(@$bodyd, {'tag'=>'img','value'=>'','attr'=>[{'width'=>'500px'},{'src'=>'http://federvieh.local/etc/titel_vwh.png'}]});
 
     ########################################################################################################
     #
@@ -411,6 +412,16 @@ sub Zuchtbuch {
         }
     }        
 
+    #-- Vorbereitung Grafik
+    my $g=[];
+    my $n=[];
+    map {
+        push(@$g, $hs->{$_}->[2]);
+        push(@$n, "'$_'");
+    } keys %{$hs};
+
+
+
     #-- einzelne Zellen an Zeile anfüggen 
     foreach my $key (sort keys %$hs) {
     
@@ -516,6 +527,37 @@ sub Zuchtbuch {
         push(@$bodyd, $_);
     } @$atag;
 
+    #-- Grafik
+    my $filename=sprintf( "%08X", rand(0xfffffffffffff));
+    my $path=$apiis->APIIS_LOCAL.'/tmp/'.$filename;
+
+    #- prepare hash for r_plot;
+    my %parameter_hash = (
+            filename =>$path,
+            sql      => '',
+            data => [$n, $g],
+            no_sql_elements => '',
+            legend        => [],
+            second_y_axis => 'no',
+            export_format => 'jpg',
+            chart_type => 'barplot_zplan', #'barplot',
+            titel      => "'Schlupfraten getrennt nach Züchtern'",
+            subtitel   => '""',
+            xlabel     => '"Züchter"',
+            ylabel     => '"Schlupfrate"',
+            mtext_l    => '', # additional text
+            mtext_r    => '',
+            rotate     => 0,
+            color      => 'yes',
+            x_dates    => 'no'
+            );
+
+    my $href = r_plot::r_plot( \%parameter_hash );
+
+    my $d={'tag'=>'img','value'=>'','attr'=>[{'width'=>'50%'},{'src'=>'/tmp/'.$filename.'.jpg'},
+           {'style'=>[{'transform'=>'rotate(90deg)'}]}]};
+
+    push(@$bodyd, {'tag'=>'div','data'=>[$d],'attr'=>[{'style'=>[{'font-size'=>'30px'},{'margin-left'=>'200px'}]}]});
 
     ########################################################################################################
     #
