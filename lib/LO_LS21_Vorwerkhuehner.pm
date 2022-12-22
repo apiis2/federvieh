@@ -141,8 +141,8 @@ sub LO_LS21_Vorwerkhuehner {
             'ext_sex'               => {'type'=>'data','status'=>'1','origin'=>,$data[15],'pos'=>16, 'value'=> $sex,'errors'=>[]},
             'ext_breed'             => {'type'=>'data','status'=>'1',                      'value'=> 'Vorwerkhühner','errors'=>[]},
 
-            'ext_unit_animal_br'    => {'type'=>'data','status'=>'1',                      'value'=> 'bundesring','errors'=>[]},
-            'ext_id_animal_br'      => {'type'=>'data','status'=>'1',                      'value'=> $vyear,'errors'=>[]},                            
+            'ext_unit_animal_br'    => {'type'=>'data','status'=>'1',                      'value'=> 'bundesring',  'errors'=>[]},
+            'ext_id_animal_br'      => {'type'=>'data','status'=>'1',                      'value'=> 'BDRG',        'errors'=>[]},                            
             'ext_animal_br'         => {'type'=>'data','status'=>'1','origin'=>$data[16],'pos'=>17, 'value'=> $data[16],'errors'=>[]},
 
 
@@ -291,6 +291,7 @@ if ($z==101) {
         my $vzst=$args->{ 'ext_forster' }.':::'.$args->{'ext_parent'}.':::'.$args->{'schlupf'};
 
         $args->{'schlupfdatum'}=$zst->{$vzst}->{'SchlupfDt'} if ($args->{'schlupfdatum'} eq '');
+        ($args->{'schlupfjahr'})=($zst->{$vzst}->{'SchlupfDt'}=~/(\d{2})$/);
 
         #-- Predefinition 
         $args->{'entry_dt_br'}  = $args->{'schlupfdatum'};
@@ -313,6 +314,10 @@ if ($z==101) {
             
             #-- Zuchtstamm holen
             my $guid=undef;
+            $args->{'ext_id_parent'}+='-'.$args->{'schlupfjahr'};
+            
+            ($args->{'ext_parent'})=($args->{'ext_parent'}=~/^(\d\d)/);
+
             ($args->{'db_parents'}, $guid) = GetDbAnimal({  'ext_unit'  =>$args->{'ext_unit_parent'},
                                                             'ext_id'    =>$args->{'ext_id_parent'},
                                                             'ext_animal'=>$args->{'ext_parent'}
@@ -325,8 +330,9 @@ if ($z==101) {
             #-- wenn kein Tierstamm gefunden wurde, dann neu erzeugen  
             if (!$guid) {
                 
-                ($args->{'db_unit_parent'},$exists)=GetDbUnit({'ext_unit'=>$args->{'ext_unit_parent'}
-                                                ,'ext_id'=>$args->{'ext_id_parent'}}
+                ($args->{'db_unit_parent'},$exists)=GetDbUnit({
+                                                 'ext_unit' =>$args->{'ext_unit_parent'}
+                                                ,'ext_id'   =>$args->{'ext_id_parent'}}
                                                 ,'y');
                 if ($apiis->status) {                    
                     push(@{$record->{'data'}->{'ext_parent'}->{'errors'}},$apiis->errors); 
