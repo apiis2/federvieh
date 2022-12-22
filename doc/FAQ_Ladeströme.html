@@ -27,24 +27,33 @@ function show(id) {
     <a href="http://federvieh.local/doc/Beispiel_LS01.xlsx">Beispiel</a>
     <p> 
 Über diesen Ladestrom werden Zuchtstämme an das Herdbuch gemeldet. Dazu wird eine Datei je Zuchtstamm in der nachfolgend beschriebenen Form erstellt. Neben der Erfassung in Excel können die Daten auch über einen Ladestrom erfaßt werden.
-<h3>Excel</h3>
-Hinweis: Die grauen Bereiche dürfen nicht überschrieben werden.<p>
+<h3>Meldung eines Zuchtstammes</h3>
+Das nachfolgende Beispiel ist wie folgt zu interpretieren: Der Züchter mit der Züchternummer C361H hat einen Zuchtstamm mit der Bezeichnung 2022-1 erstellt. Der Zuchtstamm enthält Tiere der Rasse Perlhuhn im Farschlag blau mit Perlung. Der Zuchtstamm ist ab 01.06.2022 gültig. Der Zuchtstamm besteht aus einem Hahn und zwei Hennen. Der Hahn hat die Bundesringnummer 20AP3. Der Hahn entstammt aus einer Verpaarung in der Vater (Bundesring 19K2) und Mutter (Bundesring 18LO243) direkt miteinander gepaart wurden. Von den beiden Hennen des Zuchtstammes ist eine Henne ein Zukauf und hat keinen Bundesring, sondern eine Züchternummer. Der Züchter ist C34H, die Nummer 223. Die Eltern des Tieres sind im Zuchtstamm des Herkunftszüchters registriert. Der Zuchtstamm heißt C34H-20:Stall2. Die andere der beiden Hennen hat einen Bundesring 20C28 und entstammt einem Zuchtstamm des oben angegebenen Züchters C361H. Der Zuchtstamm heißt vollständig C361H-20:12. Der Zuchtstamm der Henne bestand aus den beiden Hähnen mit den Bundesringnummern 19LW23 und 19K12 sowie den beiden Hennen mit den Bundesringnummern 19L01 und 19K15.
     <img width="1000" src="http://federvieh.local/doc/LS01_excel.png">
-    <h4>Züchter</h4>Muss das unter ID in der Gruppe:'breeder' angegebene Züchterkürzel sein:<p>
+Hinweis: Die grauen Bereiche dürfen nicht überschrieben werden.<p>
+    <h4>Züchter</h4>Züchternummer (nicht den Namen). Wenn nicht bekannt, dann beim Zuchtverband zu erfragen. 
+    <h4>gültig ab</h4>Ab dem Zeitpunkt werden Leistungen des Zuchtstammes wie z.B. Anzahl Eier diesem Zuchtstamm zugeordnet.  
+    <h4>Rasse</h4>Rassebezeichnung. Nur die in der Liste aufgeführten Rassen sind gültig. 
+    <h4>Farbe</h4>Farbschlag. Nur die in der Liste aufgeführten Farbschläge sind gültig. Hat eine Rasse keine Farbschläge, bleibt das Feld leer. 
+    <h4>ZuchtstammID</h4>Die Bezeichnung des Zuchtstammes muss in Verbindung mit der Züchternummer und dem Jahr eindeutig sein. Achtung: Enthält der Zuchtstamm Tiere, die bereits in einem anderen Zuchtstamm aufgeführt sind, dann wird der andere Zuchtstamm geschlossen.  <p>
+    Wie die Tiernummer besteht auch die ZuchtstammID aus drei Teilen
+    <ul>Nummernsystems: Hier immer "zuchtstamm" </ul>
+    <ul>Nummernkreis: Hier immer Züchternummer-Jahr z.B. C385H-22</ul>
+    <ul>Nummer: eine beliebige Bezeichnung z.B: 1 oder Stall5 oder ...</ul>
+    <h4>Hahn</h4>In der Spalte werden die Hähne des Zuchtstammes aufgeführt. Sie können mit der Bundesringnummer oder mit einer gültigen Züchternummer bezeichnet sein. Die Ringnummer hat das Format <p>Format: JJBBZZZ (JahrJahr-BuchstabeBuchstabe-ZahlZahlZahl)(z.B. 20G10 oder 15AB347). Die Züchternummer kann beliebig sein. Muss aber die Züchternummer vorangestellt haben (z.B: C361H:223). Der Doppelpunkt dient der Abgrenzung zwischen Züchternummer und Tiernummer. 
+    <h4>Kükennummer</h4>Her kann gegebenenfalls die Flügelnummer angegeben werden. Das ist nur sinnvoll, wenn es Leistungen gibt, die nur über die Flügelnummer abgerufen werden können. Sofern es eine Züchter- oder Bundesringnummer gibt, kann das Feld leer bleiben.
+    <h4>ZuchtstammID</h4>Abstammung des Hahnes. Unter dieser ID sind in der Datenbank die Eltern des Hahnes hinterlegt. 
+    <h4>Hahn (Ring-/Züchternummer)</h4>Vater des Hahnes. S.u. "Hahn"
+    <h4>Hennen (Ring-/Züchternummer)</h4>Mutter des Hahnes. S.u. "Hahn
+
+    <h4>Hennen</h4>In den nächsten Zeilen werden alle Hennen des Zuchtstammes aufgeführt. Die Angaben zur Nummer, Kükennumer und Abstammung sind analog der Angaben beim Hahn.
+    <h4>Hinweise für den Koordinator</h4>
+    <h4>Züchter</h4>Die Nummer muss in der Klasse "breeder" definiert sein<p>
     <img width="400" src="http://federvieh.local/doc/LS05_unit.png">
     <h4>Rasse</h4>Muss der unter 'Externer Schlüssel' in der Klasse: 'BREED' angegebene Schlüssel sein<p>
     <img width="400" src="http://federvieh.local/doc/LS05_codes_breed.png">
     <h4>Farbe</h4>Muss der unter 'Externer Schlüssel' in der Klasse: 'FARBSCHLAG' angegebene Schlüssel sein<p>
     <img width="400" src="http://federvieh.local/doc/LS05_codes_farbschlag.png">
-    <h4>Hahn-Ring</h4>Ringnummer des Hahnes <p>Format: JJBBZZZ (JahrJahr-BuchstabeBuchstabe-ZahlZahlZahl)(z.B. 20G10 oder 15AB347)
-    <h4>Kükennummer</h4>Flügelnummer des Hahnes. 
-    <h4>Vater-Ring</h4>Ringnummer des Hahnes - Format: JJBBZZZ (JahrJahr-BuchstabeBuchstabe-ZahlZahlZahl)(z.B. 20G10 oder 15AB347)
-    <h4>Mutter-Ring</h4>Ringnummer der Mutter - Format: JJBBZZZ (JahrJahr-BuchstabeBuchstabe-ZahlZahlZahl)(z.B. 20G10 oder 15AB347)
-
-    <h4>Henne-Ring</h4>Ringnummer der Henne -Format: JJBBZZZ (JahrJahr-BuchstabeBuchstabe-ZahlZahlZahl)(z.B. 20G10 oder 15AB347)
-    <h4>Kükennummer</h4>Flügelnummer der Henne. 
-    <h4>Vater-Ring</h4>Ringnummer des Vaters - Format: JJBBZZZ (JahrJahr-BuchstabeBuchstabe-ZahlZahlZahl)(z.B. 20G10 oder 15AB347)
-    <h4>Mutter-Ring</h4>Ringnummer der Mutter - Format: JJBBZZZ (JahrJahr-BuchstabeBuchstabe-ZahlZahlZahl)(z.B. 20G10 oder 15AB347)
 <p>    
 Eine Übersicht über Zu- und Abgänge in einem bestimmten Zeitraum je Züchter und Rasse kann über die <a onclick="javascript:show('bestandsliste');" href="#bestandsliste">Bestandsliste</a> aufgerufen werden.     
 
