@@ -81,21 +81,33 @@ sub LO_LS21_Vorwerkhuehner {
             map { $_=~s/\s+$//g } @data;
 
             #-- Daten sichern  
-#            push( @{ $json->{ 'Bak' } },join(';',@data)); 
             my $sdata=join(';',@data);
        
             next if ($sdata=~/ZuchtstammID/);
 
-#            push( @{ $json->{ 'Bak' } },$sdata); 
-   
             my $sex;
             if ($data[15]=~/^0/) {  #-- weiblich?
                 $sex='2';
             } elsif ($data[15]=~/^1/ ) {
                 $sex='1';
             }
-      
+     
+            if ($data[0] eq 'Lothar') {
+                $data[1]='VWH8(Hü)';
+            }
+            if ($data[2] eq 'Lothar') {
+                $data[3]='VWH8(Hü)';
+            }
+
             ($vyear)=($data[4]=~/^(..)/);
+
+            #-- Kükennummer setzen, wenn diese leer und Bundesringnummer nicht dem Format folgt
+            if ((($data[13] eq '') or ($data[13] eq $data[8])) and ($data[16]!~/^\D{1,2}\d{1,}$/)) {
+                $data[13]=$data[16];
+            }
+            if ($data[16]!~/^\D{1,2}\d{1,}$/) {
+                $data[16]='';
+            }
 
 #            if ($data[12] eq '') {
 #                $data[12]='01.01.20'.$vyear ;
@@ -210,7 +222,7 @@ sub LO_LS21_Vorwerkhuehner {
         foreach (keys %{ $record->{ 'data' } }) {
             $args->{$_}=$record->{ 'data' }->{$_}->{'value'};
         }
-
+        
         my $vzst=$args->{ 'ext_forster' }.':::'.$args->{'ext_parent'}.':::'.$args->{'schlupf'};
 
         #-- Zuchtstamm initialisieren 
@@ -237,11 +249,11 @@ sub LO_LS21_Vorwerkhuehner {
     
         $zst->{$vzst}->{'SchlupfDt'}=$args->{'schlupfdatum'} if ($args->{'schlupfdatum'} and !$zst->{$vzst}->{'SchlupfDt'});
 
-        $zst->{$vzst}->{'ZSt-Schlupf-Anzahl-Geschlüpft'}++     if ($args->{'schlupfergebnis'}==1); 
-        $zst->{$vzst}->{'ZSt-Schlupf-Anzahl-Klarei'}++         if ($args->{'schlupfergebnis'}==2); 
-        $zst->{$vzst}->{'ZSt-Schlupf-Anzahl-Absterber'}++      if ($args->{'schlupfergebnis'}==3); 
-        $zst->{$vzst}->{'ZSt-Schlupf-Anzahl-Steckenbleiber'}++ if ($args->{'schlupfergebnis'}==4); 
-        $zst->{$vzst}->{'ZSt-Schlupf-Anzahl-Unbekannt'}++      if ($args->{'schlupfergebnis'}==9); 
+        $zst->{$vzst}->{'ZSt-Schlupf-Anzahl-Geschlüpft'}++     if ($args->{'schlupfergebnis'} eq '1'); 
+        $zst->{$vzst}->{'ZSt-Schlupf-Anzahl-Klarei'}++         if ($args->{'schlupfergebnis'} eq '2'); 
+        $zst->{$vzst}->{'ZSt-Schlupf-Anzahl-Absterber'}++      if ($args->{'schlupfergebnis'} eq '3'); 
+        $zst->{$vzst}->{'ZSt-Schlupf-Anzahl-Steckenbleiber'}++ if ($args->{'schlupfergebnis'} eq '4'); 
+        $zst->{$vzst}->{'ZSt-Schlupf-Anzahl-Unbekannt'}++      if ($args->{'schlupfergebnis'} eq '9'); 
     }
 
     $z=0;
@@ -257,8 +269,8 @@ sub LO_LS21_Vorwerkhuehner {
         foreach (keys %{ $record->{ 'data' } }) {
             $args->{$_}=$record->{ 'data' }->{$_}->{'value'};
         }
-
-if ($z==101) {
+print $z."\n";
+if ($z==622) {
     print "kk";
 }
         #-- Datenbehandlung=Erweiterung um Jahr, wenn zweistellig  
@@ -287,10 +299,41 @@ if ($z==101) {
                 $args->{$vd}="$dd.$mm.$yy";
             }
         }
+   
+        #-- Default setzen 
+        if (!$args->{'schlupf'}) {
+            $args->{'schlupf'}=0;
+
+            my $a= Apiis::Errors->new(
+                        type       => 'DATA',
+                        severity   => 'CRIT',
+                        from       => 'LO_LS21_Vorwerkhuehner',
+                        ext_fields => ['schlupf'],
+                        msg_short  =>"Kein Schlupf definiert => wird auf '0' gesetzt."
+                    );
+            
+            push(@{$record->{'data'}->{ 'text_sex' }->{'warnings'}},$a); 
+        }
 
         my $vzst=$args->{ 'ext_forster' }.':::'.$args->{'ext_parent'}.':::'.$args->{'schlupf'};
 
         $args->{'schlupfdatum'}=$zst->{$vzst}->{'SchlupfDt'} if ($args->{'schlupfdatum'} eq '');
+        
+        if (!$args->{'schlupfdatum'}) {
+
+            my $a= Apiis::Errors->new(
+                        type       => 'DATA',
+                        severity   => 'CRIT',
+                        from       => 'LO_LS21_Vorwerkhuehner',
+                        ext_fields => ['schlupf'],
+                        msg_short  =>"Kein Schlupfdatum definiert => gesamter Datensatz wird ignoriert."
+                    );
+            
+            push(@{$record->{'data'}->{ 'text_sex' }->{'errorss'}},$a);
+
+            goto EXIT;
+        }
+
         ($args->{'schlupfjahr'})=($zst->{$vzst}->{'SchlupfDt'}=~/(\d{2})$/);
 
         #-- Predefinition 
@@ -309,82 +352,83 @@ if ($z==101) {
         #
         #######################################################################################
        
+        #-- Zuchtstamm holen
+        my $guid=undef;
+        $args->{'ext_id_parent'}=$args->{'ext_id_parent'}.'-'.$args->{'schlupfjahr'};
+        
+        ($args->{'ext_parent'})=($args->{'ext_parent'}=~/^(\d\d)/);
+
+        ($args->{'db_parents'}, $guid) = GetDbAnimal({  'ext_unit'  =>$args->{'ext_unit_parent'},
+                                                        'ext_id'    =>$args->{'ext_id_parent'},
+                                                        'ext_animal'=>$args->{'ext_parent'}
+        });
+
+        $apiis->status(0);
+        $apiis->del_errors;
+        my $exists;
+    
+        #-- wenn kein Tierstamm gefunden wurde, dann neu erzeugen  
+        if (!$guid) {
+            
+            ($args->{'db_unit_parent'},$exists)=GetDbUnit({
+                                                'ext_unit' =>$args->{'ext_unit_parent'}
+                                            ,'ext_id'   =>$args->{'ext_id_parent'}}
+                                            ,'y');
+            if ($apiis->status) {                    
+                push(@{$record->{'data'}->{'ext_parent'}->{'errors'}},$apiis->errors); 
+                $apiis->status(0);
+                $apiis->del_errors;
+            }
+            
+            #-- neue interne Nummer für Zuchtstamm erezeugen 
+            $args->{'db_parents'} = $apiis->DataBase->seq_next_val('seq_transfer__db_animal');
+
+            $zst->{$vzst}->{'db_parents'}=$args->{'db_parents'};
+            $zst->{$vzst}->{'db_parents_db_unit'}=$args->{'db_unit_parent'};
+
+            #-- Zuchtstamm in transfer anlegen 
+            $guid=undef;
+            $guid=CreateTransfer($apiis,
+                                {'db_animal'=>$args->{'db_parents'},
+                                'db_unit'=>$args->{'db_unit_parent'},
+                                'ext_unit'=>$args->{'ext_unit_parent'},
+                                'ext_id'=>$args->{'ext_id_parent'},
+                                'ext_animal'=>$args->{'ext_parent'},
+                                'opening_dt'=>$zst->{$vzst}->{'SchlupfDt'}}
+                                );
+        
+            if ($apiis->status) {                    
+                push(@{$record->{'data'}->{'ext_parent'}->{'errors'}},$apiis->errors); 
+                $record->{'data'}->{'ext_parent'}->{'status'}='2';
+                $apiis->status(1);
+                $apiis->del_errors;
+            }
+        
+            if ($guid) {
+                $record->{'data'}->{'ext_parent'}->{'status'}='0';
+            }
+        
+            $zst->{$vzst}->{'db_parents'}=$args->{'db_parents'};
+        }
+        else {
+            $zst->{$vzst}->{'db_parents'}=$args->{'db_parents'};
+            $record->{'data'}->{'ext_parent'}->{'status'}='3';
+        }
+
+        my $db_unit; 
+        $exists=undef;
+        ($db_unit, $exists)=GetDbUnit({'ext_unit'=>$args->{'ext_unit_location_fo'},
+                                       'ext_id'=>$args->{'ext_forster'}},
+                                       'create');
+
+        #-- Fehlerbehandlung 
+        if (Federvieh::Fehlerbehandlung($apiis,$exists, $record, ['ext_forster'] , $apiis->errors)) {
+            goto EXIT;
+        }
+
         if (!$zst->{$vzst}->{'erledigt'}) {
             $zst->{$vzst}->{'erledigt'}=1;
             
-            #-- Zuchtstamm holen
-            my $guid=undef;
-            $args->{'ext_id_parent'}+='-'.$args->{'schlupfjahr'};
-            
-            ($args->{'ext_parent'})=($args->{'ext_parent'}=~/^(\d\d)/);
-
-            ($args->{'db_parents'}, $guid) = GetDbAnimal({  'ext_unit'  =>$args->{'ext_unit_parent'},
-                                                            'ext_id'    =>$args->{'ext_id_parent'},
-                                                            'ext_animal'=>$args->{'ext_parent'}
-            });
-
-            $apiis->status(0);
-            $apiis->del_errors;
-            my $exists;
-        
-            #-- wenn kein Tierstamm gefunden wurde, dann neu erzeugen  
-            if (!$guid) {
-                
-                ($args->{'db_unit_parent'},$exists)=GetDbUnit({
-                                                 'ext_unit' =>$args->{'ext_unit_parent'}
-                                                ,'ext_id'   =>$args->{'ext_id_parent'}}
-                                                ,'y');
-                if ($apiis->status) {                    
-                    push(@{$record->{'data'}->{'ext_parent'}->{'errors'}},$apiis->errors); 
-                    $apiis->status(0);
-                    $apiis->del_errors;
-                }
-                
-                #-- neue interne Nummer für Zuchtstamm erezeugen 
-                $args->{'db_parents'} = $apiis->DataBase->seq_next_val('seq_transfer__db_animal');
-
-                $zst->{$vzst}->{'db_parents'}=$args->{'db_parents'};
-                $zst->{$vzst}->{'db_parents_db_unit'}=$args->{'db_unit_parent'};
-
-                #-- Zuchtstamm in transfer anlegen 
-                $guid=undef;
-                $guid=CreateTransfer($apiis,
-                                    {'db_animal'=>$args->{'db_parents'},
-                                    'db_unit'=>$args->{'db_unit_parent'},
-                                    'ext_unit'=>$args->{'ext_unit_parent'},
-                                    'ext_id'=>$args->{'ext_id_parent'},
-                                    'ext_animal'=>$args->{'ext_parent'},
-                                    'opening_dt'=>$zst->{$vzst}->{'SchlupfDt'}}
-                                    );
-            
-                if ($apiis->status) {                    
-                    push(@{$record->{'data'}->{'ext_parent'}->{'errors'}},$apiis->errors); 
-                    $record->{'data'}->{'ext_parent'}->{'status'}='2';
-                    $apiis->status(1);
-                    $apiis->del_errors;
-                }
-            
-                if ($guid) {
-                    $record->{'data'}->{'ext_parent'}->{'status'}='0';
-                }
-            
-                $zst->{$vzst}->{'db_parents'}=$args->{'db_parents'};
-            }
-            else {
-                $zst->{$vzst}->{'db_parents'}=$args->{'db_parents'};
-                $record->{'data'}->{'ext_parent'}->{'status'}='3';
-            }
-
-            my $db_unit; 
-            $exists=undef;
-            ($db_unit, $exists)=GetDbUnit({'ext_unit'=>$args->{'ext_unit_location_fo'}
-                    ,'ext_id'=>$args->{'ext_forster'}});
-   
-            #-- Fehlerbehandlung 
-            if (Federvieh::Fehlerbehandlung($apiis,$exists, $record, ['ext_forster'] , $apiis->errors)) {
-                goto EXIT;
-            }
-
             
             #-- Leistungen wegschreiben
             #-- Event erzeugen
@@ -393,6 +437,7 @@ if ($z==101) {
             ($db_event, $exists) = GetDbEvent({
                                         'ext_unit_event'        => $args->{'ext_unit_location_fo'},
                                         'ext_id_event'          => $args->{'ext_forster'},
+                                        'ext_field'             => 'schlupf', 
 
                                         'ext_standard_events_id'=> $args->{'event_schlupf'},
                                         'event_dt'              => $zst->{$vzst}->{'SchlupfDt'}},
@@ -437,7 +482,8 @@ if ($z==101) {
             }
         }
     
-        my $guid; my $exists;
+        $guid=undef;
+        $exists=undef;
         ($guid,$exists)=GetDbPerformance({
                             'db_animal' => $zst->{$vzst}->{'db_parents'},
                             'db_event'  => $zst->{$vzst}->{ 'db_event' },
@@ -534,6 +580,11 @@ if ($z==101) {
             #-- skip if a db_animal found 
             next if ($args->{'db_animal'});
 
+            #-- Jahr vor Bundesringnummer setzen 
+            if (($e eq 'br') and $args->{'ext_animal_'.$e}) {
+                $args->{'ext_animal_'.$e}=$args->{'schlupfjahr'}.$args->{'ext_animal_'.$e} ;
+            }
+
             #-- zwischenspeichern     
             $found=$e;
 
@@ -552,7 +603,7 @@ if ($z==101) {
         }
 
         #-- wenn kein Tier gefunden wurde, dann Fehler zurücksetzen und Tier anlegen 
-        if (!$guid) {
+        if (!$args->{'db_animal'}) {
 
             $apiis->del_errors;
             $apiis->status(0); 
@@ -957,6 +1008,7 @@ if ($z==101) {
             my ($db_event, $exists) = GetDbEvent({
                                             'ext_unit_event'        => $args->{'ext_unit_location_fo'},
                                             'ext_id_event'          => $args->{'ext_forster'},
+                                            'ext_field'             => $ext_fielde, 
 
                                             'ext_standard_events_id'=> $targs->{'standard_events_id'},
                                             'event_dt'              => $targs->{'event_dt'}},
