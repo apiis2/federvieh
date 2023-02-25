@@ -560,16 +560,19 @@ sub GetPerformances {
         my $i=1;
 
         foreach my $trait (@$tt) {
-            if ($trait->{'type'} eq 'long_name') {
+            
+            next if (!$trait);
+            
+            if (($trait->{'type'}) and ($trait->{'type'} eq 'long_name')) {
                 push( @gr, "user_get_ext_code(z.f".$i.", 'l') as f".$i);
             }
-            elsif ($trait->{'type'} eq 'ext_id') {
+            elsif (($trait->{'type'}) and ($trait->{'type'} eq 'ext_id')) {
                 push( @gr, "user_get_ext_id(z.f".$i.") as f".$i);
             }
-            elsif ($trait->{'type'} eq 'year') {
+            elsif (($trait->{'type'}) and ($trait->{'type'} eq 'year')) {
                 push( @gr, "z.f".$i." as f".$i);
             }
-            elsif ($trait->{'field'} eq 'Gesamt') {
+            elsif (($trait->{'field'}) and ($trait->{'field'} eq 'Gesamt')) {
                 push( @gr, "'Gesamt' as f".$i);
             }
             else {
@@ -586,6 +589,9 @@ sub GetPerformances {
         my @gr; 
 
         foreach my $trait (@$tt) {
+            
+            next if (!$trait);
+            
             push(@gr,$trait->{'field'});
         }
 
@@ -612,6 +618,9 @@ sub GetPerformances {
         my @tt; my $i=1;
         
         foreach my $trait (@$tt) {
+            
+            next if (!$trait);
+            
             if ($trait->{'field'} eq 'db_sex') {
                 push(@tt, 'animal.db_sex as f'.$i);
                 $ht->{'inner join animal on sp.db_animal=animal.db_animal'} = 1
@@ -624,7 +633,7 @@ sub GetPerformances {
             elsif ($trait->{'field'} eq 'db_event_type') {
                 push(@tt, 'standard_events.db_event_type  as f'.$i);
             }
-            elsif ($trait->{'type'} eq 'year') {
+            if (($trait->{'type'}) and ($trait->{'type'} eq 'year')) {
                 push( @tt, "date_part('year', event.event_dt) as f".$i);
             }
             if ($trait->{'field'} eq 'db_location') {
@@ -644,7 +653,9 @@ sub GetPerformances {
         
         foreach my $trait (@$tt) {
             my $alias='';
-            
+           
+            next if (!$trait);
+
             if ($trait->{'field'} eq 'event_dt') {
                 $alias='event.';
             }
