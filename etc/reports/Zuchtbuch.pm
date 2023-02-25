@@ -2,15 +2,17 @@ use lib $apiis->APIIS_LOCAL . "/lib";
 use SQLStatements;
 use Federvieh;
 use Apiis::Misc;
+use r_plot_chicks;
 use r_plot;
+use JSON;
 use strict;
 use warnings;
 
 sub Zuchtbuch {
     my ( $self, $ext_breed, $von, $bis, $flagdata ) = @_;
 
-    $von='01.01.2021';
-    $bis='31.12.2021';
+    $von='01.01.2020';
+    $bis='31.12.2022';
     $flagdata=undef;
 
     my $sql      = "Set datestyle to 'german'";
@@ -26,7 +28,7 @@ sub Zuchtbuch {
 
     push(@$bodyd, {'tag'=>'div','value'=>'Zuchtbuch - Vorwerkhühner 2021','attr'=>[{'style'=>[{'font-size'=>'30px'}]}]});
    
-    push(@$bodyd, {'tag'=>'img','value'=>'','attr'=>[{'width'=>'500px'},{'src'=>'http://federvieh.local/etc/titel_vwh.png'}]});
+    push(@$bodyd, {'tag'=>'img','value'=>'','attr'=>[{'width'=>'500px'},{'src'=>'http://federvieh.local/tmp/titel_vwh.png'}]});
 
     ########################################################################################################
     #
@@ -416,11 +418,9 @@ sub Zuchtbuch {
     my $g=[];
     my $n=[];
     map {
-        push(@$g, $hs->{$_}->[2]);
-        push(@$n, "'$_'");
+        push(@$g, [$hs->{$_}->[2]]);
+        push(@$n, [$_]);
     } keys %{$hs};
-
-
 
     #-- einzelne Zellen an Zeile anfüggen 
     foreach my $key (sort keys %$hs) {
@@ -527,35 +527,33 @@ sub Zuchtbuch {
         push(@$bodyd, $_);
     } @$atag;
 
-    #-- Grafik
-    my $filename=sprintf( "%08X", rand(0xfffffffffffff));
+    my $filename=sprintf( "%08X", rand(0xffffffff));
     my $path=$apiis->APIIS_LOCAL.'/tmp/'.$filename;
 
-    #- prepare hash for r_plot;
-    my %parameter_hash = (
-            filename =>$path,
-            sql      => '',
-            data => [$n, $g],
-            no_sql_elements => '',
-            legend        => [],
-            second_y_axis => 'no',
-            export_format => 'jpg',
-            chart_type => 'barplot_zplan', #'barplot',
-            titel      => "'Schlupfraten getrennt nach Züchtern'",
-            subtitel   => '""',
-            xlabel     => '"Züchter"',
-            ylabel     => '"Schlupfrate"',
-            mtext_l    => '', # additional text
-            mtext_r    => '',
-            rotate     => 0,
-            color      => 'yes',
-            x_dates    => 'no'
-            );
+    my $hsg1={ 
+                "titel" =>["Schlupfrate getrennt nach Züchtern"],
+                "group" =>["Züchter"],
+                "header"=> $n ,
+                "data"  => $g ,
+                "labx"=>["Züchter"],
+                "laby"=>["Schlupfrate in %"],
+                "plot"=>["barchart"]
+    };
 
-    my $href = r_plot::r_plot( \%parameter_hash );
+    my $hsg2={
+                "titel"=>["Schlupfrate\n über alle Züchter 59.4"],
+                "data"=>[ [59.4] ],
+                "plot"=>["line"]
+    };
+   
+    my $json=to_json({'chart'=>[$hsg1,$hsg2], 'filename'=>rand() } );
 
-    my $d={'tag'=>'img','value'=>'','attr'=>[{'width'=>'50%'},{'src'=>'/tmp/'.$filename.'.jpg'},
-           {'style'=>[{'transform'=>'rotate(90deg)'}]}]};
+    open( RIN, ">$path");
+
+    my %hash = ( json => $json );
+    my $outfile = r_plot_chicks($apiis, \%hash );
+
+    my $d={'tag'=>'img','value'=>'','attr'=>[{'width'=>'100%'},{'src'=>'/tmp/'.$outfile} ]};
 
     push(@$bodyd, {'tag'=>'div','data'=>[$d],'attr'=>[{'style'=>[{'font-size'=>'30px'},{'margin-left'=>'200px'}]}]});
 
@@ -721,12 +719,67 @@ sub Zuchtbuch {
 
     ########################################################################################################
     #
+    #-- Vorbereitung Grafik
+    #
+    ########################################################################################################
+
+    $g=[];
+    $n=[];
+    map {
+        my $tt=[];
+        
+        for (my $z=1; $z<=4; $z++) {
+
+
+            if ($hs->{$_}->[$z]) {
+                push(@$tt, $hs->{$_}->[$z]);
+            }
+            else {
+                push(@$tt, '0');
+            }
+        }
+
+        push(@$g,$tt);
+        push(@$n, [$_]);
+    } keys %{$hs};
+
+    #-- Grafik
+    $filename=sprintf( "%08X", rand(0xffffffff));
+    $path=$apiis->APIIS_LOCAL.'/tmp/'.$filename;
+
+    $hsg1={ 
+                "titel" =>["Schlupfrate in %"],
+                "group" =>["Schlupf 1", "Schlupf 2","Schlupf 3", "Gesamt"],
+                "header"=> $n ,
+                "data"  => $g ,
+                "labx"=>["Jahr"],
+                "laby"=>["Schlupfrate [%]"],
+                "plot"=>["linechart"]
+    };
+
+    $hsg2={};
+   
+    $json=to_json({'chart'=>[$hsg1,$hsg2], 'filename'=>rand() });
+
+    open( RIN, ">$path");
+
+    %hash = ( json => $json );
+    $outfile = r_plot_chicks($apiis, \%hash );
+
+    $d={'tag'=>'img','value'=>'','attr'=>[{'width'=>'50%'},{'src'=>'/tmp/'.$outfile},
+           {'style'=>[{'transform'=>'rotate(90deg)'}]}]};
+
+    push(@$bodyd, {'tag'=>'div','data'=>[$d],'attr'=>[{'style'=>[{'font-size'=>'30px'},{'margin-left'=>'200px'}]}]});
+    
+    ########################################################################################################
+    #
     # Gewichte Hähne  
     #
     ########################################################################################################
   
     $trb=[];
     $tr=[];
+    $hs={};
 
     foreach my $trait ('Schlupfgewicht','Körpergewicht 2. LW', 'Körpergewicht 10.LW',
                        'Körpergewicht 20.LW','Körpergewicht am Bewertungstag') {
@@ -763,6 +816,7 @@ sub Zuchtbuch {
 
             #-- einzelne Zellen an Zeile anfüggen 
             for (my $i=0; $i<5; $i++) {
+      
                 #-- einzelne Zellen an Zeile anfüggen 
                 push( @$td, {'tag'=>'td','value'=>$q->[ $i ]});
             }
@@ -883,7 +937,231 @@ sub Zuchtbuch {
 
     ########################################################################################################
     #
-    # Gewichte Hähne +Hennen nach  Besitzern 
+    # Gewichte Hähne und Hennen nach Züchtern 
+    #
+    ########################################################################################################
+  
+    $trb=[];
+    $tr=[];
+    $hs={};
+
+    foreach my $trait ('1','2') {
+
+        ($sql, $sqlf)=SQLStatements::GetPerformances({
+                'groups'=>[{'field'=>'db_location', 'type'=>'ext_id'}],
+                'wheres'=>[{'field'=>'event_dt', 'value'=>$von, 'operator'=>'>='},
+                           {'field'=>'event_dt', 'value'=>$bis, 'operator'=>'<='},
+                           {'field'=>'label', 'value'=>'Körpergewicht 20.LW', 'operator'=>'='},
+                           {'field'=>'db_sex', 'value'=>"user_get_db_code('SEX','".$trait."')", 'operator'=>'=', 'ticks'=>'no'},],
+                'functs'=>[{'field'=>'round(avg(result),1)'}]           
+        });
+
+        my $sql_ref = $apiis->DataBase->sys_sql( $sqlf );
+        if ( $sql_ref->status and ($sql_ref->status == 1 )) {
+            $apiis->status( 1 );
+            $apiis->errors( $sql_ref->errors );
+            goto ERR;
+        }
+       
+        if ($flagdata) {
+            $sql=Federvieh::AddAnimalToSql($sql);
+            $link=Federvieh::PrintSQLRecordset($apiis, $sql);
+            $linkf=Federvieh::PrintSQLRecordset($apiis, $sqlf);
+            
+            push(@$atag, {'tag'=>'a','value'=>$trait.' (Tiere) ','attr'=>[{'href'=>$link}]});
+            push(@$atag, {'tag'=>'a','value'=>$trait.' (Tabelle) ','attr'=>[{'href'=>$linkf}]});
+        }
+
+        while ( my $q = $sql_ref->handle->fetch ) {
+
+            #-- Daten für Grafik speichern 
+            $hs->{$q->[ 0 ]}=[] if (!exists $hs->{$q->[ 0 ]});
+            $hs->{$q->[ 0 ]}->[ $trait ]=$q->[ 1 ];
+        }
+    }
+
+    map {
+        push(@$bodyd, $_);
+    } @$atag;
+
+    
+    ########################################################################################################
+    #
+    #-- Vorbereitung Grafik
+    #
+    ########################################################################################################
+
+    $g=[];
+    $n=[];
+    map {
+        push(@$g, [$hs->{$_}->[1], $hs->{$_}->[2]]);
+        push(@$n, [$_]);
+    } keys %{$hs};
+
+    #-- Grafik
+    $filename=sprintf( "%08X", rand(0xffffffff));
+    $path=$apiis->APIIS_LOCAL.'/tmp/'.$filename;
+
+    $hsg1={ 
+                "titel" =>["Körpergewichte 20. Lebenswoche"],
+                "group" =>["Hähne", "Hennen"],
+                "header"=> $n ,
+                "data"  => $g ,
+                "labx"=>["Züchter"],
+                "laby"=>["Körpergewicht [kg]"],
+                "plot"=>["barchart"]
+    };
+
+    $hsg2={
+                "titel"=>["Hähne: 999 g","Hennen: 888 g"],
+                "data"=>[ ["999","888"] ],
+                "plot"=>["line"]
+    };
+   
+    $json=to_json({'chart'=>[$hsg1,$hsg2], 'filename'=>rand() });
+
+    open( RIN, ">$path");
+
+    %hash = ( json => $json );
+    $outfile = r_plot_chicks($apiis, \%hash );
+
+    $d={'tag'=>'img','value'=>'','attr'=>[{'width'=>'50%'},{'src'=>'/tmp/'.$outfile},
+           {'style'=>[{'transform'=>'rotate(90deg)'}]}]};
+
+    push(@$bodyd, {'tag'=>'div','data'=>[$d],'attr'=>[{'style'=>[{'font-size'=>'30px'},{'margin-left'=>'200px'}]}]});
+
+
+    ########################################################################################################
+    #
+    # Gewichte Hähne/Hennen/Zuchthähne/Zuchthennen nach Züchtern 
+    #
+    ########################################################################################################
+  
+    $trb=[];
+    $tr=[];
+    $hs={};
+
+    foreach my $t ('1','2','3','4') {
+
+        my $vsex; my $dbs;
+        if ($t eq '1') {
+            $vsex='1';
+            $dbs='';
+        }
+        if ($t eq '2') {
+            $vsex='2';
+            $dbs='';
+        }
+        if ($t eq '3') {
+            $vsex='1';
+            $dbs={'field'=>'db_selection', 'value'=>"user_get_db_code('EINSTUFUNG','Z')", 'operator'=>'=', 'ticks'=>'no'};
+        }
+        if ($t eq '4') {
+            $vsex='2';
+            $dbs={'field'=>'db_selection', 'value'=>"user_get_db_code('EINSTUFUNG','Z')", 'operator'=>'=', 'ticks'=>'no'}
+        }
+        ($sql, $sqlf)=SQLStatements::GetPerformances({
+                'groups'=>[{'field'=>'db_location', 'type'=>'ext_id'}],
+                'wheres'=>[{'field'=>'event_dt', 'value'=>$von, 'operator'=>'>='},
+                           {'field'=>'event_dt', 'value'=>$bis, 'operator'=>'<='},
+                           {'field'=>'label', 'value'=>'Körpergewicht am Bewertungstag', 'operator'=>'='},
+                           {'field'=>'db_sex', 'value'=>"user_get_db_code('SEX','".$vsex."')", 'operator'=>'=', 'ticks'=>'no'},
+                           $dbs 
+                          ],
+                'functs'=>[{'field'=>'round(avg(result),1)'}]           
+        });
+
+        my $sql_ref = $apiis->DataBase->sys_sql( $sqlf );
+        if ( $sql_ref->status and ($sql_ref->status == 1 )) {
+            $apiis->status( 1 );
+            $apiis->errors( $sql_ref->errors );
+            goto ERR;
+        }
+       
+        if ($flagdata) {
+            $sql=Federvieh::AddAnimalToSql($sql);
+            $link=Federvieh::PrintSQLRecordset($apiis, $sql);
+            $linkf=Federvieh::PrintSQLRecordset($apiis, $sqlf);
+            
+            push(@$atag, {'tag'=>'a','value'=>$trait.' (Tiere) ','attr'=>[{'href'=>$link}]});
+            push(@$atag, {'tag'=>'a','value'=>$trait.' (Tabelle) ','attr'=>[{'href'=>$linkf}]});
+        }
+
+        while ( my $q = $sql_ref->handle->fetch ) {
+
+            #-- Daten für Grafik speichern 
+            $hs->{$q->[ 0 ]}=[] if (!exists $hs->{$q->[ 0 ]});
+            $hs->{$q->[ 0 ]}->[ $t ]=$q->[ 1 ];
+        }
+    }
+
+    map {
+        push(@$bodyd, $_);
+    } @$atag;
+
+    
+    ########################################################################################################
+    #
+    #-- Vorbereitung Grafik
+    #
+    ########################################################################################################
+
+    $g=[];
+    $n=[];
+    map {
+        my $tt=[];
+        
+        for (my $z=1; $z<=4; $z++) {
+
+
+            if ($hs->{$_}->[$z]) {
+                push(@$tt, $hs->{$_}->[$z]);
+            }
+            else {
+                push(@$tt, '0');
+            }
+        }
+
+        push(@$g,$tt);
+        push(@$n, [$_]);
+    } keys %{$hs};
+
+    #-- Grafik
+    $filename=sprintf( "%08X", rand(0xffffffff));
+    $path=$apiis->APIIS_LOCAL.'/tmp/'.$filename;
+
+    $hsg1={ 
+                "titel" =>["Körpergewichte am Bewertungstag"],
+                "group" =>["Hähne", "Hennen","Zuchthähne", "Zuchthennen"],
+                "header"=> $n ,
+                "data"  => $g ,
+                "labx"=>["Züchter"],
+                "laby"=>["Körpergewicht [kg]"],
+                "plot"=>["barchart"]
+    };
+
+    $hsg2={
+                "titel"=>["Hähne: 999 g","Hennen: 888 g", "Zuchthähne", "Zuchthennen"],
+                "data"=>[ ["999","888", "1220", "1111"] ],
+                "plot"=>["line"]
+    };
+   
+    $json=to_json({'chart'=>[$hsg1,$hsg2], 'filename'=>rand() });
+
+    open( RIN, ">$path");
+
+    %hash = ( json => $json );
+    $outfile = r_plot_chicks($apiis, \%hash );
+
+    $d={'tag'=>'img','value'=>'','attr'=>[{'width'=>'50%'},{'src'=>'/tmp/'.$outfile},
+           {'style'=>[{'transform'=>'rotate(90deg)'}]}]};
+
+    push(@$bodyd, {'tag'=>'div','data'=>[$d],'attr'=>[{'style'=>[{'font-size'=>'30px'},{'margin-left'=>'200px'}]}]});
+
+
+    ########################################################################################################
+    #
+    # Gewichte Hähne + Hennen nach  Besitzern 
     #
     ########################################################################################################
   
@@ -1204,8 +1482,10 @@ sub Zuchtbuch {
     $tr=[];
     $atag=[];
     $hs={};
+    my $hs_grafik={};
+    my $maxcol=0;
 
-    for (my $k=0; $k<3; $k++) {
+    for (my $k=1; $k<4; $k++) {
 
         my ($sql, $sqlf);
         ($sql, $sqlf)=SQLStatements::GetPerformances({
@@ -1241,6 +1521,9 @@ sub Zuchtbuch {
 
             $hs->{$q->[0]}=[] if (!exists $hs->{$q->[0]});
             push(@{$hs->{$q->[0]}},($q->[1],$q->[2],$q->[3]));
+
+            $hs_grafik->{$q->[0]}=[] if (!exists $hs_grafik->{$q->[0]});
+            push(@{$hs_grafik->{$q->[0]}},($q->[1]));
         }
     }
     
@@ -1302,6 +1585,47 @@ sub Zuchtbuch {
         push(@$bodyd, $_);
     } @$atag;
 
+    ########################################################################################################
+    #
+    #-- Vorbereitung Grafik
+    #
+    ########################################################################################################
+
+    $g=[];
+    $n=[];
+    map {
+        push(@$g,$hs_grafik->{$_});
+        push(@$n, [$_]);
+    } keys %{$hs_grafik};
+
+    #-- Grafik
+    $filename=sprintf( "%08X", rand(0xffffffff));
+    $path=$apiis->APIIS_LOCAL.'/tmp/'.$filename;
+
+    $hsg1={ 
+                "titel" =>["Bruteigewicht in g"],
+                "group" =>["Schlupf 1", "Schlupf 2","Schlupf 3"],
+                "header"=> $n ,
+                "data"  => $g ,
+                "labx"=>["Jahr"],
+                "laby"=>["Eigewicht [g]"],
+                "plot"=>["linechart"]
+    };
+
+    $hsg2={};
+   
+    $json=to_json({'chart'=>[$hsg1], 'filename'=>rand() });
+
+    open( RIN, ">$path");
+
+    %hash = ( json => $json );
+    $outfile = r_plot_chicks($apiis, \%hash );
+
+    $d={'tag'=>'img','value'=>'','attr'=>[{'width'=>'50%'},{'src'=>'/tmp/'.$outfile},
+           {'style'=>[{'transform'=>'rotate(90deg)'}]}]};
+
+    push(@$bodyd, {'tag'=>'div','data'=>[$d],'attr'=>[{'style'=>[{'font-size'=>'30px'},{'margin-left'=>'200px'}]}]});
+   
     ########################################################################################################
     #
     # Auswertung Körpegewichte von Hähnen nach Jahren 
@@ -1414,6 +1738,60 @@ sub Zuchtbuch {
 
     ########################################################################################################
     #
+    #-- Vorbereitung Grafik
+    #
+    ########################################################################################################
+
+    $g=[];
+    $n=[];
+    map {
+        my $tt=[];
+        
+        for (my $z=1; $z<=4; $z++) {
+
+
+            if ($hs->{$_}->[$z]) {
+                push(@$tt, $hs->{$_}->[$z]);
+            }
+            else {
+                push(@$tt, '0');
+            }
+        }
+
+        push(@$g,$tt);
+        push(@$n, [$_]);
+    } keys %{$hs};
+
+    #-- Grafik
+    $filename=sprintf( "%08X", rand(0xffffffff));
+    $path=$apiis->APIIS_LOCAL.'/tmp/'.$filename;
+
+    $hsg1={ 
+                "titel" =>["Entwicklung der Körpergewichte von Hähnen über die Jahre"],
+                "group" =>["2. LW", "10. LW","20. LW"],
+                "header"=> $n ,
+                "data"  => $g ,
+                "labx"=>["Jahr"],
+                "laby"=>["Körpergewicht in [g]"],
+                "plot"=>["linechart"]
+    };
+
+    $hsg2={};
+   
+    $json=to_json({'chart'=>[$hsg1,$hsg2], 'filename'=>rand() });
+
+    open( RIN, ">$path");
+
+    %hash = ( json => $json );
+    $outfile = r_plot_chicks($apiis, \%hash );
+
+    $d={'tag'=>'img','value'=>'','attr'=>[{'width'=>'50%'},{'src'=>'/tmp/'.$outfile},
+           {'style'=>[{'transform'=>'rotate(90deg)'}]}]};
+
+    push(@$bodyd, {'tag'=>'div','data'=>[$d],'attr'=>[{'style'=>[{'font-size'=>'30px'},{'margin-left'=>'200px'}]}]});
+    
+    #######################################################################################################
+    #
     # Auswertung Körpegewichte von Hennen nach Jahren 
     #
     ########################################################################################################
@@ -1522,6 +1900,59 @@ sub Zuchtbuch {
         push(@$bodyd, $_);
     } @$atag;
 
+    ########################################################################################################
+    #
+    #-- Vorbereitung Grafik
+    #
+    ########################################################################################################
+
+    $g=[];
+    $n=[];
+    map {
+        my $tt=[];
+        
+        for (my $z=1; $z<=4; $z++) {
+
+
+            if ($hs->{$_}->[$z]) {
+                push(@$tt, $hs->{$_}->[$z]);
+            }
+            else {
+                push(@$tt, '0');
+            }
+        }
+
+        push(@$g,$tt);
+        push(@$n, [$_]);
+    } keys %{$hs};
+
+    #-- Grafik
+    $filename=sprintf( "%08X", rand(0xffffffff));
+    $path=$apiis->APIIS_LOCAL.'/tmp/'.$filename;
+
+    $hsg1={ 
+                "titel" =>["Entwicklung der Körpergewichte von Hennen über die Jahre"],
+                "group" =>["2. LW", "10. LW","20. LW"],
+                "header"=> $n ,
+                "data"  => $g ,
+                "labx"=>["Jahr"],
+                "laby"=>["Körpergewicht in [g]"],
+                "plot"=>["linechart"]
+    };
+
+    $hsg2={};
+   
+    $json=to_json({'chart'=>[$hsg1,$hsg2], 'filename'=>rand() });
+
+    open( RIN, ">$path");
+
+    %hash = ( json => $json );
+    $outfile = r_plot_chicks($apiis, \%hash );
+
+    $d={'tag'=>'img','value'=>'','attr'=>[{'width'=>'50%'},{'src'=>'/tmp/'.$outfile},
+           {'style'=>[{'transform'=>'rotate(90deg)'}]}]};
+
+    push(@$bodyd, {'tag'=>'div','data'=>[$d],'attr'=>[{'style'=>[{'font-size'=>'30px'},{'margin-left'=>'200px'}]}]});
     ########################################################################################################
 
 
