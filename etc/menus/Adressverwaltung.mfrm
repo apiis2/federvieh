@@ -1,12 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE Form PUBLIC "1" "http://federvieh.local/etc/form2.dtd"[  
-  <!ENTITY NavigationButtons_Fields SYSTEM "http://federvieh.local/etc/navigationbuttons.xml">
-  <!ENTITY ActionButtons_Fields     SYSTEM "http://federvieh.local/etc/actionbuttons.xml">
-  <!ENTITY StatusLine_Block         SYSTEM "http://federvieh.local/etc/statusbar.xml">
-  <!ENTITY DumpButton_Block         SYSTEM "http://federvieh.local/etc/dumpbutton_block.xml">
-  <!ENTITY StatusLine2_Block        SYSTEM "http://federvieh.local/etc/statusbar.xml">
-  <!ENTITY CallForm_Block           SYSTEM "http://federvieh.local/etc/callform_button_block.xml">
-]>
+<!DOCTYPE Form PUBLIC "1" "form.dtd">
 <Form Name="Adressverwaltung_m2">
   <General Description="Menu" Name="General_0a2" StyleSheet="/etc/apiis.css"/>
   <Block Description="Adressverwaltung" Name="Block_0a2" NavigationBar="no">
@@ -46,6 +39,14 @@
        <Color BackGround="white" />
        <Format MarginTop="30px"/>
     </Image>
+    <Field Name="Field_901a6">
+	    <Button ButtonLabel="Adress-&amp;Uuml;bersicht drucken" URL="/etc/reports/Adressen.rpt" Command="do_open_report"/>
+      <Position Row="2" Column="5"/>
+      <Miscellaneous/>
+      <Text FontSize="12px" TextAlign="center"/>
+      <Color BackGround="#c5ffff"/>
+      <Format BorderStyle="groove" BorderColor="lightgray"/>
+    </Field>
     <Image Name="Image_31a2" Alt="Test" Src="/icons/blank1.gif">
       <Position Column="3" Row="2" Width="1px"/>
       <Color BackGround="black" />
@@ -56,15 +57,7 @@
        <Color BackGround="white" />
        <Format MarginTop="30px"/>
     </Image>
-    <Field Name="Field_82ea2">
-      <Button ButtonLabel="Adressen-Stammkarte" URL="MitgliederStammkarte.pfrm" Command="do_open_report"/>
-      <Position Column="5" Row="2"/>
-      <Miscellaneous/>
-      <Text FontSize="12px" TextAlign="center"/>
-      <Color BackGround="#c5ffff"/>
-      <Format BorderStyle="groove" BorderColor="lightgray"/>
-      
-    </Field>
+
     <Image Name="Image_71fa2" Alt="Test" Src="/icons/blank1.gif">
        <Position Column="6" Row="2" Width="1px"/>
        <Color BackGround="white" />
@@ -80,20 +73,20 @@
       <Format BorderStyle="groove" BorderColor="lightgray"/>
     </Field>
 
-    <Field Name="Field_901a6">
-	    <Button ButtonLabel="Adress-&amp;Uuml;bersicht drucken" URL="/etc/reports/Adressen.rpt" Command="do_open_report"/>
-      <Position Row="4" Column="5"/>
+
+<!--    
+    <Field Name="Field_82ea2">
+      <Button ButtonLabel="Adressen-Stammkarte" URL="MitgliederStammkarte.pfrm" Command="do_open_report"/>
+      <Position Column="5" Row="2"/>
       <Miscellaneous/>
       <Text FontSize="12px" TextAlign="center"/>
       <Color BackGround="#c5ffff"/>
       <Format BorderStyle="groove" BorderColor="lightgray"/>
     </Field>
-
     <Label Name="Label_1aa2" Content="Export">
       <Position Column="0" Columnspan="6" Row="5"/>
       <Text FontSize="16px" TextAlign="center"/>
     </Label>
-<!--    
     <Image Name="Image_91a2" Alt="Test" Src="/icons/blank1.gif">
       <Position Column="3" Row="6" Width="1px"/>
       <Color BackGround="black" />
