@@ -67,7 +67,7 @@ mytab=data.frame(x, y)
 def.par <- par(no.readonly = TRUE)# save default, for resetting...
 #par(mar=c(5,4,4,12))
 
-png(paste(\''. $filename .'\',\'.png\', sep=""))
+png(paste(\''. $filename .'\',\'.png\', sep=""), res=150);
 #pdf(paste(\''. $filename .'\',\'.pdf\', sep=""), version="1.4", width=6, height=4)
 ##pdf(paste(\''. $filename .'\',\'.pdf\', sep=""), version="1.4", paper = \'a4r\')
 
@@ -172,7 +172,7 @@ def.par <- par(no.readonly = TRUE)# save default, for resetting...
 #par(mar=c(5,4,4,12))
 
 #pdf(paste(\''. $filename .'\',\'.pdf\', sep=""), version="1.4", width=6, height=4)
-png(paste(\''. $filename .'\',\'.png\', sep=""))
+png(paste(\''. $filename .'\',\'.png\', sep=""), res=150);
 
 ggplot(data=mytab_melt, aes(x=x, y=value, group = variable, fill=variable) ) +
 ';

@@ -1,130 +1,48 @@
-#####################################################################
-# load object: LO_LS02
-# $Id: LO_LS10.pm,v 1.2 2021/12/02 19:20:23 ulf Exp $
-#####################################################################
-# Mit dem Ladeobjekt werden Gelege mit Küken in die  DB geschrieben
-#
-#####################################################################
 use strict;
 use warnings;
 use Federvieh;
 use GetDbUnit;
-use Spreadsheet::Read;
-use Encode;
+use JSON;
 use Digest::MD5 qw(md5_base64);
 our $apiis;
 
-
-sub LO_LS10 {
+sub LO_LS10_NeuerNutzer {
     my $self     = shift;
     my $args     = shift;
  
-    
-#TEST-DATA    
-#    $args = {
-#        zuchtjahr => '2029'  ,
-#        ext_breeder => 'C08G'  ,
-#        ext_breed => 'Pommerngans'  ,
-#        ext_color => 'grau-gescheckt'  ,
-#
-#        litter_dt => '01.01.2019',
-#        no_pickled_eggs =>'10'
-#        no_unfertilized_eggs =>'5'
+    my ($json, $record, $fileimport,$block, $i, $action);
 
-#        ext_unit_sire => 'züchternummer',
-#        ext_id_sire => 'C08G',
-#        ext_sire => 'Peterle',
-#
-#        ext_unit_dam => 'bundesring',
-#        ext_id_dam => '12',
-#        ext_animal_dam => 'AF20',
-#
-#    };
-
-    use JSON;
-    use URI::Escape;
-    use GetDbUnit;
-    use Text::ParseWords;
-
-    my ($json, @record);
-    my ($err_ref, $err_status);
-    my ($ext_breeder, $breeder); 
-    my $log;
-
-    my @field;
-    my $hs_fields={};
-    my %hs_insert;
-    my %hs_version=();
-    my $fileimport;
-
-    
-    if (exists $args->{ 'FILE' }) {
-        $fileimport=$args->{ 'FILE' };
-    }
     my $onlycheck='off';
-    if (exists $args->{ 'onlycheck' }) {
-        $onlycheck=lc($args->{ 'onlycheck' });
-    }
-
-    my $action='insert';
+    $fileimport=1                           if (exists $args->{ 'fileimport'});
+    $onlycheck=lc($args->{ 'onlycheck' })   if (exists $args->{ 'onlycheck' });
 
     #-- Wenn ein File geladen werden soll, dann zuerst umwandeln in
     #   einen JSON-String, damit einheitlich weiterverarbeitet werden kann
     if ( $fileimport ) {
 
-        #-- Datei öffnen
-        open( IN, "$fileimport" ) || die "error: kann $fileimport nicht öffnen";
-
-        $json = { 'Info'        => [],
-                  'RecordSet'   => [],
-                  'Bak'         => [],
+        $json = { 'infos'        => [],
+                  'recordset'   => [],
+                  'glberrors'   => {},
                 };
         
-        #-- Excel-Tabelle öffnen 
-        my $book = Spreadsheet::Read->new ($fileimport, dtfmt => "dd.mm.yyyy");
-        my $sheet = $book->sheet (1);
+        my $counter=1;
+        my $record = {};
 
-        #-- Fehlermeldung, wenn es nicht geht 
-        if(defined $book->[0]{'error'}){
-            print "Error occurred while processing $fileimport:".
-                $book->[0]{'error'}."\n";
-            exit(-1);
-        }
+        foreach my $dd (@{$args->{'data'}} ) {
+            my @data=@$dd;
         
-        my $max_rows = $sheet->{'maxrow'};
-        my $max_cols = $sheet->{'maxcol'};
-
-        my $record={};
-        my $i=0;
-        my $block;
-
-        #--Schleife über alle Zeilen 
-        for my $row_num (1..($max_rows))  {
-
-            #-- declare
-            my @data;
-            my $sdata;
-            my $col='A';
-
-            #-- Schleife über alle Spalten       
-            for my $col_num (1..($max_cols)){
-
-                #-- einen ";" String erzeugen  
-                push(@data, encode_utf8 $sheet->{$col.$row_num});
-            
-                $col++;
-            }
-      
             #-- initialisieren mit '' 
-            map { if (!$_) {$_=''} } @data;
+            map { if (!defined $_) {$_=''} } @data;
+
+            #-- führende und endende Leerzeichen entfernen 
             map { $_=~s/^\s+//g } @data;
             map { $_=~s/\s+$//g } @data;
+            map { $_=~s/\[/(/g } @data;
+            map { $_=~s/\]/)/g } @data;
 
             #-- Daten sichern  
-            push( @{ $json->{ 'Bak' } },join(';',@data)); 
-            
-            $sdata=join(';',@data);
-        
+            my $sdata=join(';',@data);
+      
             push( @{ $json->{ 'Bak' } },$sdata); 
     
             #--store categorie (Login|Adresse|Rollen/Units 
@@ -146,13 +64,15 @@ sub LO_LS10 {
                 $data[3]='coord' if ($data[3]=~/coord/i);
                 $data[3]='user'  if ($data[3]=~/nutz/i);
 
-                $record->{'user_login'}=[$data[1],'',[]];
-                $record->{'user_password'}=[$data[2],'',[]];
-                $record->{'user_category'}=[$data[3],'',[]];
-                $record->{'user_language_id'}=[$data[4],'',[]];
-                $record->{'user_marker'}=[$apiis->node_name,'',[]];
-                $record->{'user_disabled'}=['false','',[]];
-                $record->{'user_status'}=['false','',[]];
+    $record->{'no'}              = {'type'=>'data','status'=>'1',                   'pos'=>0, 'value'=> $counter++,'errors'=>[]};
+    $record->{'user_login'}      = {'type'=>'data','status'=>'1','origin'=>$data[1],'pos'=>1, 'value'=> $data[1],'errors'=>[]};
+    $record->{'user_password'}   = {'type'=>'data','status'=>'1','origin'=>$data[2],'pos'=>2, 'value'=> $data[2],'errors'=>[]};
+    $record->{'user_category'}   = {'type'=>'data','status'=>'1','origin'=>$data[3],'pos'=>3, 'value'=> $data[3],'errors'=>[]};
+    $record->{'user_language_id'}= {'type'=>'data','status'=>'1','origin'=>$data[4],'pos'=>4, 'value'=> $data[4],'errors'=>[]};
+    $record->{'user_marker'}     = {'type'=>'data','status'=>'1',                   'pos'=>5, 'value'=>$apiis->node_name,'errors'=>[]};
+    $record->{'user_disabled'}   = {'type'=>'data','status'=>'1',                   'pos'=>6, 'value'=> 'false' ,'errors'=>[]},
+    $record->{'user_status'}     = {'type'=>'data','status'=>'1',                   'pos'=>7, 'value'=> 'false' ,'errors'=>[]},
+
             }
 
             if ($block eq 'Adresse') {
@@ -171,60 +91,44 @@ sub LO_LS10 {
                     $data[1]=$q->[0];
                 }
 
-                $record->{'ext_address'}=[$record->{'user_login'}->[0],'',[]];
-                $record->{'ext_salutation'}=[$data[1],'',[]];
-                $record->{'ext_title'}=[$data[2],'',[]];
-                $record->{'first_name'}=[$data[3],'',[]];
-                $record->{'second_name'}=[$data[4],'',[]];
-                $record->{'street'}=[$data[5],'',[]];
-                $record->{'zip'}=[$data[6],'',[]];
-                $record->{'town'}=[$data[7],'',[]];
-                $record->{'email'}=[$data[8],'',[]];
-                $record->{'phone_mobil'}=[$data[9],'',[]];
+    $record->{'ext_address'}   = {'type'=>'data','status'=>'1','origin'=>$record->{'user_login'}->{'value'},'pos'=>8, 'value'=> $record->{'user_login'}->{'value'},'errors'=>[]};
+    $record->{'ext_salutation'}  = {'type'=>'data','status'=>'1','origin'=>$data[1],'pos'=>9, 'value'=> $data[1],'errors'=>[]};
+    $record->{'ext_title'}       = {'type'=>'data','status'=>'1','origin'=>$data[2],'pos'=>10,'value'=> $data[2],'errors'=>[]};
+    $record->{'first_name'}      = {'type'=>'data','status'=>'1','origin'=>$data[3],'pos'=>11,'value'=> $data[3],'errors'=>[]};
+    $record->{'second_name'}     = {'type'=>'data','status'=>'1','origin'=>$data[4],'pos'=>12,'value'=> $data[4],'errors'=>[]};
+    $record->{'street'}          = {'type'=>'data','status'=>'1','origin'=>$data[5],'pos'=>13,'value'=> $data[5],'errors'=>[]};
+    $record->{'zip'}             = {'type'=>'data','status'=>'1','origin'=>$data[6],'pos'=>14,'value'=> $data[6],'errors'=>[]};
+    $record->{'town'}            = {'type'=>'data','status'=>'1','origin'=>$data[7],'pos'=>15,'value'=> $data[7],'errors'=>[]};
+    $record->{'email'}           = {'type'=>'data','status'=>'1','origin'=>$data[8],'pos'=>16,'value'=> $data[8],'errors'=>[]};
+    $record->{'phone_mobil'}     = {'type'=>'data','status'=>'1','origin'=>$data[9],'pos'=>17,'value'=> $data[9],'errors'=>[]};
+    
             }
 
             if ($block eq 'Rollen/Units') {
 
                  $i++;
 
-                 $record->{ 'g'.$i.'0' }=   [$data[1],'',[]];
-                 $record->{ 'g'.$i.'1' }=   [$data[2],'',[]];
+    $record->{ 'g'.$i.'0' }     = {'type'=>'data','status'=>'1','origin'=>$data[1],'pos'=>17+$i,'value'=> $data[1],'errors'=>[]};
+    $record->{ 'g'.$i.'1' }     = {'type'=>'data','status'=>'1','origin'=>$data[2],'pos'=>18+$i,'value'=> $data[2],'errors'=>[]}; 
             }
 
         }
 
         #-- Datensatz mit neuem Zeiger wegschreiben
-        push( @{ $json->{ 'RecordSet' } },{ 'Info' => [], 'Data' => { %{$record} },'Insert'=>[], 'Tables'=>['ar_users','address']} );
+        push( @{ $json->{ 'recordset' } },{'infos' => [], 'errors'=>[], 'data' => { %{$record} }} );
 
         #-- Datei schließen
         close( IN );
 
-        #-- file
-        $json->{ 'Header'}={
-            'zip'=>'PLZ', 
-            'town'=>'Stadt', 
-            'street'=>'Straße', 
-            'first_name'=>'Vorname', 
-            'second_name'=>'Nachname', 
-            'db_salutation'=>'Anrede', 
-            'db_title'=>'Titel', 
-            'email'=>'eMail', 
-            'phone_mobil'=>'Telefon', 
-            'user_login'=>'', 
-            'user_password'=>'', 
-            'user_category'=>'', 
-            'user_language_id'=>'', 
-        };
-
-        for (my $j=1;$j<=$i;$j++) {
-            $json->{ 'Header'}->{'ext_unit'.$j}     ='Gruppe'.$j;
-            $json->{ 'Header'}->{'ext_id'.$j}       ='ID'.$j;
-            $json->{ 'Header'}->{'ext_db_member'.$j}='Mitglied'.$j;
-        }
+        $json->{ 'headers'}      =['No','user_login', 'user_password', 'user_category','user_language_id', 'user_marker',
+                                   'user_disabled', 'user_status', 'ext_address', 'ext_salutation', 'ext_title', 
+                                   'first_name', 'second_name', 'street', 'zip', 'town', 'email'. 'phone_mobil'];
         
-        $json->{ 'Fields'}=[];
-
-        $json->{ 'Tables'}  = [ 'ar_users','address' ]; 
+        for (my $j=1;$j<=$i;$j++) {
+            push(@{$json->{ 'headers'}}, 'Gruppe'.$j);
+            push(@{$json->{ 'headers'}}, 'ID'.$j);
+            push(@{$json->{ 'headers'}}, 'Mitglied'.$j);
+        }
     }
     else {
 
@@ -238,22 +142,28 @@ sub LO_LS10 {
             $json = from_json( $args->{ 'JSON' } );
         }
         else {
-            $json={ 'RecordSet' => [{Info=>[],'Data'=>{}}]};
-            map { $json->{ 'RecordSet'}->[0]->{ 'Data' }->{$_}=[];
-                  $json->{ 'RecordSet'}->[0]->{ 'Data' }->{$_}[0]=$args->{$_}} keys %$args;
+            $json={ 'recordset' => [{Info=>[],'Data'=>{}}]};
+            map { $json->{ 'recordset'}->[0]->{ 'Data' }->{$_}=[];
+                  $json->{ 'recordset'}->[0]->{ 'Data' }->{$_}[0]=$args->{$_}} keys %$args;
         }
     }
+
+    my $z=0;
+    my $tbd=[];
 
     #-- Ab hier ist es egal, ob die Daten aus einer Datei
     #   oder aus einer Maske kommen
     #-- Schleife über alle Records und INFO füllen
-    foreach my $record ( @{ $json->{ 'RecordSet' } } ) {
+    foreach my $record ( @{ $json->{ 'recordset' } } ) {
 
-        $args={};
+        my $args={};
+        
+        #Zähler für debugging 
+        $z++;
 
         #-- Daten aus Hash holen
-        foreach (keys %{ $record->{ 'Data' } }) {
-            $args->{$_}=$record->{ 'Data' }->{$_}->[0];
+        foreach (keys %{ $record->{ 'data' } }) {
+            $args->{$_}=$record->{ 'data' }->{$_}->{'value'};
         }
 
         $args->{'user_password'}=md5_base64($args->{'user_password'});
@@ -268,16 +178,15 @@ sub LO_LS10 {
             while ( my $q = $sql_ref->handle->fetch ) {
                 $args->{'guid_ar_users'}=$q->[0];
             }
+            
+            #-- Fehlerbehandlung 
+            if (Federvieh::Fehlerbehandlung($apiis,$args->{'guid_ar_users'}, $record, ['user_login'] , $sql_ref->errors)) {
+                goto EXIT;
+            }
         }
         
-        my $action='insert';
-        $hs_insert{'ar_users'}='Insert';
-        $record->{ 'Insert' }->[ 0 ]= 'Insert';
-
-        if ($args->{'guid_ar_users'}) {
-            $action='update';
-            $hs_insert{'ar_users'}=$args->{'guid'};
-        }
+        $action='insert';
+        $action='update'  if ($args->{'guid_ar_users'});
 
         $apiis->del_errors;
         $apiis->status(0);
@@ -292,59 +201,33 @@ sub LO_LS10 {
         #-- neuen DS anlegen
         if (lc($action) eq 'insert') {
         
-            #-- neuen DS anlegen
             $ar_users->insert;
-            $record->{'Insert'}->[ 0 ]='insert';
 
-            $args->{'user_id'} = $ar_users->column('user_id')->intdata;
+            #-- Fehlerbehandlung 
+            if (Federvieh::Fehlerbehandlung($apiis,undef, $record, ['user_login','user_password','user_category',
+                        'user_language_id', 'user_marker', 'user_disabled', 'user_status'] , $ar_users->errors)) {
+                goto EXIT;
+            }
+            else {
+                $args->{'user_id'} = $ar_users->column('user_id')->intdata;
+            }
         }
         else {
 
             #-- guid
-            if ($args->{ 'guid_ar_users' } and ($args->{ 'guid_ar_users' } ne '')) {
-                $ar_users->column( 'guid' )->extdata( $args->{ 'guid_ar_users' } );
-            }   
+            $ar_users->column( 'guid' )->extdata( $args->{ 'guid_ar_users' } );
 
             #-- DS modifizieren
             $ar_users->update;
-            $record->{'Insert'}->[ 0 ]=$args->{ 'guid_ar_users' };
-        }
-
-        if ( $ar_users->status ) {
-    
-            #-- Sonderbehandlung bei einem File
-            if ($fileimport) {
-
-                $record->{'Insert'}->[ 0 ]='-';
-
-                #-- Error sichern
-                for (my $i=0; $i<=$#{ $ar_users->errors };$i++) { 
-                    if ($ar_users->errors->[$i]->ext_fields) {
-                
-                        my $msg=$ar_users->errors->[0]->msg_long;
-                        $msg=$ar_users->errors->[0]->msg_short if (!$msg);
-
-                        push(@{$record->{'Data'}->{ $ar_users->errors->[$i]->ext_fields->[0] }->[2]},scalar $ar_users->errors );
-                    }
-                    else {
-                        my $msg=$ar_users->errors->[$i]->msg_short;
-                        $msg=~s/.*failed: (.*?) at.*/$1/g;
-                        push(@{$record->{'Info'}}, $msg );
-                    }
-                }
-
-                #-- Rücksetzen
-                $apiis->status( 0 );
-                $apiis->del_errors;
-            }   
+            
+            #-- Fehlerbehandlung 
+            if (Federvieh::Fehlerbehandlung($apiis,undef, $record, ['user_login','user_password','user_category',
+                        'user_language_id', 'user_marker', 'user_disabled', 'user_status'] , $ar_users->errors)) {
+                goto EXIT;
+            }
             else {
-                $self->errors( $ar_users->errors);
-                $self->status(1);
-                $apiis->status(1);
-            }   
-        }
-        else {
-            $args->{'user_id'} = $ar_users->column('user_id')->intdata;
+                $args->{'user_id'} = $ar_users->column('user_id')->intdata;
+            }
         }
         
         ################################# ---  address  --- #################################################
@@ -357,16 +240,15 @@ sub LO_LS10 {
             while ( my $q = $sql_ref->handle->fetch ) {
                 $args->{'guid_address'}=$q->[0];
             }
+            
+            #-- Fehlerbehandlung 
+            if (Federvieh::Fehlerbehandlung($apiis,$args->{'guid_address'}, $record, ['user_login'] , $sql_ref->errors)) {
+                goto EXIT;
+            }
         }
         
         $action='insert';
-        $hs_insert{'address'}='Insert';
-        $record->{ 'Insert' }->[ 0 ]= 'Insert';
-
-        if ($args->{'guid_address'}) {
-            $action='update';
-            $hs_insert{'address'}=$args->{'guid_address'};
-        }
+        $action='update' if ($args->{'guid_address'});
 
         $apiis->del_errors;
         $apiis->status(0);
@@ -395,56 +277,32 @@ sub LO_LS10 {
         
             #-- neuen DS anlegen
             $address->insert;
-            $record->{'Insert'}->[ 0 ]='insert';
 
+            #-- Fehlerbehandlung 
+            if (Federvieh::Fehlerbehandlung($apiis,undef, $record,['ext_address', 'ext_salutation', 'ext_title', 'first_name',
+                        'second_name','street','zip','town','email', 'phone_mobil'] , $address->errors)) {
+                goto EXIT;
+            }
+            else {
+                $args->{'db_address'} = $address->column('db_address')->intdata;
+            }
         }
         else {
 
             #-- guid
-            if ($args->{ 'guid_address' } and ($args->{ 'guid_address' } ne '')) {
-                $address->column( 'guid' )->extdata( $args->{ 'guid_address' } );
-            }   
+            $address->column( 'guid' )->extdata( $args->{ 'guid_address' } );
 
             #-- DS modifizieren
             $address->update;
-            $record->{'Insert'}->[ 0 ]=$args->{ 'guid_address' };
-        }
-
-        if ( $address->status ) {
-    
-            #-- Sonderbehandlung bei einem File
-            if ($fileimport) {
-
-                $record->{'Insert'}->[ 0 ]='-';
-
-                #-- Error sichern
-                for (my $i=0; $i<=$#{ $address->errors };$i++) { 
-                    if ($address->errors->[$i]->ext_fields) {
-                
-                        my $msg=$address->errors->[0]->msg_long;
-                        $msg=$address->errors->[0]->msg_short if (!$msg);
-
-                        push(@{$record->{'Data'}->{ $address->errors->[$i]->ext_fields->[0] }->[2]},scalar $address->errors );
-                    }
-                    else {
-                        my $msg=$address->errors->[$i]->msg_short;
-                        $msg=~s/.*failed: (.*?) at.*/$1/g;
-                        push(@{$record->{'Info'}}, $msg );
-                    }
-                }
-
-                #-- Rücksetzen
-                $apiis->status( 0 );
-                $apiis->del_errors;
-            }   
+            
+            #-- Fehlerbehandlung 
+            if (Federvieh::Fehlerbehandlung($apiis,undef, $record,['ext_address', 'ext_salutation', 'ext_title', 'first_name',
+                        'second_name','street','zip','town','email', 'phone_mobil'] , $address->errors)) {
+                goto EXIT;
+            }
             else {
-                $self->errors( $address->errors);
-                $self->status(1);
-                $apiis->status(1);
-            }   
-        }
-        else {
-            $args->{'db_address'} = $address->column('db_address')->intdata;
+                $args->{'db_address'} = $address->column('db_address')->intdata;
+            }
         }
 
         #-- ################  unit   ###########################################################################        
@@ -463,17 +321,16 @@ sub LO_LS10 {
                 while ( my $q = $sql_ref->handle->fetch ) {
                     $args->{'guid_unit'}=$q->[0];
                 }
+                
+                #-- Fehlerbehandlung 
+                if (Federvieh::Fehlerbehandlung($apiis,$args->{'guid_unit'}, $record, ['user_login', 'g'.$i.'1' ] , $sql_ref->errors)) {
+                    goto EXIT;
+                }
             }
             
             $action='insert';
-            $hs_insert{'unit'}='Insert';
-            $record->{ 'Insert' }->[ 0 ]= 'Insert';
-
-            if ($args->{'guid_unit'}) {
-                $action='update';
-                $hs_insert{'unit'}=$args->{'guid_unit'};
-            }
-       
+            $action='update'    if ($args->{'guid_unit'});
+            
             my @dbm;
             
             if ($args->{'g'.$i.'1'}=~/:::/) {
@@ -488,9 +345,16 @@ sub LO_LS10 {
                     $dbm[0]=$q->[0];
                     $dbm[1]=$args->{'g'.$i.'1'};
                 }
+                
+                #-- Fehlerbehandlung 
+                if (Federvieh::Fehlerbehandlung($apiis,undef, $record, ['g'.$i.'1' ] , $sql_ref->errors)) {
+                    goto EXIT;
+                }
             }
 
-            my $db_unit=GetDbUnit({'ext_unit'=>$args->{'g'.$i.'0'},
+            my ($db_unit, $exists);
+
+            ($db_unit, $exists)=GetDbUnit({'ext_unit'=>$args->{'g'.$i.'0'},
                                    'ext_id'=>$args->{'ext_id'},
                                    'db_member'=>[@dbm],
                                    'db_address'=>$args->{'db_address'},
@@ -498,8 +362,15 @@ sub LO_LS10 {
                                    },
                                    'update');
 
+            #-- Fehlerbehandlung 
+            if (Federvieh::Fehlerbehandlung($apiis,$exists, $record, ['g'.$i.'0'] , $apiis->errors)) {
+                $apiis->del_errors;
+                goto EXIT;
+            }
         }
 EXIT:
+        $tbd=Federvieh::CreateTBD($tbd, $json->{'glberrors'}, $record,$z );
+        
         if ((!$apiis->status) and ($onlycheck eq 'off')) {
             $apiis->DataBase->commit;
         }
@@ -509,10 +380,15 @@ EXIT:
 
         $apiis->status(0);
         $apiis->del_errors;
+
     }
      
+    ###### tr #######################################################################################
+    my $tr  =Federvieh::CreateTr( $json, $json->{'glberrors'} );
+    my $data=Federvieh::CreateBody( $tbd, $tr, 'Ladestrom: LS10_NeueNutzer');
+
     if ($fileimport) {
-        return $json;
+        return JSON::to_json({'data'=>$data, 'tag'=>'body'});
     }
     else {
         return ( $self->status, $self->errors );

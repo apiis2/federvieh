@@ -269,10 +269,10 @@ sub LO_LS21_Vorwerkhuehner {
         foreach (keys %{ $record->{ 'data' } }) {
             $args->{$_}=$record->{ 'data' }->{$_}->{'value'};
         }
-print $z."\n";
-if ($z==622) {
-    print "kk";
-}
+#print $z."\n";
+#if ($z==622) {
+#    print "kk";
+#}
         #-- Datenbehandlung=Erweiterung um Jahr, wenn zweistellig  
         foreach my $vd ('schlupfdatum','abgangsdatum') {
             

@@ -9,6 +9,16 @@ for FILE in *; do
     perl $FEDERVIEH/lib/load.DS LO_LS10  "${FILE}" off ;
 done
 
+cd  $FEDERVIEH/load/data/Vorwerkhühner/2021
+
+#-- Zuchtstammmeldung
+for FILE in *.xlsx; do 
+    echo "${FILE}";
+    perl $FEDERVIEH/lib/load.DS LO_LS10_NeuerNutzer  ${FILE} off ;
+done
+
+exit;
+
 cd $FEDERVIEH/load/data/Zuchtstammmeldungen_2021;
 
 #-- Zuchtstammmeldung
