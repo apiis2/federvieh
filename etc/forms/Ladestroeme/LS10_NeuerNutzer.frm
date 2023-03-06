@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE Form PUBLIC "1" "http://federvieh.local/etc/form2.dtd">
+<!DOCTYPE Form PUBLIC "1" "../../form2.dtd">
 <Form Name="F4LS10">
   <General Name="G983" StyleSheet="/etc/apiis.css" Description="Neuer Nutzer"/>
 
