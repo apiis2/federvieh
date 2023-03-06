@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+ <!DOCTYPE Form PUBLIC "1" "../form2.dtd">
+<Form Name="ExpPjt_FORM_1129e">
+  <General Name="ExpPjt_General_515" StyleSheet="/etc/apiis.css" Description="__('Project')"/>
+
+  <Block Name="ExpPjt_Block_488" Description="" NavigationBar="no">
+    <DataSource Name="ExpPjt_DataSource_493" >
+      <none/>
+    </DataSource>
+
+    <Label Name="ExpPjt_FileUpload_L1" Content="__('Project')">
+      <Position Column="0" Columnspan="1" Position="absolute" Row="1"/>
+      <Text FontSize="24px" TextDecoration="underline"/>
+      <Format PaddingBottom="10px"/>
+    </Label>
+
+    <Field Name="ExpPjt_Field_514" FlowOrder="2">
+      <Button ButtonLabel="__('Export Datenbank')" URL="/etc/export_data/ExportProject" Command="do_exit"/>
+      <Position Column="0-1" Position="absolute" Row="7"/>
+      <Miscellaneous/>
+      <Text/>
+      <Color/>
+      <Format MarginTop="10px"/>
+      
+    </Field>
+
+    <Color BackGround="#f0f0f0"/>
+    <Format BorderStyle="ridge" BorderColor="#f0f0f0" Padding="10px"/>
+
+  </Block>
+</Form>
