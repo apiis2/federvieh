@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE Form PUBLIC "1" "http://federvieh.local/etc/form.dtd">
+<!DOCTYPE Form PUBLIC "1" "../form.dtd">
 
 <Form Name="FORM_1569957046ar">
   <General Name="ar_users_schemes.frm" StyleSheet="/etc/apiis.css" Description="Form" AR_Group="admin"/>
