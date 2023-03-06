@@ -1,11 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE Form PUBLIC "1" "http://federvieh.local/etc/form3.dtd"[  <!ENTITY NavigationButtons_Fields SYSTEM "http://federvieh.local/etc/navigationbuttons.xml">
-  <!ENTITY ActionButtons_Fields     SYSTEM "http://federvieh.local/etc/actionbuttons.xml">
-  <!ENTITY StatusLine_Block         SYSTEM "http://federvieh.local/etc/statusbar.xml">
-  <!ENTITY DumpButton_Block         SYSTEM "http://federvieh.local/etc/dumpbutton_block.xml">
-  <!ENTITY StatusLine2_Block        SYSTEM "http://federvieh.local/etc/statusbar.xml">
-  <!ENTITY CallForm_Block           SYSTEM "http://federvieh.local/etc/callform_button_block.xml">
-]>
+<!DOCTYPE Form PUBLIC "1" "../form3.dtd">
+
 <Form Name="FP30">
   <General Name="G177"  Content="__('Stammdaten')"  MenuID="M1" ToolTip="__('Eingabe/Ändern von Stammdaten')" Help="/doc/StammdatenFrm.html" AR="user" Difficulty='basic' StyleSheet="/etc/apiis.css" Description="Stammdaten"/>
 
@@ -26,24 +21,13 @@
       <Column DBName="db_sex" Name="C93" Order="4" Type="DB"/>
       <Column DBName="birth_dt" Name="C102" Order="5" Type="DB"/>
 
-      <Column DBName="db_sire" Name="C105" Order="6" Type="DB">
-          <IdSet Name="idset_Column_71"  SetName="10-herdbuch"/>
-          <IdSet Name="idset_Column_71a" SetName="20-jungtier"/>
-          <IdSet Name="idset_Column_71b" SetName="30-feldtest"/>
+      <Column DBName="db_parents" Name="C105" Order="6" Type="DB">
+          <IdSet Name="idset_Column_71"  SetName="zuchtstamm"/>
       </Column>
          <Column DBName="ext_unit" Name="C109" Order="7" RelatedColumn="C105" RelatedOrder="0" Type="Related"/>
          <Column DBName="ext_id" Name="C111" Order="8" RelatedColumn="C105" RelatedOrder="1" Type="Related"/>
          <Column DBName="ext_animal" Name="C113" Order="9" RelatedColumn="C105" RelatedOrder="2" Type="Related"/>
 
-      <Column DBName="db_dam" Name="C116" Order="10" Type="DB">
-          <IdSet Name="idset_Column_72"  SetName="10-herdbuch"/>
-          <IdSet Name="idset_Column_72a" SetName="20-jungtier"/>
-          <IdSet Name="idset_Column_72b" SetName="30-feldtest"/>
-      </Column>
-      
-      <Column DBName="ext_unit" Name="C120" Order="11" RelatedColumn="C116" RelatedOrder="0" Type="Related"/>
-      <Column DBName="ext_id" Name="C122" Order="12" RelatedColumn="C116" RelatedOrder="1" Type="Related"/>
-      <Column DBName="ext_animal" Name="C124" Order="13" RelatedColumn="C116" RelatedOrder="2" Type="Related"/>
       
       
       <Column DBName="name" Name="C148" Order="17" Type="DB"/>
@@ -104,7 +88,7 @@
 
 
 
-    <Label Name="L104" Content="Vater:">
+    <Label Name="L104" Content="Zuchtstamm:">
       <Position Column="0" Position="absolute" Row="2"/>
     </Label>
 
@@ -118,7 +102,7 @@
     </Field>
     <Field Name="F110" AR="user" DSColumn="C109" FlowOrder="4" >
       <DataSource Name="DataSource_103">
-        <Sql Statement="select ext_code, ext_code from codes where class='ID_SET' order by ext_code"/>
+        <Sql Statement="select ext_code, ext_code from codes where class='ID_SET' and ext_code='zuchtstamm'"/>
       </DataSource>
       <ScrollingList Size="1" />  
       <Position Column="1" Position="absolute" Row="2"/>
@@ -129,7 +113,7 @@
     </Field>
     <Field Name="F112" AR="user" DSColumn="C111" FlowOrder="5" >
       <DataSource Name="DataSource_1017">
-        <Sql Statement="select distinct ext_id, ext_id from entry_unit where ext_unit in (select  ext_code from entry_codes where class='ID_SET' ) order by ext_id"/>
+        <Sql Statement="select distinct ext_id, ext_id from entry_unit where ext_unit in (select  ext_code from entry_codes where class='ID_SET' and ext_code='zuchtstamm') order by ext_id"/>
       </DataSource>
       <ScrollingList Size="1" StartCompareString="right" ReduceEntries="yes" />  
       <Position Column="2" Position="absolute" Row="2"/>
@@ -147,49 +131,6 @@
       <Format/>
     </Field>
 
-
-    <Label Name="L115" Content="Mutter:">
-      <Position Column="0" Position="absolute" Row="3"/>
-    </Label>
-
-    <Field Name="F119" AR="user" DSColumn="C116" >
-      <TextField Override="no" Size="20"/>
-      <Position Column="1" Position="absolute" Row="3"/>
-      <Miscellaneous Visibility="hidden" Enabled="no"/>
-      <Text/>
-      <Color/>
-      <Format/>
-    </Field>
-    <Field Name="F121" AR="user" DSColumn="C120" FlowOrder="7" >
-      <DataSource Name="DataSource_107">
-        <Sql Statement="select ext_code, ext_code from codes where class='ID_SET' order by ext_code" />
-      </DataSource>
-      <ScrollingList Size="1" />  
-      <Position Column="1" Position="absolute" Row="3"/>
-      <Miscellaneous/>
-      <Text/>
-      <Color/>
-      <Format/>
-    </Field>
-    <Field Name="F123" AR="user" DSColumn="C122" FlowOrder="8" >
-      <DataSource Name="DataSource_1018">
-        <Sql Statement="select distinct ext_id, ext_id from entry_unit where ext_unit in (select  ext_code from entry_codes where class='ID_SET' ) order by ext_id"/>
-      </DataSource>
-      <ScrollingList Size="1" StartCompareString="right" ReduceEntries="yes" />  
-      <Position Column="2" Position="absolute" Row="3"/>
-      <Miscellaneous/>
-      <Text/>
-      <Color/>
-      <Format/>
-    </Field>
-    <Field Name="F125" AR="user" DSColumn="C124" FlowOrder="9" >
-      <TextField Override="no" Size="20"/>
-      <Position Column="3" Position="absolute" Row="3"/>
-      <Miscellaneous/>
-      <Text/>
-      <Color/>
-      <Format/>
-    </Field>
 
     <Label Name="L92" Content="Geschlecht:">
       <Position Column="0" Position="absolute" Row="4"/>
@@ -242,9 +183,9 @@
 
     <Field Name="F167" AR="user" DSColumn="C166" FlowOrder="15" InternalData="yes">
       <DataSource Name="DataSource_1015aa5">
-        <Sql Statement="select a.db_breedcolor,b.ext_code || case when a.db_color isnull then '' else ' - ' || c.ext_code end from breedcolor a inner join codes b on a.db_breed=b.db_code left outer join codes c on a.db_color=c.db_code where db_breedcolor=585  order by b.ext_code, c.ext_code"/>
+        <Sql Statement="select a.db_breedcolor,b.ext_code || case when a.db_color isnull then '' else ' - ' || c.ext_code end from breedcolor a inner join codes b on a.db_breed=b.db_code left outer join codes c on a.db_color=c.db_code  order by b.ext_code, c.ext_code"/>
       </DataSource>
-      <ScrollingList Size="1"/>
+      <ScrollingList Size="1"  StartCompareString="right" ReduceEntries="yes"/>
       <Position Column="1" Columnspan="3" Position="absolute" Row="8"/>
       <Miscellaneous/>
       <Text/>

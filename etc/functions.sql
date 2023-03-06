@@ -107,7 +107,7 @@ CREATE OR REPLACE FUNCTION user_get_ext_breed_of(int,text) RETURNS text AS $$ se
 
 CREATE OR REPLACE FUNCTION user_get_ext_location_of(int) RETURNS text AS $$ select unit.ext_id from unit inner join locations on unit.db_unit=locations.db_location where locations.db_animal=$1 order by entry_dt desc limit 1; $$ LANGUAGE SQL;
 
-CREATE OR REPLACE FUNCTION user_get_ext_id_animal(int) RETURNS text AS $$ select case when ext_unit='bundesring' then  ext_id || ext_animal else ext_id || '-' || ext_animal end  from unit c inner join transfer d on c.db_unit=d.db_unit where d.db_animal=$1 order by c.ext_unit limit 1; $$ LANGUAGE SQL;
+CREATE OR REPLACE FUNCTION user_get_ext_id_animal(int) RETURNS text AS $$ select case when ext_unit='bundesring' then  ext_animal else ext_id || '-' || ext_animal end  from unit c inner join transfer d on c.db_unit=d.db_unit where d.db_animal=$1 order by c.ext_unit limit 1; $$ LANGUAGE SQL;
 
 CREATE OR REPLACE FUNCTION user_get_ext_address_via_sid(text) RETURNS text AS $$ select distinct a.ext_address from address a inner join unit b on a.db_address=b.db_address inner join ar_users c on c.user_id=b.user_id and c.user_session_id=$1 limit 1; $$ LANGUAGE SQL;
 

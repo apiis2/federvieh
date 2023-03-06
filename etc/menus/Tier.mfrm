@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE Form PUBLIC "1" "../form.dtd">
+<!DOCTYPE Form PUBLIC "1" "form.dtd">
 <Form Name="TM_Tier_m7">
   <General Name="TM_General_715a7" StyleSheet="/etc/apiis.css" Description="Form"/>
 
@@ -16,7 +16,7 @@
     </Label>
     
     <Field Name="TM_Field_95aa7">
-      <Button ButtonLabel="Verkauf" URL="Ladestroeme/Verkauf.frm"  Command="do_open_form"/>
+      <Button ButtonLabel="Verkauf" URL="Ladestroeme/LS42_Verkauf.frm"  Command="do_open_form"/>
       <Position Row="1" Column="1"/>
       <Miscellaneous/>
       <Text FontSize="12px" TextAlign="center"/>
@@ -25,7 +25,7 @@
     </Field>
 
     <Field Name="TM_Field_95aa72">
-      <Button ButtonLabel="Aktivieren" URL="Ladestroeme/Aktivieren.frm"  Command="do_open_form"/>
+      <Button ButtonLabel="Aktivieren" URL="Ladestroeme/LS43_Aktivieren.frm"  Command="do_open_form"/>
       <Position Row="1" Column="2"/>
       <Miscellaneous/>
       <Text FontSize="12px" TextAlign="center"/>
@@ -34,7 +34,7 @@
     </Field>
 
     <Field Name="TM_Field_95aa71">
-      <Button ButtonLabel="Abgang" URL="Ladestroeme/Abgangsmeldung.frm" Command="do_open_form"/>
+      <Button ButtonLabel="Abgang" URL="Ladestroeme/LS41_Abgangsmeldung.frm" Command="do_open_form"/>
       <Position Row="2" Column="1"/>
       <Miscellaneous/>
       <Text FontSize="12px" TextAlign="center"/>
@@ -50,7 +50,6 @@
       <Format BorderStyle="groove" BorderColor="lightgray" MarginBottom="10px"/>
     </Field>
     
-
     <Image Name="TM_Image_71ca7" Alt="Test" Src="/icons/blank1.gif">
        <Position Column="0" Row="6" Width="1px"/>
        <Color BackGround="white" />
@@ -59,7 +58,7 @@
 
     
     <Field Name="TM_Field_94a7">
-      <Button ButtonLabel="Stammdaten" URL="stammdaten.pfrm" Command="do_open_form"/>
+      <Button ButtonLabel="Stammdaten" URL="Stammdaten.frm" Command="do_open_form"/>
       <Position Row="7" Column="1"/>
       <Miscellaneous/>
       <Text FontSize="12px" TextAlign="center"/>
@@ -68,7 +67,7 @@
     </Field>
 
    <Field Name="TM_Field_90a7">
-      <Button ButtonLabel="Standort" URL="locations.pfrm" Command="do_open_form"/>
+      <Button ButtonLabel="Standort" URL="locations.frm" Command="do_open_form"/>
       <Position Row="7" Column="2"/>
       <Miscellaneous/>
       <Text FontSize="12px" TextAlign="center"/>
@@ -80,6 +79,16 @@
     <Field Name="TM_open_transfer">
       <Button ButtonLabel="Tiernummern" URL="transfer.pfrm" Command="do_open_form"/>
       <Position Row="8" Column="1"/>
+      <Miscellaneous/>
+      <Text FontSize="12px" TextAlign="center"/>
+      <Color BackGround="#ffc600"/>
+      <Format BorderStyle="groove" BorderColor="lightgray" MarginBottom="10px"/>
+    </Field>
+    
+    
+    <Field Name="TM_open_performances">
+      <Button ButtonLabel="Leistungen" URL="performances.frm" Command="do_open_form"/>
+      <Position Row="10" Column="1"/>
       <Miscellaneous/>
       <Text FontSize="12px" TextAlign="center"/>
       <Color BackGround="#ffc600"/>

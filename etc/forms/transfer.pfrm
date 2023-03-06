@@ -1,16 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE Form PUBLIC "1" "http://federvieh.local/etc/form3.dtd"[  <!ENTITY NavigationButtons_Fields SYSTEM "http://federvieh.local/etc/navigationbuttons.xml">
-  <!ENTITY ActionButtons_Fields     SYSTEM "http://federvieh.local/etc/actionbuttons.xml">
-  <!ENTITY StatusLine_Block         SYSTEM "http://federvieh.local/etc/statusbar.xml">
-  <!ENTITY DumpButton_Block         SYSTEM "http://federvieh.local/etc/dumpbutton_block.xml">
-  <!ENTITY StatusLine2_Block        SYSTEM "http://federvieh.local/etc/statusbar.xml">
-  <!ENTITY CallForm_Block           SYSTEM "http://federvieh.local/etc/callform_button_block.xml">
-]>
+<!DOCTYPE Form PUBLIC "1" "../form3.dtd">
+
 <Form Name="EM_transfer">
 
-  <General Name      ="transfer_General"  MenuID="M1" AR="user" Content="__('Tiernummern')" Difficulty="basic" 
+  <General Name      ="transfer_General"  MenuID="M1" AR="user" Content="__('Tiernummern/Zuchtstämme')" Difficulty="basic" 
            StyleSheet="/etc/apiis.css" Description="Tiernummern einem Tier zuordnen" 
-           ToolTip   ="__'(Zuordnung einer Nummer zu einem Tier')" Help="/doc/Transfer.html"/>
+           ToolTip   ="__'(Zuordnung einer Nummer zu einem Tier/Zuchtstamm')" Help="/doc/Transfer.html"/>
 
   <Block Name="B613" Description="Update Transfer">
      
@@ -26,13 +21,13 @@
     </DataSource>
       
 
-    <Label Name="L694" Content="__('Korrektur - Tiernummern')">
+    <Label Name="L694" Content="__('Korrektur - Tiernummern/Zuchtstamm')">
       <Position Column="0" Columnspan="3" Position="absolute" Row="0"/>
       <Text FontSize="24px" TextDecoration="underline"/>
       <Format PaddingBottom="10px"/>
     </Label>
 
-    <Label Name="L1" Content="__('Tiernummer')">
+    <Label Name="L1" Content="__('Tiernummer/Zuchtstamm')">
       <Position Column="0" Position="absolute" Row="2"/>
     </Label>
     
@@ -44,7 +39,7 @@
       <Position Column="2" Position="absolute" Row="1"/>
       <Text FontSize="10px"/>
     </Label>
-    <Label Name="L4" Content="__('Tiernummer')">
+    <Label Name="L4" Content="__('Nummer')">
       <Position Column="3" Position="absolute" Row="1"/>
       <Text FontSize="10px"/>
     </Label>
@@ -127,7 +122,7 @@
     </Field>
     
     <Image Name="EM_TransferImage_311" Alt="Test" Src="/icons/blank1.gif">
-      <Position Column="0" Columnspan="3" Row="7"/>
+      <Position Column="0" Columnspan="3" Row="8"/>
       <Format PaddingTop="20px"/>
     </Image>
     

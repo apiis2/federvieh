@@ -80,24 +80,6 @@
       <Format BorderStyle="groove" BorderColor="lightgray"/>
     </Field>
 
-    <Field Name="Field_9">
-      <Button ButtonLabel="Adressliste/Etiketten" URL="/etc/forms/Adressaufkleber.pfrm" Command="do_open_report"/>
-      <Position Column="5" Row="3"/>
-      <Miscellaneous/>
-      <Text FontSize="12px" TextAlign="center"/>
-      <Color BackGround="#c5ffff"/>
-      <Format BorderStyle="groove" BorderColor="lightgray"/>
-    </Field>
-    
-    <Field Name="Field_110a61">
-      <Button ButtonLabel="Etikett definieren" URL="Schluessel/Etiketten.frm" Command="do_open_form"/>
-      <Position Row="4" Column="1"/>
-      <Miscellaneous/>
-      <Text FontSize="12px" TextAlign="center"/>
-      <Color BackGround="#ffc600"/>
-      <Format BorderStyle="groove" BorderColor="lightgray"/>
-    </Field>
-    
     <Field Name="Field_901a6">
 	    <Button ButtonLabel="Adress-&amp;Uuml;bersicht drucken" URL="/etc/reports/Adressen.rpt" Command="do_open_report"/>
       <Position Row="4" Column="5"/>
@@ -111,7 +93,7 @@
       <Position Column="0" Columnspan="6" Row="5"/>
       <Text FontSize="16px" TextAlign="center"/>
     </Label>
-    
+<!--    
     <Image Name="Image_91a2" Alt="Test" Src="/icons/blank1.gif">
       <Position Column="3" Row="6" Width="1px"/>
       <Color BackGround="black" />
@@ -125,7 +107,7 @@
       <Color BackGround="#c5ffff"/>
       <Format BorderStyle="groove" BorderColor="lightgray"/>
     </Field>
-    
+-->    
     <Color BackGround="#ffffdd"/>
     <Format BorderStyle="ridge" BorderColor="#004ce4" Padding="10px"/>
  
