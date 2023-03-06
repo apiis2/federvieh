@@ -1535,7 +1535,7 @@
 
             DESCRIPTION  = "Selection status of an animal"
             LENGTH       = "20"
-            CHECK        = "ForeignKey codes db_code class=SELECTION"
+            CHECK        = "ForeignKey codes db_code class=EINSTUFUNG"
             DATATYPE     = "BIGINT"
             name         = "db_selection">
         </column>
