@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE Form PUBLIC "1" "file:///home/b08mueul/apiis/federvieh/etc/form3.dtd">
+<!DOCTYPE Form PUBLIC "1" "../form3.dtd">
 <Form Name="FileUpload">
   <General Name="FileUpload_General"  MenuID="M1" AR="user" Content="__('File Upload')" Difficulty="basic" StyleSheet="/etc/apiis.css" Description="Parameter-FileUpload" ToolTip="__'(Parametrisierung zum Upload von Excel-Dateien')" Help="/doc/Bestandsliste.html"/>
 
