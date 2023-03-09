@@ -62,7 +62,7 @@ sub pdf {
 \usepackage[utf8]{inputenc}
 \usepackage{multicol}
 \usepackage{color}
-\usepackage{longtable}
+\usepackage{ltablex} 
 \usepackage[pdftex]{graphicx}
 %\pagestyle{empty}
 \usepackage{marvosym} % some symboles
@@ -94,22 +94,22 @@ sub pdf {
         map { $_ = Apiis::Misc::MaskForLatex( $_ ) } @line;
         
         if ( $oldunit ne $line[0] ) { 
-            $self->{'_longtablecontent'} .= "\\end{longtable}\n" if ( $count > 1 );
+            $self->{'_longtablecontent'} .= "\\end{tabularx}\n" if ( $count > 1 );
             $self->{'_longtablecontent'} .= "\\clearpage\n\n "   if ( $count > 1 );
 
             $self->{'_longtablecontent'} .= "
                 \\rhead{\\large \  $line[0] }
-                \\chead{\ \\raisebox{1ex}{Codesliste} }
+                \\chead{\ \\raisebox{1ex}{Merkmalsliste} }
                 \\lhead{\\today\\\\Seite: \\thepage}
                 \\lfoot{\\tiny }
                 \\cfoot{}\n\n";
 
-            $self->{'_longtablecontent'} .= "\\begin{longtable}{\@{}llll>{\\raggedright}p{52mm}>{\\raggedright}p{54mm}ll\@{}}\\hline\n\n";
-            $self->{'_longtablecontent'} .= '\makecell{Merkmal \\\\ Label \\\\ Label (kurz) \\\\ Label (Mittel)} 
-                                          & \makecell{Variante \\\\ Bezug \\\\ Methode \\\\ } 
-                                          & \makecell{Einheit \\\\ Dezimalstelle \\\\ Minimum \\\\ Maximum }
-                                          & \makecell{Beschreibung \\\\ Dezimalstelle \\\\ Herkunft }';
-            $self->{'_longtablecontent'} .= " \\hline \\endhead\n";
+            $self->{'_longtablecontent'} .=" 
+            \\begin{tabularx}{\\linewidth}{XXXX} \\hline
+            \\rowcolor{mg} Label & Variante & Einheit & Merkmal \\\\
+            \\rowcolor{mg} Label (kurz) & Bezug & Dezimalstelle & - \\\\
+            \\rowcolor{mg} Label (Mittel) & Methode & Minimum & - \\\\
+            \\rowcolor{mg} - & - & Maximum & Herkunft \\\\ \\hline \\endhead ";
         }   
         
         $count++;
@@ -119,13 +119,13 @@ sub pdf {
 #$tex .= $graycol . '{\textbf{' . join( '}} & {\textbf{ ', @header ) . '}}'. "\\\\ \\hline \n";
 
          $self->{'_longtablecontent'}.= "
-                     \\makecell{$line[2] \\\\ $line[3] \\\\ $line[4] \\\\ $line[5]} &
-                     \\makecell{$line[8] \\\\ $line[6] \\\\ $line[7] \\\\ } &
-                     \\makecell{$line[9] \\\\ $line[10] \\\\ $line[11] \\\\ $line[12]} 
-                     \\makecell{$line[13] \\\\  \\\\ \\\\ } \\hline";
+                        $line[3]&$line[7]&$line[8]&$line[2]\\\\
+                        $line[4]&$line[5]&$line[9]&-\\\\
+                        $line[5]&$line[6]&$line[10]&-\\\\
+                        -&-&$line[11]&$line[13] \\\\ \\hline";
     }
 
-    $self->{'_longtablecontent'} .= "\\end{longtable}\n";
+    $self->{'_longtablecontent'} .= "\\end{tabularx}\n";
 
 #    $tex .= "\\hline \n\\end{tabularx}";
 

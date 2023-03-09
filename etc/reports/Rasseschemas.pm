@@ -48,7 +48,7 @@ sub pdf {
 \usepackage[utf8]{inputenc}
 \usepackage{multicol}
 \usepackage{color}
-\usepackage{longtable}
+\usepackage{ltablex} 
 \usepackage[pdftex]{graphicx}
 %\pagestyle{empty}
 \usepackage{marvosym} % some symboles
@@ -84,8 +84,8 @@ sub pdf {
     
         #-- wenn neuen Rubrik, dann neue Seite  
         if ( $oldunit ne $line[0] ) { 
-            $self->{'_longtablecontent'} .= "\\end{longtable}\n" if ( $count > 1 );
-            $self->{'_longtablecontent'} .= "\\clearpage\n\n "   if ( $count > 1 );
+            $self->{'_longtablecontent'} .= " \\hline \\end{tabularx}\n" if ( $count > 1 );
+            $self->{'_longtablecontent'} .= "\\clearpage\n "   if ( $count > 1 );
 
             $self->{'_longtablecontent'} .= "
                 \\rhead{\\large \  $line[0] }
@@ -94,8 +94,8 @@ sub pdf {
                 \\lfoot{\\tiny }
                 \\cfoot{}\n\n";
 
-            $self->{'_longtablecontent'} .= "\\begin{longtable}{lll}\\hline\n\n";
-            $self->{'_longtablecontent'} .= "Rasse  & Rasse & Rasse \\hline \\endhead\n";
+            $self->{'_longtablecontent'} .= "\\begin{tabularx}{\\linewidth}{XXX} \\hline";
+            $self->{'_longtablecontent'} .= "\\rowcolor{mg} Rasse & Rasse & Rasse \\\\ \\hline \\endhead ";
 
             $i=0;
         }   
@@ -106,8 +106,8 @@ sub pdf {
         $ar[$i++] = $line[1];
 
         #-- wenn array gefüllt, dann anfügen 
-        if ($i==2) {
-            $self->{'_longtablecontent'}.=join(' & ', @ar);
+        if ($i==3) {
+            $self->{'_longtablecontent'}.=join(' & ', @ar). " \\\\";
 
             #-- Rücksetzen 
             $i=0;
@@ -117,10 +117,10 @@ sub pdf {
 
     #-- wenn letzte Zeile nicht vollständig 
     if ($i<2) {
-        $self->{'_longtablecontent'}.=join(' & ', @ar);
+        $self->{'_longtablecontent'}.=join(' & ', @ar). " \\\\";
     }
 
-    $self->{'_longtablecontent'} .= "\\end{longtable}\n";
+    $self->{'_longtablecontent'} .= " \\hline \\end{tabularx}\n";
 }
 
 1;
