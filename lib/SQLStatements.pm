@@ -242,7 +242,7 @@ sub sql_adressen {
     my $unit = shift;
 
   my $sql="
-  select address.db_address, ext_address, firma_name,  
+  select distinct address.db_address, ext_address, firma_name,  
          user_get_ext_code(db_title),
          user_get_ext_code(db_salutation), 
          case when db_salutation notnull then user_get_ext_code(db_salutation) || ' ' else '' end || 

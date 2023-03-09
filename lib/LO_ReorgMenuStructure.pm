@@ -343,6 +343,8 @@ EXIT: {
                     #-- skip CVS-Directory           
                     next if ($file!~/\.(pfrm|frm|rpt)$/);
 
+                    print $file."\n";
+
                     my $status='admin';
                     my $label='';
                     my $difficulty='a';
@@ -359,7 +361,10 @@ EXIT: {
                         $raw_xml.=$_;
                     }
                     close(IN);
-                    
+
+                    #-- nur neue Forms bearbeiten 
+                    next if (($file=~/\.(pfrm|frm)/) and ($raw_xml!~/form3.dtd/));
+
                     $raw_xml = Encode::encode_utf8($raw_xml);
                     
                     my $d = XML::LibXML->load_xml(string => $raw_xml );
