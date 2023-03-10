@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Form PUBLIC "1" "../../form3.dtd">
-<Form Name="FCodefrm" >
-  <General Name="Codes" Content="__('Eingabe/Ändern von Schlüsseln')" MenuID="M1" ToolTip="__('Eingabe/Ändern von in der Datenbank genutzten Schlüsseln')" Help="/doc/CodesFrm.html" AR="coord" Difficulty='advanced' StyleSheet="/etc/apiis.css" Description="Form"/>
+  <!ENTITY NavigationButtons_Fields SYSTEM "http://federvieh.local/etc/navigationbuttons.xml">
+  <!ENTITY ActionButtons_Fields     SYSTEM "http://federvieh.local/etc/actionbuttons.xml">
+  <!ENTITY StatusLine_Block         SYSTEM "http://federvieh.local/etc/statusbar.xml">
+]>
+  
+    <General Name="Codes" Content="__('Eingabe/Ändern von Schlüsseln')" MenuID="M1" ToolTip="__('Eingabe/Ändern von in der Datenbank genutzten Schlüsseln')" Help="/doc/CodesFrm.html" AR="coord" Difficulty='advanced' StyleSheet="/etc/apiis.css" Description="Form"/>
 
   <Block Name="B64" Description="Update codes">
      

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Form PUBLIC "1" "../form3.dtd">
+
 <Form Name="FPZuchtbuch">
-  <General Name="General_515" StyleSheet="/etc/apiis.css" Description="Zuchtbuch"/>
+  <General Name="General_515"  Content="__('Zuchtbuch')"  MenuID="M2" ToolTip="__('Ausdruck Zuchtbuch')" Help="/doc/ZuchtbuchFrm.html" AR="user" Difficulty='basic' StyleSheet="/etc/apiis.css" Description="Zuchtbuch"/>
 
   <Block Name="Block_488" Description="Zuchtbuch" NavigationBar="no">
     <DataSource Name="DataSource_493a">
@@ -18,7 +19,7 @@
     <Label Name="Label_1491b" Content="Ausgabe als:">
       <Position Column="0" Position="absolute" Row="3"/>
     </Label>
-    <Field Name="_exportfilter" Check="NotNull">
+    <Field Name="_exportfilter" Check="NotNull" AR="user" FlowOrder="1" ToolTip="__('Ausgabeformat des Zuchtbuches')" LabelName="Label_1491b" >
       <DataSource Name="DataSource_493b">
         <Sql Statement="select 'json2html','HTML' union select 'json2pdf','PDF'"/> 
       </DataSource>
@@ -30,7 +31,7 @@
       <Format/>
     </Field>
     
-    <Field Name="Field_514">
+    <Field Name="g" AR="user" FlowOrder="1" ToolTip="__('Zuchtbuch wird erstellt')" >
       <Button ButtonLabel="__('Zuchtbuch erstellen')" URL="/etc/reports/Zuchtbuch.rpt" Command="do_exit"/>
       <Position Column="0-3" Position="absolute" Row="4"/>
       <Miscellaneous/>

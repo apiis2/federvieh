@@ -30,7 +30,7 @@
       <Format/>
     </Field>
     
-    <Label Name="Bestandsliste_L3" Content="__('von'):">
+    <Label Name="Bestandsliste_L3" Content="__('von')">
       <Position Column="0" Position="absolute" Row="3"/>
     </Label>
     <Field Name="bestandsliste_von" FlowOrder="3" LabelName="Bestandsliste_L3" ToolTip="__('Zugänge in den Bestand ab diesem Zeitpunkt')">
@@ -42,7 +42,7 @@
       <Format MarginRight="5px"/>
     </Field>
 
-    <Label Name="Bestandsliste_L3b" Content="__('bis'):">
+    <Label Name="Bestandsliste_L3b" Content="__('bis')">
       <Position Column="0" Position="absolute" Row="4"/>
     </Label>
     <Field Name="bestandsliste_bis" FlowOrder="4" LabelName="Bestandsliste_L3b" ToolTip="__('Abgänge aus den Bestand ab diesem Zeitpunkt')">
@@ -54,7 +54,7 @@
       <Format/>
     </Field>
 
-    <Label Name="Label_1491c" Content="__('Züchter'):">
+    <Label Name="Label_1491c" Content="__('Züchter')">
       <Position Column="0" Position="absolute" Row="5"/>
     </Label>
     <Field Name="betrieb" FlowOrder="5" LabelName="Label_1491c" ToolTip="__('Auswahl eines oder mehrerer Züchter')">
@@ -69,7 +69,7 @@
       <Format/>
     </Field>
     
-    <Label Name="Label_14911c" Content="__('Farbdruck'):">
+    <Label Name="Label_14911c" Content="__('Farbdruck')">
       <Position Column="0" Position="absolute" Row="6"/>
     </Label>
     <Field Name="farbe" FlowOrder="6" LabelName="Label_14911c" ToolTip="__('Die Zu- und Abgänge werden farblich markiert. Für scharz/weiß-Druck den Haken entfernen')" >
@@ -81,7 +81,7 @@
       <Format/>
     </Field>
     
-    <Label Name="Label_14911ca" Content="__('Datumsangabe'):">
+    <Label Name="Label_14911ca" Content="__('Datumsangabe')">
       <Position Column="0" Position="absolute" Row="7"/>
     </Label>
     <Field Name="datum" FlowOrder="6" LabelName="Label_14911ca" ToolTip="__('Hinter der Tiernummer wird zusätzlich das Datum des Zu- oder Abgangs ausgegeben')">
@@ -93,7 +93,7 @@
       <Format/>
     </Field>
     
-    <Label Name="Label_14911caa" Content="__('Zusammenfassungen'):">
+    <Label Name="Label_14911caa" Content="__('Zusammenfassungen')">
       <Position Column="0" Position="absolute" Row="8"/>
     </Label>
     <Field Name="zusammenfassung" FlowOrder="7" LabelName="Label_14911caa" ToolTip="__('Fügt eine Tabelle an den Anfang der Liste ein mit einer Gesamtübersicht der Zu- und Abgänge getrennt nach Rassen/Farbschlägen')">
@@ -105,7 +105,7 @@
       <Format/>
     </Field>
     
-    <Label Name="Label_1499c" Content="__('Sortierung'):">
+    <Label Name="Label_1499c" Content="__('Sortierung')">
       <Position Column="0" Position="absolute" Row="9"/>
     </Label>
     <Field Name="sort" FlowOrder="8" LabelName="Label_1499c" 
@@ -121,7 +121,7 @@
       <Format/>
     </Field>
     
-    <Field Name="Field_514">
+    <Field Name="g">
       <Button ButtonLabel="Bestandsliste zusammenstellen" URL="/etc/reports/Bestandsliste.rpt" Command="do_exit"  ToolTip="__('Liste wird erzeugt und als pdf angezeigt')"/>
       <Position Column="0" Columnspan="2" Position="absolute" Row="10"/>
       <Miscellaneous/>
