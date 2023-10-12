@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Form PUBLIC "1" "../../form3.dtd">
+<Form Name="FPCheck_LS01_Zuchtstamm">
+  <General Name="General_515" StyleSheet="/etc/apiis.css" Description="Check_LS01_Zuchtstamm"/>
+
+  <Block Name="Block_488" Description="Check_LS01_Zuchtstamm" NavigationBar="no">
+    <DataSource Name="DataSource_493a">
+      <none/>
+    </DataSource>
+
+    <Label Name="Label_490" Content="__('Check_LS01_Zuchtstamm')">
+      <Position Column="0-1" Position="absolute" Row="0"/>
+      <Text FontSize="24px" TextDecoration="underline"/>
+      <Format PaddingBottom="10px"/>
+    </Label>
+
+    <Label Name="Label_4911" Content="__('Zuchtstamm').:">
+      <Position Column="0" Position="absolute" Row="1"/>
+    </Label>
+    <Field Name="animal_ext_unit">
+      <DataSource Name="DataSource_1015a">
+       <Sql Statement="SELECT ext_code,short_name FROM codes WHERE class='ID_SET'"/>
+      </DataSource>
+      <ScrollingList Size="1" />  
+      <Position Column="1" Position="absolute" Row="1"/>
+      <Miscellaneous/>
+      <Text/>
+      <Color/>
+      <Format/>    
+    </Field>
+
+    <Field Name="animal_ext_id" >
+     <TextField Override="no" Size="12"/>
+      <Position Column="2" Position="absolute" Row="1"/>
+      <Miscellaneous/>
+      <Text/>
+      <Color/>
+      <Format/> 
+    </Field>
+    
+    <Field Name="animal_ext_animal" >
+     <TextField Override="no" Size="12"/>
+      <Position Column="3" Position="absolute" Row="1"/>
+      <Miscellaneous/>
+      <Text/>
+      <Color/>
+      <Format/>
+      
+    </Field>
+    
+    <Field Name="Field_514">
+      <Button ButtonLabel="__('Check LS01_Zuchtstamm')" URL="/etc/reports/Check/Check_LS01_Zuchtstamm.rpt" Command="do_exit"/>
+      <Position Column="0-3" Position="absolute" Row="4"/>
+      <Miscellaneous/>
+      <Text/>
+      <Color/>
+      <Format MarginTop="10px"/>
+    </Field>
+
+    <Label Name="Label_1491b" Content="Ausgabe als:">
+      <Position Column="0" Position="absolute" Row="3"/>
+    </Label>
+    <Field Name="_exportfilter" Check="NotNull">
+      <DataSource Name="DataSource_493b">
+        <Sql Statement="select 'json2html','HTML' union select 'json2pdf','PDF'"/> 
+      </DataSource>
+      <ScrollingList Size="1" Default="json2html"/>
+      <Position Column="1" Position="absolute" Row="3"/>
+      <Miscellaneous/>
+      <Text/>
+      <Color/>
+      <Format/>
+    </Field>
+    
+    <Color BackGround="#f0f0f0"/>
+    <Format BorderStyle="ridge" BorderColor="#f0f0f0" Padding="10px"/>
+
+  </Block>
+</Form>
