@@ -21,7 +21,8 @@
     </Label>
     <Field Name="_exportfilter" Check="NotNull" AR="user" FlowOrder="1" ToolTip="__('Ausgabeformat des Zuchtbuches')" LabelName="Label_1491b" >
       <DataSource Name="DataSource_493b">
-        <Sql Statement="select 'json2html','HTML' union select 'json2pdf','PDF'"/> 
+        <SqlFunction Action="do_execute_sql" View="ScrollinglistChooseHTMLPDF"/>  
+<!--         <Sql Statement="select 'json2html','HTML' union select 'json2pdf','PDF'"/>  -->
       </DataSource>
       <ScrollingList Size="1" Default="json2html"/>
       <Position Column="1" Position="absolute" Row="3"/>
