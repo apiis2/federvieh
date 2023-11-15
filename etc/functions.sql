@@ -94,6 +94,11 @@ select '0' as key, 'Nummernkreis' as value union
 select '1', 'Nummer'
 ;
 
+CREATE OR REPLACE View ScrollinglistChooseHTMLPDF AS  
+Select 'json2html' as key ,'HTML' as value union 
+select 'json2pdf','PDF'
+;
+
 CREATE OR REPLACE View ScrollinglistBreederBestand AS  
 Select  f.ext_id as key, f.ext_id as value
 from entry_locations a 
