@@ -17,7 +17,9 @@ sub CheckLO {
         #-- einen String daraus machen, damit der geprüft werden kann 
         my $v=join(',',@$rec);
 
-        return 'LO_LS01_Zuchtstamm'     if ($v=~/Hähne.+?Kükennummer.+?ZuchtstammID.+?Väter/);
+        return 'LO_LS01_Zuchtstamm'     if ($v=~/Hähne.+?Kükennummer.+?V(a|ä)ter/);
+        return 'LO_LS01_Zuchtstamm'     if ($v=~/RN-Tier.*?Kükennummer.*?RN-Vater.*?RN-Mutter/);
+        return 'LO_LS01_Zuchtstamm'     if ($v=~/Hahn.*?Kükennummer.*?ZuchtstammID.*?Hahn.*?Hennen/);
         return 'LO_LS13_eNest'          if ($v=~/TransponderEPC/);
         return 'LO_LS21_Vorwerkhuehner' if ($v=~/ZuchtstammID.+?2=Klarei/); 
         return 'LO_LS30_Merkmale'       if ($v=~/Variante.+?Bezug.+?Methode/);
