@@ -10,11 +10,11 @@ sub Steckbrief {
     my $sql      = "Set datestyle to 'german'";
     my $sql_ref  = $apiis->DataBase->sys_sql( $sql );
 
+    my ($db_animal, $table, $trb, $trh, $trd, $tr, $thd, $cap, $tbl);
     my $hs_daten = {};
     my $i        = 0;
-    my ( $db_animal);
     my $bodyd     =[];
-    my $table;
+
     #-- Tiernummer holen
     $sql="select user_get_db_animal('$ext_unit', '$ext_id', '$ext_animal')";
     
@@ -43,7 +43,21 @@ sub Steckbrief {
         while ( my $q = $sql_ref->handle->fetch ) {
             $db_animal= $q->[ 0 ];
         }
-    } 
+        
+        if (!$db_animal) {
+            $apiis->status( 1 );
+            $apiis->errors(
+                    Apiis::Errors->new(
+                        type      => 'DATA',
+                        severity  => 'INFO',
+                        from      => 'Stammkarte',
+                        msg_short => main::__('Tiernummer')
+                                     ." ($ext_unit|$ext_id|$ext_animal) "
+                                     .main::__('in der Datenbank nicht gefunden')
+                    )
+            );
+            goto ERR;
+        }} 
     
     #############################################################################
     #
@@ -51,120 +65,122 @@ sub Steckbrief {
     #
     #############################################################################
 
-    $sql="select db_sire, db_dam, user_get_ext_id_animal(db_parents), user_get_ext_code(db_sex), user_get_ext_code(b.db_breed), birth_dt, name, user_get_ext_code(db_selection), hb_ein_dt from animal a inner join breedcolor b on a.db_breed=b.db_breedcolor where db_animal=$db_animal";
-    
-    $sql_ref = $apiis->DataBase->sys_sql( $sql );
-    if ( $sql_ref->status and ($sql_ref->status == 1 )) {
-        $apiis->status( 1 );
-        $apiis->errors( $sql_ref->errors );
-        goto ERR;
-    }
+    if ($ext_unit ne 'zuchtstamm') {
+        $sql="select db_sire, db_dam, user_get_ext_id_animal(db_parents), user_get_ext_code(db_sex), user_get_ext_code(b.db_breed), birth_dt, name, user_get_ext_code(db_selection), hb_ein_dt from animal a inner join breedcolor b on a.db_breed=b.db_breedcolor where db_animal=$db_animal";
+        
+        $sql_ref = $apiis->DataBase->sys_sql( $sql );
+        if ( $sql_ref->status and ($sql_ref->status == 1 )) {
+            $apiis->status( 1 );
+            $apiis->errors( $sql_ref->errors );
+            goto ERR;
+        }
 
 
-    my $td=[];
-    while ( my $q = $sql_ref->handle->fetch ) {
-
-        #-- einzelne Zellen an Zeile anfüggen 
-        push( @$td, {'tag'=>'td','value'=>$q->[ 0 ]});
-        push( @$td, {'tag'=>'td','value'=>$q->[ 1 ]});
-        push( @$td, {'tag'=>'td','value'=>$q->[ 2 ]});
-        push( @$td, {'tag'=>'td','value'=>$q->[ 3 ]});
-        push( @$td, {'tag'=>'td','value'=>$q->[ 4 ]});
-        push( @$td, {'tag'=>'td','value'=>$q->[ 5 ]});
-        push( @$td, {'tag'=>'td','value'=>$q->[ 6 ]});
-        push( @$td, {'tag'=>'td','value'=>$q->[ 7 ]});
-        push( @$td, {'tag'=>'td','value'=>$q->[ 8 ]});
-
-        #-- undef => '' 
-        map { if (!$_->{'value'}) { $_->{'value'}=''} } @$td;
-
-        #-- Gesamte Zeile an Tabelle anfügen 
-    }
-
-    my $trt={'tag'=>'tr',    'data'=>$td,  'attr'=>[]};
-    my $trb={'tag'=>'tbody', 'data'=>[$trt], 'attr'=>[]};
-
-    my $thd={'tag'=>'tr', 'data'=>[{'tag'=>'th','value'=>'Vater'},{'tag'=>'th','value'=>'Mutter'},
-                                   {'tag'=>'th','value'=>'Zuchtstamm'},{'tag'=>'th','value'=>'Geschlecht'},
-                                   {'tag'=>'th','value'=>'Rasse'},{'tag'=>'th','value'=>'Schlupfdatum'},
-                                   {'tag'=>'th','value'=>'Name'},{'tag'=>'th','value'=>'Status'},
-                                   {'tag'=>'th','value'=>'DatHerdbuch'}]};
-
-   my $cap={'tag'    =>'caption',
-                    'value' =>'Stammdaten',
-                    'attr'  =>[{'style'=>[{'font-size'=>'20px'},{'text-align'=>'left'}]}]};
-
-    my $trh={'tag'=>'thead', 'data'=>[$thd],        'attr'=>[{'style'=>[{'background-color'=>'lightgray'},{'text-align'=>'left'},
-                                        {'border-collapse'=>'collapse'},{'border-bottom'=>'1px solid black'}] }]};
-
-    my $tbl={'tag'=>'table', 'data'=>[$cap, $trh,$trb],   'attr'=>[{'rules'=>'groups'},{'border'=>'1'},{'style'=>[{'border'=>'2px solid black'},{'width'=>'100%'},{'margin-top'=>'20px'}]}]};
-
-
-    push(@{$bodyd},$tbl);
-
-
-    #############################################################################
-    #
-    # Events-einmalig
-    #
-    #############################################################################
-
-    #-- Events-Einmalig holen
-    $sql="select user_get_event_location(c.db_location) as ext_location, user_get_ext_code(e.db_event_type,'s') as event_type,c.event_dt as edate,d.label,case when d.class isnull then a.result else user_get_ext_code(a.result::integer,'s') end, d.unit from performances a inner join standard_performances b on a.standard_performances_id=b.standard_performances_id inner join event c on b.db_event=c.db_event inner join traits d on a.traits_id=d.traits_id inner join standard_events e on c.standard_events_id=e.standard_events_id where b.db_animal=$db_animal";
-    
-    $sql_ref = $apiis->DataBase->sys_sql( $sql );
-    if ( $sql_ref->status and ($sql_ref->status == 1 )) {
-        $apiis->status( 1 );
-        $apiis->errors( $sql_ref->errors );
-        goto ERR;
-    }
-
-    my $tr=[];
-
-    while ( my $q = $sql_ref->handle->fetch ) {
         my $td=[];
+        while ( my $q = $sql_ref->handle->fetch ) {
 
-        #-- einzelne Zellen an Zeile anfüggen 
-        push( @$td, {'tag'=>'td','value'=>$q->[ 0 ]});
-        push( @$td, {'tag'=>'td','value'=>$q->[ 1 ]});
-        push( @$td, {'tag'=>'td','value'=>$q->[ 2 ]});
-        push( @$td, {'tag'=>'td','value'=>$q->[ 3 ]});
+            #-- einzelne Zellen an Zeile anfüggen 
+            push( @$td, {'tag'=>'td','value'=>$q->[ 0 ]});
+            push( @$td, {'tag'=>'td','value'=>$q->[ 1 ]});
+            push( @$td, {'tag'=>'td','value'=>$q->[ 2 ]});
+            push( @$td, {'tag'=>'td','value'=>$q->[ 3 ]});
+            push( @$td, {'tag'=>'td','value'=>$q->[ 4 ]});
+            push( @$td, {'tag'=>'td','value'=>$q->[ 5 ]});
+            push( @$td, {'tag'=>'td','value'=>$q->[ 6 ]});
+            push( @$td, {'tag'=>'td','value'=>$q->[ 7 ]});
+            push( @$td, {'tag'=>'td','value'=>$q->[ 8 ]});
 
-        #-- Einheit anfügen
-        my $m;
-        if ($q->[ 5 ]) {
-            $m=$q->[ 4 ].' '.$q->[ 5 ];
+            #-- undef => '' 
+            map { if (!$_->{'value'}) { $_->{'value'}=''} } @$td;
+
+            #-- Gesamte Zeile an Tabelle anfügen 
         }
-        else {
-            $m=$q->[ 4 ],
+
+        my $trt={'tag'=>'tr',    'data'=>$td,  'attr'=>[]};
+        my $trb={'tag'=>'tbody', 'data'=>[$trt], 'attr'=>[]};
+
+        my $thd={'tag'=>'tr', 'data'=>[{'tag'=>'th','value'=>'Vater'},{'tag'=>'th','value'=>'Mutter'},
+                                    {'tag'=>'th','value'=>'Zuchtstamm'},{'tag'=>'th','value'=>'Geschlecht'},
+                                    {'tag'=>'th','value'=>'Rasse'},{'tag'=>'th','value'=>'Schlupfdatum'},
+                                    {'tag'=>'th','value'=>'Name'},{'tag'=>'th','value'=>'Status'},
+                                    {'tag'=>'th','value'=>'DatHerdbuch'}]};
+
+        my $cap={'tag'    =>'caption',
+                        'value' =>'Stammdaten',
+                        'attr'  =>[{'style'=>[{'font-size'=>'20px'},{'text-align'=>'left'}]}]};
+
+        my $trh={'tag'=>'thead', 'data'=>[$thd],        'attr'=>[{'style'=>[{'background-color'=>'lightgray'},{'text-align'=>'left'},
+                                            {'border-collapse'=>'collapse'},{'border-bottom'=>'1px solid black'}] }]};
+
+        my $tbl={'tag'=>'table', 'data'=>[$cap, $trh,$trb],   'attr'=>[{'rules'=>'groups'},{'border'=>'1'},{'style'=>[{'border'=>'2px solid black'},{'width'=>'100%'},{'margin-top'=>'20px'}]}]};
+
+
+        push(@{$bodyd},$tbl);
+
+
+        #############################################################################
+        #
+        # Events-einmalig
+        #
+        #############################################################################
+
+        #-- Events-Einmalig holen
+        $sql="select user_get_event_location(c.db_location) as ext_location, user_get_ext_code(e.db_event_type,'s') as event_type,c.event_dt as edate,d.label,case when d.class isnull then a.result else user_get_ext_code(a.result::integer,'s') end, d.unit from performances a inner join standard_performances b on a.standard_performances_id=b.standard_performances_id inner join event c on b.db_event=c.db_event inner join traits d on a.traits_id=d.traits_id inner join standard_events e on c.standard_events_id=e.standard_events_id where b.db_animal=$db_animal";
+        
+        $sql_ref = $apiis->DataBase->sys_sql( $sql );
+        if ( $sql_ref->status and ($sql_ref->status == 1 )) {
+            $apiis->status( 1 );
+            $apiis->errors( $sql_ref->errors );
+            goto ERR;
         }
 
-        push( @$td, {'tag'=>'td','value'=>$m});
+        $tr=[];
 
-        #-- undef => '' 
-        map { if (!$_->{'value'}) { $_->{'value'}=''} } @$td;
+        while ( my $q = $sql_ref->handle->fetch ) {
+            my $td=[];
 
-        #-- Gesamte Zeile an Tabelle anfügen 
-        push(@$tr,{'tag'=>'tr',    'data'=>$td,  'attr'=>[]});
-    }
+            #-- einzelne Zellen an Zeile anfüggen 
+            push( @$td, {'tag'=>'td','value'=>$q->[ 0 ]});
+            push( @$td, {'tag'=>'td','value'=>$q->[ 1 ]});
+            push( @$td, {'tag'=>'td','value'=>$q->[ 2 ]});
+            push( @$td, {'tag'=>'td','value'=>$q->[ 3 ]});
 
-    $trb={'tag'=>'tbody', 'data'=>$tr, 'attr'=>[]};
+            #-- Einheit anfügen
+            my $m;
+            if ($q->[ 5 ]) {
+                $m=$q->[ 4 ].' '.$q->[ 5 ];
+            }
+            else {
+                $m=$q->[ 4 ],
+            }
 
-    $thd={'tag'=>'tr', 'data'=>[{'tag'=>'th','value'=>'Ort'},{'tag'=>'th','value'=>'Event'},
-                                   {'tag'=>'th','value'=>'Datum'},{'tag'=>'th','value'=>'Merkmal'},
-                                   {'tag'=>'th','value'=>'Ergebnis'}]};
+            push( @$td, {'tag'=>'td','value'=>$m});
 
-    $cap={'tag'    =>'caption',
-                    'value' =>'Events (einmalig)',
-                    'attr'  =>[{'style'=>[{'font-size'=>'20px'},{'text-align'=>'left'}]}]};
+            #-- undef => '' 
+            map { if (!$_->{'value'}) { $_->{'value'}=''} } @$td;
 
-    $trh={'tag'=>'thead', 'data'=>[$thd],        'attr'=>[{'style'=>[{'background-color'=>'lightgray'},{'text-align'=>'left'},
-                                        {'border-collapse'=>'collapse'},{'border-bottom'=>'1px solid black'}] }]};
+            #-- Gesamte Zeile an Tabelle anfügen 
+            push(@$tr,{'tag'=>'tr',    'data'=>$td,  'attr'=>[]});
+        }
 
-    $tbl={'tag'=>'table', 'data'=>[$cap, $trh,$trb],   'attr'=>[{'rules'=>'groups'},{'border'=>'1'},{'style'=>[{'border'=>'2px solid black'},{'width'=>'100%'},{'margin-top'=>'20px'}]}]};
+        $trb={'tag'=>'tbody', 'data'=>$tr, 'attr'=>[]};
+
+        $thd={'tag'=>'tr', 'data'=>[{'tag'=>'th','value'=>'Ort'},{'tag'=>'th','value'=>'Event'},
+                                    {'tag'=>'th','value'=>'Datum'},{'tag'=>'th','value'=>'Merkmal'},
+                                    {'tag'=>'th','value'=>'Ergebnis'}]};
+
+        $cap={'tag'    =>'caption',
+                        'value' =>'Events (einmalig)',
+                        'attr'  =>[{'style'=>[{'font-size'=>'20px'},{'text-align'=>'left'}]}]};
+
+        $trh={'tag'=>'thead', 'data'=>[$thd],        'attr'=>[{'style'=>[{'background-color'=>'lightgray'},{'text-align'=>'left'},
+                                            {'border-collapse'=>'collapse'},{'border-bottom'=>'1px solid black'}] }]};
+
+        $tbl={'tag'=>'table', 'data'=>[$cap, $trh,$trb],   'attr'=>[{'rules'=>'groups'},{'border'=>'1'},{'style'=>[{'border'=>'2px solid black'},{'width'=>'100%'},{'margin-top'=>'20px'}]}]};
 
 
-    push(@{$bodyd},$tbl);
+        push(@{$bodyd},$tbl);
+    }    
     
     #############################################################################
     #
@@ -202,12 +218,15 @@ sub Steckbrief {
 
     $trb={'tag'=>'tbody', 'data'=>$tr, 'attr'=>[]};
 
+    my $ltiernummer='Tiernummer';
+    $ltiernummer='ZuchtstammID' if ($ext_unit eq 'zuchtstamm');
+
     $thd={'tag'=>'tr', 'data'=>[{'tag'=>'th','value'=>'Nummernsystem'},{'tag'=>'th','value'=>'Nummernkreis'},
-                                   {'tag'=>'th','value'=>'Tiernummer'},{'tag'=>'th','value'=>'aktiv seit'},
+                                   {'tag'=>'th','value'=>$ltiernummer},{'tag'=>'th','value'=>'aktiv seit'},
                                    {'tag'=>'th','value'=>'inaktiv seit'}]};
 
     $cap={'tag'    =>'caption',
-                    'value' =>'Tiernummern',
+                    'value' =>$ltiernummer,
                     'attr'  =>[{'style'=>[{'font-size'=>'20px'},{'text-align'=>'left'}]}]};
 
     $trh={'tag'=>'thead', 'data'=>[$thd],        'attr'=>[{'style'=>[{'background-color'=>'lightgray'},{'text-align'=>'left'},
@@ -218,58 +237,60 @@ sub Steckbrief {
 
     push(@{$bodyd},$tbl);
     
-    #############################################################################
-    #
-    # Orte
-    #
-    #############################################################################
+    if ($ext_unit ne 'zuchtstamm') {
+        #############################################################################
+        #
+        # Orte
+        #
+        #############################################################################
 
-    $sql="select b.ext_unit, b.ext_id, a.entry_dt, user_get_ext_code(a.db_entry_action), a.exit_dt, user_get_ext_code(a.db_exit_action) from locations a inner join unit b on a.db_location=b.db_unit where db_animal=$db_animal";
+        $sql="select b.ext_unit, b.ext_id, a.entry_dt, user_get_ext_code(a.db_entry_action), a.exit_dt, user_get_ext_code(a.db_exit_action) from locations a inner join unit b on a.db_location=b.db_unit where db_animal=$db_animal";
 
-    $sql_ref = $apiis->DataBase->sys_sql( $sql );
-    if ( $sql_ref->status and ($sql_ref->status == 1 )) {
-        $apiis->status( 1 );
-        $apiis->errors( $sql_ref->errors );
-        goto ERR;
+        $sql_ref = $apiis->DataBase->sys_sql( $sql );
+        if ( $sql_ref->status and ($sql_ref->status == 1 )) {
+            $apiis->status( 1 );
+            $apiis->errors( $sql_ref->errors );
+            goto ERR;
+        }
+
+        $tr=[];
+
+        while ( my $q = $sql_ref->handle->fetch ) {
+            my $td=[];
+
+            #-- einzelne Zellen an Zeile anfüggen 
+            push( @$td, {'tag'=>'td','value'=>$q->[ 0 ]});
+            push( @$td, {'tag'=>'td','value'=>$q->[ 1 ]});
+            push( @$td, {'tag'=>'td','value'=>$q->[ 2 ]});
+            push( @$td, {'tag'=>'td','value'=>$q->[ 3 ]});
+            push( @$td, {'tag'=>'td','value'=>$q->[ 4 ]});
+            push( @$td, {'tag'=>'td','value'=>$q->[ 5 ]});
+
+            #-- undef => '' 
+            map { if (!$_->{'value'}) { $_->{'value'}=''} } @$td;
+
+            #-- Gesamte Zeile an Tabelle anfügen 
+            push(@$tr,{'tag'=>'tr',    'data'=>$td,  'attr'=>[]});
+        }
+
+        $trb={'tag'=>'tbody', 'data'=>$tr, 'attr'=>[]};
+
+        $thd={'tag'=>'tr', 'data'=>[{'tag'=>'th','value'=>'Kategorie'},{'tag'=>'th','value'=>'Ort'},
+                                    {'tag'=>'th','value'=>'gültig seit'},{'tag'=>'th','value'=>'Status'},
+                                    {'tag'=>'th','value'=>'gültig bis'},{'tag'=>'th','value'=>'Status'}]};
+
+        $cap={'tag'    =>'caption',
+                        'value' =>'Züchter/Besitzer',
+                        'attr'  =>[{'style'=>[{'font-size'=>'20px'},{'text-align'=>'left'}]}]};
+
+        $trh={'tag'=>'thead', 'data'=>[$thd],        'attr'=>[{'style'=>[{'background-color'=>'lightgray'},{'text-align'=>'left'},
+                                            {'border-collapse'=>'collapse'},{'border-bottom'=>'1px solid black'}] }]};
+
+        $tbl={'tag'=>'table', 'data'=>[$cap, $trh,$trb],   'attr'=>[{'rules'=>'groups'},{'border'=>'1'},{'style'=>[{'border'=>'2px solid black'},{'width'=>'100%'},{'margin-top'=>'20px'}]}]};
+
+
+        push(@{$bodyd},$tbl);
     }
-
-    $tr=[];
-
-    while ( my $q = $sql_ref->handle->fetch ) {
-        my $td=[];
-
-        #-- einzelne Zellen an Zeile anfüggen 
-        push( @$td, {'tag'=>'td','value'=>$q->[ 0 ]});
-        push( @$td, {'tag'=>'td','value'=>$q->[ 1 ]});
-        push( @$td, {'tag'=>'td','value'=>$q->[ 2 ]});
-        push( @$td, {'tag'=>'td','value'=>$q->[ 3 ]});
-        push( @$td, {'tag'=>'td','value'=>$q->[ 4 ]});
-        push( @$td, {'tag'=>'td','value'=>$q->[ 5 ]});
-
-        #-- undef => '' 
-        map { if (!$_->{'value'}) { $_->{'value'}=''} } @$td;
-
-        #-- Gesamte Zeile an Tabelle anfügen 
-        push(@$tr,{'tag'=>'tr',    'data'=>$td,  'attr'=>[]});
-    }
-
-    $trb={'tag'=>'tbody', 'data'=>$tr, 'attr'=>[]};
-
-    $thd={'tag'=>'tr', 'data'=>[{'tag'=>'th','value'=>'Kategorie'},{'tag'=>'th','value'=>'Ort'},
-                                   {'tag'=>'th','value'=>'gültig seit'},{'tag'=>'th','value'=>'Status'},
-                                   {'tag'=>'th','value'=>'gültig bis'},{'tag'=>'th','value'=>'Status'}]};
-
-    $cap={'tag'    =>'caption',
-                    'value' =>'Züchter/Besitzer',
-                    'attr'  =>[{'style'=>[{'font-size'=>'20px'},{'text-align'=>'left'}]}]};
-
-    $trh={'tag'=>'thead', 'data'=>[$thd],        'attr'=>[{'style'=>[{'background-color'=>'lightgray'},{'text-align'=>'left'},
-                                        {'border-collapse'=>'collapse'},{'border-bottom'=>'1px solid black'}] }]};
-
-    $tbl={'tag'=>'table', 'data'=>[$cap, $trh,$trb],   'attr'=>[{'rules'=>'groups'},{'border'=>'1'},{'style'=>[{'border'=>'2px solid black'},{'width'=>'100%'},{'margin-top'=>'20px'}]}]};
-
-
-    push(@{$bodyd},$tbl);
 
     #############################################################################
     #
@@ -277,8 +298,8 @@ sub Steckbrief {
     #
     #############################################################################
 
-    $sql="select user_get_ext_id_animal(a.db_parents), user_get_ext_animal(a.db_animal),user_get_ext_code(c.db_sex) from parents a inner join (select db_parents from parents where db_animal=$db_animal) b on a.db_parents=b.db_parents inner join animal c on a.db_animal=c.db_animal";
-
+    $sql="select user_get_ext_id_animal(c.db_animal), c.birth_dt,user_get_ext_code(c.db_sex), user_get_ext_code(d.db_breed), user_get_ext_code(d.db_color),user_get_ext_zuchtstamm_of(c.db_parents) from parents b inner join animal c on b.db_animal=c.db_animal inner join breedcolor d on c.db_breed=d.db_breedcolor where b.db_parents=$db_animal";
+    
     $sql_ref = $apiis->DataBase->sys_sql( $sql );
     if ( $sql_ref->status and ($sql_ref->status == 1 )) {
         $apiis->status( 1 );
@@ -298,7 +319,6 @@ sub Steckbrief {
         push( @$td, {'tag'=>'td','value'=>$q->[ 3 ]});
         push( @$td, {'tag'=>'td','value'=>$q->[ 4 ]});
         push( @$td, {'tag'=>'td','value'=>$q->[ 5 ]});
-        push( @$td, {'tag'=>'td','value'=>$q->[ 6 ]});
 
         #-- undef => '' 
         map { if (!$_->{'value'}) { $_->{'value'}=''} } @$td;
@@ -309,12 +329,14 @@ sub Steckbrief {
 
     $trb={'tag'=>'tbody', 'data'=>$tr, 'attr'=>[]};
 
-    $thd={'tag'=>'tr', 'data'=>[{'tag'=>'th','value'=>'Kategorie'},{'tag'=>'th','value'=>'Ort'},
-                                   {'tag'=>'th','value'=>'gültig seit'},{'tag'=>'th','value'=>'Status'},
-                                   {'tag'=>'th','value'=>'gültig bis'},{'tag'=>'th','value'=>'Status'}]};
+    my $lsex='Hahn'; 
+    $thd={'tag'=>'tr', 'data'=>[{'tag'=>'th','value'=>$lsex},{'tag'=>'th','value'=>'SchlupfDt'},
+                                {'tag'=>'th','value'=>'Geschlecht'},
+                                   {'tag'=>'th','value'=>'Rasse'},{'tag'=>'th','value'=>'Farbschlag'},
+                                   {'tag'=>'th','value'=>'ZuchtstammID'}]};
 
     $cap={'tag'    =>'caption',
-                    'value' =>'Züchter/Besitzer',
+                    'value' =>'Zuchtstamm',
                     'attr'  =>[{'style'=>[{'font-size'=>'20px'},{'text-align'=>'left'}]}]};
 
     $trh={'tag'=>'thead', 'data'=>[$thd],        'attr'=>[{'style'=>[{'background-color'=>'lightgray'},{'text-align'=>'left'},
