@@ -52,7 +52,7 @@ sub LO_LS01_Zuchtstamm {
     my $args     = shift;
  
     my ($json, $chk_breedcolor, $sex, $ext_unit, $ext_id, $ext_animal, $vzuchtstamm);
-    my ($db_breed,$zuchtjahr,$db_breeder,$ext_zuchtstamm,$ext_breeder, $ext_breed, $ext_sex,$err_zuchtstamm);
+    my ($db_breed,$zuchtjahr,$db_breeder,$ext_zuchtstamm,$ext_breeder, $ext_breed, $ext_sex,$err_zuchtstamm, $rollback);
 
     my $xlsx_format ='old';
 
@@ -81,7 +81,7 @@ sub LO_LS01_Zuchtstamm {
 
             #-- 1. zeile im dataset 
             if ($data[0]=~/^Züchter/) {
-           
+                
                 $fields=[
                     {'type'=>'label',                     'value'=>$data[0], 'z'=>$zeile, 'pos'=>0},
                     {'type'=>'data','name'=>'ext_breeder','value'=>$data[1], 'z'=>$zeile, 'pos'=>1}
@@ -89,6 +89,15 @@ sub LO_LS01_Zuchtstamm {
                 $record->{'ext_breeder'}={'value'=>$data[1],'errors'=>[],'status'=>'0','origin'=>$data[1]};
             }
             
+            if ($data[0]=~/^gültig ab/) {
+                
+                $fields=[
+                    {'type'=>'label',                    'value'=>$data[0], 'z'=>$zeile, 'pos'=>0},
+                    {'type'=>'data','name'=>'opening_dt','value'=>$data[1], 'z'=>$zeile, 'pos'=>1}
+                ];
+                $record->{'opening_dt'}={'value'=>$data[1],'errors'=>[],'status'=>'0','origin'=>$data[1]};
+            }
+
             #-- 2. zeile im dataset 
             if ($data[0]=~/^(Zucht|Geburts)jahr/) {
                 $fields=[
@@ -99,6 +108,7 @@ sub LO_LS01_Zuchtstamm {
             }
             #-- 3. Zeile 
             elsif ($data[0]=~/^Rasse/) {
+                
                 $fields=[
                     {'type'=>'label',                     'value'=>$data[0], 'z'=>$zeile, 'pos'=>0},
                     {'type'=>'data','name'=>'ext_breed'  ,'value'=>$data[1], 'z'=>$zeile, 'pos'=>1}
@@ -108,6 +118,7 @@ sub LO_LS01_Zuchtstamm {
 
             #-- 4. Zeile
             elsif ($data[0]=~/^Farbe/) {
+                
                 $fields=[
                     {'type'=>'label',                     'value'=>$data[0], 'z'=>$zeile, 'pos'=>0},
                     {'type'=>'data','name'=>'ext_color'  ,'value'=>$data[1], 'z'=>$zeile, 'pos'=>1}
@@ -117,6 +128,9 @@ sub LO_LS01_Zuchtstamm {
 
             #-- 5. Zeile
             elsif ($data[0]=~/^ZuchtstammID/) {
+            
+                $data[1]=~s/\s//g;
+
                 $fields=[
                     {'type'=>'label',                         'value'=>$data[0], 'z'=>$zeile, 'pos'=>0},
                     {'type'=>'data','name'=>'ext_zuchtstamm' ,'value'=>$data[1], 'z'=>$zeile, 'pos'=>1}
@@ -126,7 +140,8 @@ sub LO_LS01_Zuchtstamm {
             }
 
             #-- Tiernummern einsammeln   
-            elsif ($data[0]=~/^(Hahn|Hähne|RN-Tier)/) {
+            elsif (($data[0]=~/^(Hahn|Hähne|RN-Tier)/) or 
+                   ($data[0]=~/Hahn.*?Kükennummer.*?ZuchtstammID.*?Hahn.*?Hennen/)) {
   
                 $fields=[
                     {'type'=>'label',                          'value'=>$data[0], 'z'=>$zeile, 'pos'=>0},
@@ -139,7 +154,8 @@ sub LO_LS01_Zuchtstamm {
             }
 
             #-- Tiernummern einsammeln   
-            elsif ($data[0]=~/(^Henne|angepaart)/) {
+            elsif (($data[0]=~/(^Henne|angepaart)/) or 
+                   ($data[0]=~/Hennen.*?Kükennummer.*?ZuchtstammID.*?Hahn.*?Hennen/)) {
   
                 $fields=[
                     {'type'=>'label',                          'value'=>$data[0], 'z'=>$zeile, 'pos'=>0},
@@ -152,6 +168,11 @@ sub LO_LS01_Zuchtstamm {
             }
 
             elsif ($sex) {
+
+                #-- Leerzeichen entfernen
+                $data[2]=~s/\s//g;
+                $data[3]=~s/\s//g;
+                $data[4]=~s/\s//g;
 
                 if ($xlsx_format eq 'new') {
                     $fields=[
@@ -207,7 +228,9 @@ sub LO_LS01_Zuchtstamm {
             #-- Datensatz mit neuem Zeiger wegschreiben
             push( @{ $json->{ 'recordset' } },{'fields'=>$fields, 'infos' => [], 'errors'=>[], 'data' => { %{$record} }} );
         }
+
         $json->{ 'glberrors'}={} ;
+
     }
     else {
 
@@ -287,7 +310,9 @@ sub LO_LS01_Zuchtstamm {
                         msg_short  =>"Keinen Eintrag für 'breeder:$args->{'ext_breeder'}' in der Datenbank gefunden."
                     ));
                     
-                goto EXIT;
+#                $apiis->status(1);    
+#                goto EXIT;
+                $rollback=1;
             }
         }    
         ####################################################################################### 
@@ -329,8 +354,10 @@ sub LO_LS01_Zuchtstamm {
                         ext_fields => ['ext_breed'],
                         msg_short  => $msg
                     ));
-                    
-                goto EXIT;
+
+#                $apiis->status(1);    
+#                goto EXIT;
+                $rollback=1;
             }
         }
 
@@ -355,7 +382,9 @@ sub LO_LS01_Zuchtstamm {
                         msg_short  =>"Keine Bezeichnung für den Zuchtstamm eingetragen."
                     ));
                     
-                goto EXIT;
+#                $apiis->status(1);    
+#                goto EXIT;
+                $rollback=1;
             }
             else {
                 $ext_zuchtstamm=$args->{'ext_zuchtstamm'};
@@ -372,7 +401,8 @@ sub LO_LS01_Zuchtstamm {
                         msg_short  => 'Keine Hähne oder Hennen gefunden => Abbruch' 
                     ));
                     
-                goto EXIT;
+                $rollback=1;
+#                goto EXIT;
             }
         }
         elsif (exists $args->{'ext_animal'.$i}) {
@@ -397,8 +427,8 @@ sub LO_LS01_Zuchtstamm {
             else {
 
                 #-- Wenn ein Züchter im Zuchtstamm angegeben wurde, dann sind nachfolgende Tiere im Besitz dieses Züchters
-                if ($args->{'ext_zuchtstamm'.$i}=~/^(.+?):(.+)/) {
-                    ($args->{'ext_id_zs'.$i},$args->{'ext_zuchtstamm'.$i})=($args->{'ext_zuchtstamm'.$i}=~/^(.+?):(.+)/);
+                if ($args->{'ext_zuchtstamm'.$i}=~/^(.+?)-.+?:(.+)/) {
+                    ($args->{'ext_id_zs'.$i},$args->{'ext_zuchtstamm'.$i})=($args->{'ext_zuchtstamm'.$i}=~/^(.+?)-.+?:(.+)/);
                     $args->{'ext_breeder'.$i}       = $args->{'ext_id_zs'.$i}; ;
                 }
                 
@@ -452,7 +482,7 @@ sub LO_LS01_Zuchtstamm {
 
                     if (!$ar_animal->[1] or !$ar_animal->[0]) {
 
-                        push(@{$record->{'data'}->{'tfield'}->{'errors'}}, 
+                        push(@{$record->{'data'}->{$tfield}->{'errors'}}, 
                             Apiis::Errors->new(
                                 type       => 'DATA',
                                 severity   => 'CRIT',
@@ -475,12 +505,12 @@ sub LO_LS01_Zuchtstamm {
                         ($db_unit, $exists)=GetDbUnit({'ext_unit'=>$ar_animal->[0],'ext_id'=>$ar_animal->[1]},'y');
         
                         if (!$db_unit) {            
-                            push(@{$record->{'data'}->{$tfield.$i}->{'errors'}}, 
+                            push(@{$record->{'data'}->{$tfield}->{'errors'}}, 
                                 Apiis::Errors->new(
                                     type       => 'DATA',
                                     severity   => 'CRIT',
                                     from       => 'LS01_Zuchtstamm',
-                                    ext_fields => [$tfield.$i],
+                                    ext_fields => [$tfield],
                                     msg_short  =>"Keinen Eintrag für '$ar_animal->[0]:$ar_animal->[1]' in der Datenbank gefunden."
                                 ));
                         }
@@ -545,7 +575,7 @@ sub LO_LS01_Zuchtstamm {
                     });
 
                     if (!$db_animal) {            
-                        push(@{$record->{'data'}->{$tfield.$i}->{'errors'}},$apiis->errors);
+                        push(@{$record->{'data'}->{$tfield}->{'errors'}},$apiis->errors);
                     }
                     else {
                         #-- Abspeichern des Tieres als Elterntier im übergeordneten Zuchtstamm 
@@ -844,7 +874,7 @@ sub LO_LS01_Zuchtstamm {
                 $args->{'ext_zuchtstamm'}   = $ext_zuchtstamm;
             }
 
-            $zuchtstammid=['zuchtstamm',$args->{'ext_id_zs'},$args->{'ext_zuchtstamm'}];
+            $zuchtstammid=['zuchtstamm',$args->{'ext_id_zs'},$args->{'ext_zuchtstamm'},$args->{'opening_dt'}];
         }
 
         my  $cnt_parents;
@@ -896,12 +926,19 @@ sub LO_LS01_Zuchtstamm {
 
             $db_parents=$apiis->DataBase->seq_next_val('seq_transfer__db_animal');
 
+            #-- Wenn im LO das Gültigkeitsdatum angegeben ist, dann das als Öffnungsdatum nehmen  
+            my $opening_dt=$apiis->today;
+            if ($zuchtstammid->[3]) {
+                $opening_dt=$zuchtstammid->[3];
+            }
+
             #-- Nur neue Nummer in transfer anlegen ('only_transfer'=>'1')
             my $guid=CreateTransfer($apiis,
                         {'db_animal'=>$db_parents,
                         'ext_unit'=>$zuchtstammid->[0],
                         'ext_id'=>$zuchtstammid->[1],
-                        'ext_animal'=>$zuchtstammid->[2]
+                        'ext_animal'=>$zuchtstammid->[2],
+                        'opening_dt'=>$opening_dt
             });
 
             if (!$guid) {
@@ -991,24 +1028,4 @@ EXIT:
 }
 1;
 __END__
-
-    if ($fileimport) {
-
-        my $sql="select  user_get_full_db_animal(a.db_parents) as ZuchtstammID, user_get_full_db_animal(b.db_animal) as Tiernummer, (select b3.ext_code || ', ' || c3.ext_code from breedcolor a3 inner join codes b3 on a3.db_breed=b3.db_code inner join codes c3 on a3.db_color=c3.db_code where a3.db_breedcolor=b.db_breed) as Rasse_Farbschlag, user_get_ext_code(b.db_sex) as Geschlecht, b.birth_dt as Geburtsdatum, user_get_ext_location_of(b.db_animal) as Züchter, user_get_full_db_animal(b.db_parents) as ZuchtstammEltern, ( select string_agg(user_get_full_db_animal(db_animal)::varchar,', ')  from parents where db_parents=b.db_parents) as eltern from parents a inner join animal b on a.db_animal=b.db_animal where a.db_parents=$vzuchtstamm";
-
-        my $sql_ref = $apiis->DataBase->sys_sql( $sql);
-
-        $json->{'Result_Header'}=['ZuchtstammID','Tiernummer','Rasse_Farbschlag','Geschlecht','Geburtsdatum','Züchter','ZuchtstammEltern','Eltern'];
-        while ( my $q = $sql_ref->handle->fetch ) {
-            push(@{$json->{'result'}},[@$q]);
-
-        }
-
-        return $json;
-    }
-    else {
-        return ( $self->status, $self->errors );
-    }
-}
-1;
 
