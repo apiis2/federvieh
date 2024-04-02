@@ -194,7 +194,7 @@
     </Label>
 
     <Field Name="admin1">
-      <Button ButtonLabel="Tier suchen/l&amp;ouml;schen" URL="admin_animal.pfrm" Command="do_open_report"/>
+      <Button ButtonLabel="Tier suchen/l&amp;ouml;schen" URL="/etc/forms/admin_animal.pfrm" Command="do_open_report"/>
       <Position Column="1" Row="11"/>
       <Miscellaneous/>
       <Text FontSize="12px" TextAlign="center"/>
@@ -203,7 +203,7 @@
     </Field>
     
     <Field Name="admin3">
-      <Button ButtonLabel="Event je Tier suchen/&amp;auml;ndern/l&amp;ouml;schen" URL="admin_event_tier.pfrm" Command="do_open_report"/>
+      <Button ButtonLabel="Event je Tier suchen/&amp;auml;ndern/l&amp;ouml;schen" URL="/etc/forms/admin_event_tier.pfrm" Command="do_open_report"/>
       <Position Column="3" Row="11"/>
       <Miscellaneous/>
       <Text FontSize="12px" TextAlign="center"/>
@@ -212,7 +212,7 @@
     </Field>
     
     <Field Name="admin5">
-      <Button ButtonLabel="Event f&amp;uuml;r mehrere Tiere suchen/&amp;auml;ndern/l&amp;ouml;schen" URL="admin_event.pfrm" Command="do_open_report"/>
+      <Button ButtonLabel="Event f&amp;uuml;r mehrere Tiere suchen/&amp;auml;ndern/l&amp;ouml;schen" URL="/etc/forms/admin_event.pfrm" Command="do_open_report"/>
       <Position Column="5" Row="11"/>
       <Miscellaneous/>
       <Text FontSize="12px" TextAlign="center"/>
@@ -221,7 +221,7 @@
     </Field>
 
     <Field Name="admin6">
-      <Button ButtonLabel="Datensatz l&amp;ouml;schen" URL="admin_delete_record.pfrm" Command="do_open_report"/>
+      <Button ButtonLabel="Datensatz l&amp;ouml;schen" URL="/etc/forms/admin_delete_record.pfrm" Command="do_open_report"/>
       <Position Column="1" Row="12"/>
       <Miscellaneous/>
       <Text FontSize="12px" TextAlign="center"/>
@@ -236,7 +236,7 @@
 
 
     <Field Name="admin9">
-      <Button ButtonLabel="Daten exportieren" URL="DatenExport.pfrm" Command="do_open_report"/>
+      <Button ButtonLabel="Daten exportieren" URL="/etc/forms/DatenExport.pfrm" Command="do_open_report"/>
       <Position Column="1" Row="14"/>
       <Miscellaneous/>
       <Text FontSize="12px" TextAlign="center"/>
