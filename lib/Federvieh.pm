@@ -247,18 +247,154 @@ sub CreateBody {
     return $data;
 }
 
+sub CreateTBDX {
+    my ($tbd, $json_glberror, $record, $z ) = @_;
+
+    my $trd     =[]; 
+    my $j       =1;
+
+    my $color;
+    my $cerr;
+    my @record=();
+    my $recdata;
+    
+    #-- zuerst en schauen, ob es im Record einen Fehler gab
+    $recdata=$record->{'data'};
+
+    my $nrec=$#record;
+
+    #-- loop over record with positions 
+    foreach ( @{$record->{'fields'}} ) {
+       
+        next if (!exists $_->{'pos'});
+
+        if ($_->{'type'} eq 'data') {
+
+            #-- link zu data 
+            my $field=$_->{'name'};
+
+            if ( $record->{'data'}->{$field}->{'errors'}[0])  {
+                $json_glberror->{$field}++;
+                $color='lightsalmon';
+                $cerr=1;
+            }
+        }
+    }
+    
+    #-- Loop over all fields 
+    foreach  ( @{$record->{'fields'}} ) {
+
+        next if (!exists $_->{'pos'});
+        
+        #-- save link to data if exists 
+        my $field;
+        if (exists $_->{'name'}) {
+            $field =$_->{'name'};
+        }
+        
+        my $style=[{'padding-right'=>'8px'}];
+        my $value=$_->{'value'};
+
+        if ($_->{'type'} eq 'data') {
+            $color='lightyellow'  if ($recdata->{$field}->{'status'} == '3');
+            $color='lightsalmon'  if ($recdata->{$field}->{'status'} == '2');
+            $color='lightgray'    if ($recdata->{$field}->{'status'} == '1');
+            $color='lightgreen'   if ($recdata->{$field}->{'status'} == '0');
+
+            #-- Errorobject umladen 
+            my $err  =$recdata->{$field}->{'errors'}; 
+
+            #-- wenn kein Fehler im Datensatz, dann alles grün 
+            if (!$cerr) {
+                push(@{$trd},{'tag'=>'td', 'attr'=>[{'style'=>[{'background-color'=>$color}]}],'value'=>$value });
+            }
+            else {
+            
+                my $style=[];
+                if ($err->[0]) {
+                    push(@{$style},{'background-color'=>$color});
+
+                    $a={'data'=>[{'tag'=>'a','attr'=>[{'class'=>'tip'}, 
+                                                    {'href'=>'javascript:void(0)'},
+                                                    {'onclick'=>"javascript:ToggleMe('".$field.$z."')"},
+                                                    {'style'=>$style}],
+                    'value'=>$value}],
+                    'attr'=>[{'style'=>[{'padding-right'=>'8px'}]}],
+                    'tag'=>'td'};
+                
+                    push(@{$trd},$a);
+                }
+                else {
+                    push(@{$trd},{'tag'=>'td', 'attr'=>[],'value'=>$value });
+                }
+            }
+        }
+        else {
+            $color='lightgray';
+            push(@{$trd},{'tag'=>'td', 'attr'=>[{'style'=>[{'background-color'=>$color}]}],'value'=>$value });
+        } 
+    }
+
+    push(@{$tbd},{'tag'=>'tr', 'attr'=>[],'data'=>$trd });
+
+    my $i=0;
+    
+    #-- Fehlerbehandlung auf Recordebene 
+    #-- Loop over all fields 
+    foreach  ( @{$record->{'fields'}} ) {
+
+        #-- save link to data if exists 
+        my $field;
+        if (exists $_->{'name'}) {
+            $field =$_->{'name'};
+        }
+        
+        my $pos=$i+1;
+        my $color='lightsalmon';
+
+        my $err  =$recdata->{$field}->{'errors'} if ($_->{'type'} eq 'data');
+
+        foreach my $err (@$err) {
+            
+            my $str= $err->msg_short; 
+            
+            push(@{$tbd}, {'tag'=>'tr', 
+                        'attr'=>[{'id'=>'Z'.$z},{'class'=>'S'.$pos}, {'style'=>[{'display'=>'none'}]}],
+                        'data'=>[{'tag'=>'td',
+                                    'attr'=>[{'colspan'=>$nrec},{'style'=>[{'background-color'=>$color},
+                                    {'border-bottom'=>'2px solid black'}]}],
+                                    'value'=>$str}] 
+            });
+            
+            $str= $err->sprint_html; 
+            
+            push(@{$tbd}, {'tag'=>'tr', 
+                        'attr'=>[{'id'=>$field.$z},{'style'=>[{'display'=>'none'}]}],
+                        'data'=>[{'tag'=>'td',
+                                    'attr'=>[{'colspan'=>$nrec},{'style'=>[{'background-color'=>$color},
+                                    {'border-bottom'=>'2px solid black'}]}],
+                                    'value'=>$str}] 
+            });
+        }
+        $i++;
+    } 
+    
+    return $tbd;
+}
+
 sub CreateTBD {
     my ($tbd, $json_glberror, $record, $z ) = @_;
 
     my $trd     =[]; 
     my $j       =1;
 
-    #-- zuersten schauen, ob es im Record einen Fehler gab
     my $color;
     my $cerr;
     my @record=();
-    my $recdata=$record->{'data'};
-
+    my $recdata;
+    
+    $recdata=$record->{'data'};
+        
     foreach my $key  (keys %{$recdata}) {
         $record[$recdata->{$key}->{'pos'}]=$key if (exists $recdata->{$key}->{'pos'}) ;
     }
@@ -276,7 +412,7 @@ sub CreateTBD {
             }
         }
     }
-    
+
     foreach my $field ( @record ) {
 
         my $style=[{'padding-right'=>'8px'}];
