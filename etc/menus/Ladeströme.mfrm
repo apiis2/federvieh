@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Form PUBLIC "1" "form.dtd">
-<Form Name="LO_verwaltung_m2">
+<Form Name="LO_verwaltung_m">
   <General Description="Menu" Name="General_0a2" StyleSheet="/etc/apiis.css"/>
   <Block Description="LO_verwaltung" Name="Block_0a2" NavigationBar="no">
     
