@@ -1,4 +1,10 @@
+create or replace view v_animal as select user_get_ext_id_animal(db_animal) as animal, user_get_ext_code(db_sex) as sex, user_get_ext_id_animal(db_sire) as sire, user_get_ext_id_animal(db_dam) as dam, user_get_ext_id_animal(db_parents) as parents, user_get_ext_breedcolor(db_animal), user_get_ext_code(db_selection) as selection, db_litter as db_litter, name, birth_dt, hb_ein_dt, la_rep_dt, la_rep, last_change_dt, last_change_user, dirty, chk_lvl, guid, owner, version, synch from animal;
+
 CREATE OR REPLACE FUNCTION user_get_ext_breedcolor(int) RETURNS text AS $$ select b3.ext_code || case when c3.ext_code isnull then '' else ', ' || c3.ext_code end from breedcolor a3 inner join codes b3 on a3.db_breed=b3.db_code left outer join codes c3 on a3.db_color=c3.db_code where a3.db_breedcolor=$1; $$ LANGUAGE SQL;
+
+CREATE OR REPLACE FUNCTION user_get_ext_zuchtstamm_of(int) RETURNS text AS $$ select concat(z1.cmp,': ', z.cmp) from
+(select STRING_AGG(a.ext_animal::varchar,', ' order by a.ext_animal) as cmp, 1 as z from (select user_get_ext_animal(x.db_animal) as ext_animal, user_get_ext_code(y.db_sex) as sex, x.db_parents from parents x inner join animal y on x.db_animal=y.db_animal where x.db_parents=$1 and user_get_ext_code(y.db_sex)='2') a ) z inner join (select STRING_AGG(b.ext_animal::varchar,', ' order by b.ext_animal) as cmp, 1 as z from (select user_get_ext_animal(x.db_animal) as ext_animal, user_get_ext_code(y.db_sex) as sex, x.db_parents from parents x inner join animal y on x.db_animal=y.db_animal where x.db_parents=$1 and user_get_ext_code(y.db_sex)='1') b) z1 on z1.z=z.z; $$ LANGUAGE SQL;
+
 
 CREATE OR REPLACE FUNCTION user_get_ext_breeder_of(int) RETURNS text AS $$  select ext_id from unit a inner join locations  b on a.db_unit=b.db_location where b.db_animal=$1 and a.ext_unit='breeder' limit 1; $$ LANGUAGE SQL;
 
