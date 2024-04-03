@@ -236,7 +236,7 @@
 
 
     <Field Name="admin9">
-      <Button ButtonLabel="Daten exportieren" URL="/etc/forms/DatenExport.pfrm" Command="do_open_report"/>
+      <Button ButtonLabel="Daten exportieren" URL="/etc/export_data/ExportProject.pfrm" Command="do_open_report"/>
       <Position Column="1" Row="14"/>
       <Miscellaneous/>
       <Text FontSize="12px" TextAlign="center"/>
