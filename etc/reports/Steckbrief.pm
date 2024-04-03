@@ -61,6 +61,61 @@ sub Steckbrief {
     
     #############################################################################
     #
+    # transfer
+    #
+    #############################################################################
+
+    $sql="select ext_unit,ext_id, ext_animal, a.opening_dt, a.closing_dt, a.guid from transfer a inner join unit b on a.db_unit=b.db_unit where db_animal=$db_animal";
+    
+    $sql_ref = $apiis->DataBase->sys_sql( $sql );
+    if ( $sql_ref->status and ($sql_ref->status == 1 )) {
+        $apiis->status( 1 );
+        $apiis->errors( $sql_ref->errors );
+        goto ERR;
+    }
+
+    $tr=[];
+
+    while ( my $q = $sql_ref->handle->fetch ) {
+        my $td=[];
+
+        #-- einzelne Zellen an Zeile anfüggen 
+        push( @$td, {'tag'=>'td','value'=>$q->[ 0 ]});
+        push( @$td, {'tag'=>'td','value'=>$q->[ 1 ]});
+        push( @$td, {'tag'=>'td','value'=>$q->[ 2 ]});
+        push( @$td, {'tag'=>'td','value'=>$q->[ 3 ]});
+        push( @$td, {'tag'=>'td','value'=>$q->[ 4 ]});
+        push( @$td, {'tag'=>'td','value'=>$q->[ 5 ]});
+
+        #-- undef => '' 
+        map { if (!$_->{'value'}) { $_->{'value'}=''} } @$td;
+
+        #-- Gesamte Zeile an Tabelle anfügen 
+        push(@$tr,{'tag'=>'tr',    'data'=>$td,  'attr'=>[]});
+    }
+
+    $trb={'tag'=>'tbody', 'data'=>$tr, 'attr'=>[]};
+
+    my $ltiernummer='Tiernummer';
+    $ltiernummer='ZuchtstammID' if ($ext_unit eq 'zuchtstamm');
+
+    $thd={'tag'=>'tr', 'data'=>[{'tag'=>'th','value'=>'Nummernsystem'},{'tag'=>'th','value'=>'Nummernkreis'},
+                                   {'tag'=>'th','value'=>$ltiernummer},{'tag'=>'th','value'=>'aktiv seit'},
+                                   {'tag'=>'th','value'=>'inaktiv seit'},{'tag'=>'th','value'=>'GUID'}]};
+
+    $cap={'tag'    =>'caption',
+                    'value' =>$ltiernummer,
+                    'attr'  =>[{'style'=>[{'font-size'=>'20px'},{'text-align'=>'left'}]}]};
+
+    $trh={'tag'=>'thead', 'data'=>[$thd],        'attr'=>[{'style'=>[{'background-color'=>'lightgray'},{'text-align'=>'left'},
+                                        {'border-collapse'=>'collapse'},{'border-bottom'=>'1px solid black'}] }]};
+
+    $tbl={'tag'=>'table', 'data'=>[$cap, $trh,$trb],   'attr'=>[{'rules'=>'groups'},{'border'=>'1'},{'style'=>[{'border'=>'2px solid black'},{'width'=>'100%'},{'margin-top'=>'20px'}]}]};
+
+
+    push(@{$bodyd},$tbl);
+    #############################################################################
+    #
     # animal
     #
     #############################################################################
@@ -178,64 +233,11 @@ sub Steckbrief {
 
         $tbl={'tag'=>'table', 'data'=>[$cap, $trh,$trb],   'attr'=>[{'rules'=>'groups'},{'border'=>'1'},{'style'=>[{'border'=>'2px solid black'},{'width'=>'100%'},{'margin-top'=>'20px'}]}]};
 
-
-        push(@{$bodyd},$tbl);
+        if ($tr->[0]) {
+            push(@{$bodyd},$tbl);
+        }    
     }    
     
-    #############################################################################
-    #
-    # transfer
-    #
-    #############################################################################
-
-    $sql="select ext_unit,ext_id, ext_animal, a.opening_dt, a.closing_dt from transfer a inner join unit b on a.db_unit=b.db_unit where db_animal=$db_animal";
-    
-    $sql_ref = $apiis->DataBase->sys_sql( $sql );
-    if ( $sql_ref->status and ($sql_ref->status == 1 )) {
-        $apiis->status( 1 );
-        $apiis->errors( $sql_ref->errors );
-        goto ERR;
-    }
-
-    $tr=[];
-
-    while ( my $q = $sql_ref->handle->fetch ) {
-        my $td=[];
-
-        #-- einzelne Zellen an Zeile anfüggen 
-        push( @$td, {'tag'=>'td','value'=>$q->[ 0 ]});
-        push( @$td, {'tag'=>'td','value'=>$q->[ 1 ]});
-        push( @$td, {'tag'=>'td','value'=>$q->[ 2 ]});
-        push( @$td, {'tag'=>'td','value'=>$q->[ 3 ]});
-        push( @$td, {'tag'=>'td','value'=>$q->[ 4 ]});
-
-        #-- undef => '' 
-        map { if (!$_->{'value'}) { $_->{'value'}=''} } @$td;
-
-        #-- Gesamte Zeile an Tabelle anfügen 
-        push(@$tr,{'tag'=>'tr',    'data'=>$td,  'attr'=>[]});
-    }
-
-    $trb={'tag'=>'tbody', 'data'=>$tr, 'attr'=>[]};
-
-    my $ltiernummer='Tiernummer';
-    $ltiernummer='ZuchtstammID' if ($ext_unit eq 'zuchtstamm');
-
-    $thd={'tag'=>'tr', 'data'=>[{'tag'=>'th','value'=>'Nummernsystem'},{'tag'=>'th','value'=>'Nummernkreis'},
-                                   {'tag'=>'th','value'=>$ltiernummer},{'tag'=>'th','value'=>'aktiv seit'},
-                                   {'tag'=>'th','value'=>'inaktiv seit'}]};
-
-    $cap={'tag'    =>'caption',
-                    'value' =>$ltiernummer,
-                    'attr'  =>[{'style'=>[{'font-size'=>'20px'},{'text-align'=>'left'}]}]};
-
-    $trh={'tag'=>'thead', 'data'=>[$thd],        'attr'=>[{'style'=>[{'background-color'=>'lightgray'},{'text-align'=>'left'},
-                                        {'border-collapse'=>'collapse'},{'border-bottom'=>'1px solid black'}] }]};
-
-    $tbl={'tag'=>'table', 'data'=>[$cap, $trh,$trb],   'attr'=>[{'rules'=>'groups'},{'border'=>'1'},{'style'=>[{'border'=>'2px solid black'},{'width'=>'100%'},{'margin-top'=>'20px'}]}]};
-
-
-    push(@{$bodyd},$tbl);
     
     if ($ext_unit ne 'zuchtstamm') {
         #############################################################################
@@ -289,7 +291,9 @@ sub Steckbrief {
         $tbl={'tag'=>'table', 'data'=>[$cap, $trh,$trb],   'attr'=>[{'rules'=>'groups'},{'border'=>'1'},{'style'=>[{'border'=>'2px solid black'},{'width'=>'100%'},{'margin-top'=>'20px'}]}]};
 
 
-        push(@{$bodyd},$tbl);
+        if ($tr->[0]) {
+            push(@{$bodyd},$tbl);
+        }    
     }
 
     #############################################################################
@@ -345,7 +349,10 @@ sub Steckbrief {
     $tbl={'tag'=>'table', 'data'=>[$cap, $trh,$trb],   'attr'=>[{'rules'=>'groups'},{'border'=>'1'},{'style'=>[{'border'=>'2px solid black'},{'width'=>'100%'},{'margin-top'=>'20px'}]}]};
 
 
-    push(@{$bodyd},$tbl);
+    if ($tr->[0]) {
+        push(@{$bodyd},$tbl);
+    }
+
 EXIT:    
     
     return JSON::to_json({'tag'=>'body', 'data'=>$bodyd});
