@@ -252,7 +252,10 @@ sub LO_LS06_Tiermeldung {
     my %reverse;
     
     my $tbd=[];
-    my ($db_sire, $db_dam, @zuchtstamm);
+    my $db_sire=1;
+    my $db_dam=2;
+    my @zuchtstamm;
+    my $err_msg='';
     $i=0;
     my $n_parent=0;
 
@@ -266,9 +269,16 @@ sub LO_LS06_Tiermeldung {
 
         #-- falls es die Felder im Recordsatz noch nicht gibt, dann aus data anlegen 
         if (!exists $record->{ 'fields' }) {
-            foreach (keys %{$record->{'data'}[0]}) {
-                $args->{$_}=$record->{'data'}[0]->{$_}[0];
-            }    
+            if (ref($record->{'data'}) eq 'ARRAY') {
+                foreach (keys %{$record->{'data'}[0]}) {
+                    $args->{$_}=$record->{'data'}[0]->{$_}[0];
+                }    
+            }
+            else {
+                foreach (keys %{$record->{'data'}}) {
+                    $args->{$_}=$record->{'data'}->{$_}[0];
+                }    
+            }
         }
         else {
             #-- Daten aus Hash holen
@@ -279,26 +289,119 @@ sub LO_LS06_Tiermeldung {
                 }
             }
         }
+       
+        #-- 
+        if (($args->{'ext_breeder'} eq '') and ($args->{'ext_owner'} eq '') and ($args->{'active'} eq '1')) {
+                $self->status(1);
+                $self->errors(
+                        Apiis::Errors->new(
+                                type       => 'DATA',
+                                severity   => 'CRIT',
+                                from       => 'LS06_Tiermeldung',
+                                ext_fields => ['active'],
+                                msg_short  => "Tiere ohne Züchter oder Besitzer können nicht aktiv gesetzt werden."
+                    )
+                );
+                $rollback=1;
+        }
+
+        if (($args->{'ext_sire'} ne '') and ($args->{'ext_dam'} ne '') and ($args->{'ext_zuchtstamm'} ne '')) {
+                $self->status(1);
+                $self->errors(
+                        Apiis::Errors->new(
+                                type       => 'DATA',
+                                severity   => 'CRIT',
+                                from       => 'LS06_Tiermeldung',
+                                ext_fields => ['ext_zuchtstamm'],
+                                msg_short  => "Es kann nur Vater UND Mutter ODER der Zuchtstamm angegeben werden."
+                    )
+                );
+                $rollback=1;
+        }
+        
+        ####################################################################################### 
+        #
+        # Check Tiernummern
+        #
+        ####################################################################################### 
+
+        foreach ('ext_animal','ext_sire','ext_dam') {
+            
+            my $nr;
+            $nr='Tiernummer'   if ($_ eq 'ext_animal');
+            $nr='Vaternummer'  if ($_ eq 'ext_sire');
+            $nr='Mutternummer' if ($_ eq 'ext_dam');
+
+            $args->{$_}=uc($args->{$_});
+
+            if (($args->{$_} ne '') and ($args->{$_}!~/\d\d\w+\d{1,5}/)) {
+           
+                $self->status(1);
+                $self->errors(
+                        Apiis::Errors->new(
+                                type       => 'DATA',
+                                severity   => 'CRIT',
+                                from       => 'LS06_Tiermeldung',
+                                ext_fields => [$_],
+                                msg_short  => "Die $nr: $args->{$_} hat ein ungültiges Format"
+                    )
+                );
+                $rollback=1;
+            }
+        }    
+
+        ####################################################################################### 
+        #
+        # Check NotNull
+        #
+        ####################################################################################### 
+        foreach ('ext_animal','db_sex', 'db_breed', 'birth_dt') {
+            
+            my $nr;
+            $nr='Tiernummer'    if ($_ eq 'ext_animal');
+            $nr='Geburtsdatum'  if ($_ eq 'birth_dt');
+            $nr='Züchter'       if ($_ eq 'ext_breeder');
+            $nr='Geschlecht'    if ($_ eq 'db_sex');
+            $nr='Rasse'         if ($_ eq 'db_breed');
+
+            if (($args->{$_} eq '')) {
+                
+                $self->status(1);
+                $self->errors(
+                        Apiis::Errors->new(
+                                type       => 'DATA',
+                                severity   => 'CRIT',
+                                from       => 'LS01_Zuchtstamm',
+                                ext_fields => [$_],
+                                msg_short  => "$nr ist ein Pflichtfeld und muss einen Wert haben"
+                    )
+                );
+                $rollback=1;
+            }
+        }    
+        
         ####################################################################################### 
         #
         # Check Breeder
         #
         ####################################################################################### 
-        if (exists $args->{'ext_breeder'}) {
+        if ($args->{'ext_breeder'} ne '') {
 
             ($db_breeder, $exists) = GetDbUnit({'ext_unit'=>'breeder','ext_id'=>$args->{'ext_breeder'}},'n');
             $ext_breeder= $args->{'ext_breeder'};
 
             if (!$db_breeder) {            
-                push(@{$record->{'data'}->{'ext_breeder'}->{'errors'}}, 
-                    Apiis::Errors->new(
-                        type       => 'DATA',
-                        severity   => 'CRIT',
-                        from       => 'LS01_Zuchtstamm',
-                        ext_fields => ['ext_breeder'],
-                        msg_short  =>"Keinen Eintrag für 'breeder:$args->{'ext_breeder'}' in der Datenbank gefunden."
-                    ));
-                    
+            
+                $self->status(1);
+                $self->errors(
+                        Apiis::Errors->new(
+                                type       => 'DATA',
+                                severity   => 'CRIT',
+                                from       => 'LS01_Zuchtstamm',
+                                ext_fields => [$_],
+                                msg_short  =>"Keinen Eintrag für 'breeder:$args->{'ext_breeder'}' in der Datenbank gefunden."
+                    )
+                );
                 $rollback=1;
             }
         }    
@@ -317,16 +420,53 @@ sub LO_LS06_Tiermeldung {
                                               'ext_animal'=>$args->{'ext_sire'}});
                                             
             if (!$db_sire ) {
-                push(@{$record->{'data'}->{'ext_sire'}->{'errors'}},
-                    Apiis::Errors->new(
+                my $error= Apiis::Errors->new(
                         type       => 'DATA',
                         severity   => 'CRIT',
                         from       => 'LS02_Tiermeldung',
                         ext_fields => ['ext_sire'],
-                        msg_short  => "Kein Tier mit dieser Nummer gefunden."
-                    ));
-                    
+                        msg_short  => "Keinen Vater mit der Nummer: $args->{'ext_sire'} in der Datenbank gefunden."
+                );
+
+                $db_sire=1;
+                $self->status(1);
+                $self->errors($error);
                 $rollback=1;
+            }
+            else {
+#               my ($ext_breed,$ext_sex) = CheckParents({   'db_animal'=>$db_sire,
+#                                                           'db_breed'=>$db_breed,
+#                                                           'db_sex'=>$args>{'db_sex'}});
+                                                
+                if ($ext_breed ) {
+                    my $error= Apiis::Errors->new(
+                            type       => 'DATA',
+                            severity   => 'CRIT',
+                            from       => 'LS06_Tiermeldung',
+                            ext_fields => ['ext_sire'],
+                            msg_short  => "Rasse des Vaters passt nicht zur Rasse des Tieres."
+                    );
+
+                    $db_sire=1;
+                    $self->status(1);
+                    $self->errors($error);
+                    $rollback=1;
+                }
+                
+                if ($ext_sex ) {
+                    my $error= Apiis::Errors->new(
+                            type       => 'DATA',
+                            severity   => 'CRIT',
+                            from       => 'LS06_Tiermeldung',
+                            ext_fields => ['ext_sire'],
+                            msg_short  => "Die Vaternummer ist kein männliches Tier."
+                    );
+
+                    $db_sire=1;
+                    $self->status(1);
+                    $self->errors($error);
+                    $rollback=1;
+                }
             }
         }
         else {
@@ -346,16 +486,18 @@ sub LO_LS06_Tiermeldung {
                                               'ext_id'=>'BDRG',
                                               'ext_animal'=>$args->{'ext_dam'}});
                                             
-            if (!$db_sire ) {
-                push(@{$record->{'data'}->{'ext_sire'}->{'errors'}},
-                    Apiis::Errors->new(
+            if (!$db_dam ) {
+                my $error= Apiis::Errors->new(
                         type       => 'DATA',
                         severity   => 'CRIT',
                         from       => 'LS02_Tiermeldung',
                         ext_fields => ['ext_sire'],
-                        msg_short  => "Kein Tier mit dieser Nummer gefunden."
-                    ));
-                    
+                        msg_short  => "Keine Mutter mit der Nummer: $args->{'ext_dam'} in der Datenbank gefunden."
+                    );
+
+                $db_dam=2;
+                $self->status(1);
+                $self->errors($error);
                 $rollback=1;
             }
         }
@@ -365,6 +507,7 @@ sub LO_LS06_Tiermeldung {
 
         #-- Wenn Vater ODER Mutter bekannt ist, dann keinen Zuchtstamm angeben 
         $args->{'db_parents'}=3;
+        
         if (( $db_sire ne '1') or ($db_dam ne '2')) {
             $args->{'db_parents'}=3;
         }    
@@ -384,16 +527,18 @@ sub LO_LS06_Tiermeldung {
                                                  'ext_animal'=>$args->{'ext_zuchtstamm'}});
                                             
             if (!$db_parents ) {
-                push(@{$record->{'data'}->{'ext_zuchtstamm'}->{'errors'}},
+                $self->status(1);
+                $self->errors(
                     Apiis::Errors->new(
                         type       => 'DATA',
                         severity   => 'CRIT',
                         from       => 'LS02_Tiermeldung',
                         ext_fields => ['ext_zuchtstamm'],
-                        msg_short  => "Keinen Zuchtstamm mit dieser Nummer gefunden."
-                    ));
+                        msg_short  => "Keinen Zuchtstamm mit der Nummer $args->{'ext_id_zuchtstamm'}:$args->{'ext_zuchtstamm'} in der Datenbank gefunden."
+                ));
                     
                 $rollback=1;
+                goto EXIT;
             }
         }
         
@@ -462,33 +607,51 @@ sub LO_LS06_Tiermeldung {
                 }    
             }
 
+            my $exit_dt='';
+            my $ext_owner='';
+
             my $db_animal;
             my $guid=undef;
+           
+            my $hs={
+                'db_animal'=>undef,
+                'ext_unit'=>$ar_animal->[0],
+                'ext_id'=>$ar_animal->[1],
+                'ext_animal'=>$ar_animal->[2],
+
+                'birth_dt'=>$args->{'birth_dt'},
+                'db_sex'=>$args->{'db_sex'},
+                'ext_breeder'=>$args->{'ext_breeder'},
+                'ext_selection'=>'1',
+                'db_breed'=>$args->{'db_breed'},
+                'db_sire'=>$db_sire,
+                'db_dam'=>$db_dam,
+                'db_parents'=>$args->{'db_parents'},
+
+                'createanimal'=>'1',
+            };
+
+            #-- wenn es Züchter gibt,
+            if ($args->{'ext_breeder'} ne '') {
+                
+                #-- mit Location  
+                $hs->{'ext_unit_location'}='breeder';  
+                $hs->{'ext_id_location'}=$args->{'ext_breeder'};
+
+                #dann aktiv oder passiv setzen 
+                if ( $args->{'active'} eq '0') {
+                    $hs->{'exit_dt'}=$apiis->today();
+                }
+            }
+            
             #-- Nur neue Nummer in transfer anlegen ('only_transfer'=>'1')
-            ($db_animal, $guid) = GetDbAnimal({ 'db_animal'=>undef,
-                                                'ext_unit'=>$ar_animal->[0],
-                                                'ext_id'=>$ar_animal->[1],
-                                                'ext_animal'=>$ar_animal->[2],
-
-                                                'birth_dt'=>$args->{'birth_dt'},
-                                                'db_sex'=>$args->{'db_sex'},
-                                                'ext_breeder'=>$ext_breeder,
-                                                'ext_selection'=>'1',
-                                                'db_breed'=>$args->{'db_breed'},
-                                                'db_sire'=>$db_sire,
-                                                'db_dam'=>$db_dam,
-                                                'db_parents'=>$args->{'db_parents'},
-
-                                                #-- mit Location  
-                                                'ext_unit_location'=>'owner',  
-                                                'ext_id_location'=>$args->{'ext_owner'},
-                                                    
-                                                'createanimal'=>'1',
-            });
+            ($db_animal, $guid) = GetDbAnimal( $hs);
 
             #-- Fehlerbehandlung 
             if (!$db_animal ) {
-                push(@{$record->{'data'}->{'ext_animal'.$i}->{'errors'}},$apiis->errors);
+                $self->errors($apiis->errors);
+                $self->status=1;
+#                push(@{$record->{'data'}->{'ext_animal'}->{'errors'}},$apiis->errors);
                     
                 $apiis->del_errors;
             }
@@ -503,7 +666,7 @@ sub LO_LS06_Tiermeldung {
     
 EXIT:
     
-    if ((!$apiis->status) and ($onlycheck eq 'off')) {
+    if ((!$self->status) and (!$apiis->status) and ($onlycheck eq 'off')) {
         $apiis->DataBase->commit;
     }
     else {
