@@ -44,8 +44,8 @@ sub Bestandsliste {
 ##############
     $tiergruppe='12'                if (!$tiergruppe);
 
-    $datvon = $apiis->today()       if (!$datvon or ($datvon eq ''));
-    $datbis = $datvon               if (!$datbis or ($datbis eq ''));
+    $datvon = '01.01.1900'          if (!$datvon or ($datvon eq ''));
+    $datbis = $apiis->today()       if (!$datbis or ($datbis eq ''));
 
     $vaktiv = 'Alle, '              if ( $tiergruppe eq '12');
     $vaktiv = 'Jungtiere, '         if ( $tiergruppe eq 'j');
@@ -206,12 +206,9 @@ sub Bestandsliste {
     else {
 
         my $tg=" ext_code='12' ";
-        
-        $tg=" (ext_code='1' or ext_code='2' or ext_code='9') " if ($tiergruppe eq '12');
-        
-        $tg=" ( ext_code='1' )" if ($tiergruppe eq 'z');
-        
-        $tg=" ( ext_code='2'  )" if ($tiergruppe eq 'j');
+#        $tg=" (ext_code='1' or ext_code='2' or ext_code='9') " if ($tiergruppe eq '12');
+#        $tg=" ( ext_code='1' )" if ($tiergruppe eq 'z');
+#        $tg=" ( ext_code='2'  )" if ($tiergruppe eq 'j');
 
         $sql.=" where   
             /* Tier ist noch aktiv und Zu/Abgang waehrend des Zuchtjahres*/
@@ -224,7 +221,7 @@ sub Bestandsliste {
             (a.exit_dt>='$datvon'::date)) 
                                                                                 
             )
-            and b.db_selection in (select db_code from codes where class='SELECTION' and $tg)
+            /*and b.db_selection in (select db_code from codes where class='SELECTION' and $tg)*/
             and (e.ext_unit='breeder' or e.ext_unit='owner') 
             and e.ext_id in ('" . join( "','", @betriebe ) . "') 
         ";
