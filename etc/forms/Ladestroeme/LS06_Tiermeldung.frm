@@ -9,13 +9,13 @@
       <Parameter Name="Parameter1" Key="LO" Value="LO_LS06_Tiermeldung"/>
     </DataSource>
 
-    <Label Name="LS06L" Content="__('Ladestrom: Tiermeldung')">
+    <Label Name="LS06L" Content="__('Tiermeldung')">
       <Position Column="1" Columnspan="8" Position="absolute" Row="0"/>
       <Text FontSize="24px" TextDecoration="underline"/>
       <Format PaddingBottom="10px"/>
     </Label>
 
-    <Label Name="LS06L1" Content="__('Bundesring-Tier')">
+    <Label Name="LS06L1" Content="__('Bundesring-Tier*')">
       <Position Column="1" Position="absolute" Row="1"/>
     </Label>
     <Field Name="ext_animal" FlowOrder="1"  LabelName="LS06L1" ToolTip="__('Bundesringnummer des Tieres')">
@@ -27,7 +27,7 @@
       <Format/>    
     </Field>
 
-    <Label Name="LS06L20" Content="__('Geschlecht')">
+    <Label Name="LS06L20" Content="__('Geschlecht*')">
       <Position Column="1" Position="absolute" Row="2"/>
     </Label>
     <Field Name="db_sex" FlowOrder="2"  LabelName="LS06L20" ToolTip="__('Geschlecht des Tieres')" InternalData="yes">
@@ -42,7 +42,7 @@
       <Format/>    
     </Field>
 
-    <Label Name="LS06L2" Content="__('Rasse/Farbschlag')">
+    <Label Name="LS06L2" Content="__('Rasse/Farbschlag*')">
       <Position Column="1" Position="absolute" Row="3"/>
     </Label>
     <Field Name="db_breed" FlowOrder="3" Check="NotNull"  LabelName="LS06L2" ToolTip="__('Rasse des Tieres')" InternalData="yes">
@@ -57,7 +57,7 @@
       <Format MarginRight="10px"/>    
     </Field>
     
-    <Label Name="LS06L4" Content="__('Schlupfdatum')">
+    <Label Name="LS06L4" Content="__('Schlupfdatum*')">
       <Position Column="1" Position="absolute" Row="5"/>
     </Label>
     <Field Name="birth_dt" FlowOrder="5"  LabelName="LS06L4" ToolTip="__('Schlupfdatum des Tieres: dd.mm.yyyy')">
