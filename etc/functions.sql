@@ -114,7 +114,9 @@ group by f.ext_id
 order by f.ext_id
 ;
 
-CREATE OR REPLACE FUNCTION user_get_ext_breed_of(int,text) RETURNS text AS $$ select case when $2 = 'l' then case when b.long_name isnull then b.ext_code else b.long_name end else case when $2='s' then case when b.short_name isnull then b.ext_code else b.short_name end else b.ext_code end end || ' - ' || case when $2 = 'l' then case when c.long_name isnull then c.ext_code else c.long_name end else case when $2='s' then case when c.short_name isnull then c.ext_code else c.short_name end else c.ext_code end end from breedcolor a inner join codes b on a.db_breed=b.db_code inner join codes c on a.db_color=c.db_code inner join animal d on a.db_breedcolor=d.db_breed where db_animal=$1; $$ LANGUAGE SQL;
+CREATE OR REPLACE FUNCTION user_get_ext_breed_of(int,text) RETURNS text AS $$ select case when $2 = 'l' then case when b.long_name isnull then b.ext_code else b.long_name end else case when $2='s' then case when b.short_name isnull then b.ext_code else b.short_name end else b.ext_code end end from breedcolor a inner join codes b on a.db_breed=b.db_code inner join animal d on a.db_breedcolor=d.db_breed where db_animal=$1; $$ LANGUAGE SQL;
+
+CREATE OR REPLACE FUNCTION user_get_ext_full_breed_of(int,text) RETURNS text AS $$ select case when $2 = 'l' then case when b.long_name isnull then b.ext_code else b.long_name end else case when $2='s' then case when b.short_name isnull then b.ext_code else b.short_name end else b.ext_code end end || ' - ' || case when $2 = 'l' then case when c.long_name isnull then c.ext_code else c.long_name end else case when $2='s' then case when c.short_name isnull then c.ext_code else c.short_name end else c.ext_code end end from breedcolor a inner join codes b on a.db_breed=b.db_code inner join codes c on a.db_color=c.db_code inner join animal d on a.db_breedcolor=d.db_breed where db_animal=$1; $$ LANGUAGE SQL;
 
 CREATE OR REPLACE FUNCTION user_get_ext_location_of(int) RETURNS text AS $$ select unit.ext_id from unit inner join locations on unit.db_unit=locations.db_location where locations.db_animal=$1 order by entry_dt desc limit 1; $$ LANGUAGE SQL;
 
