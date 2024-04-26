@@ -13,20 +13,20 @@
     </DataSource>
       
 
-    <Label Name="L17" Content="__('parents'): ">
+    <Label Name="L17" Content="__('Zuchtstämme'): ">
       <Position Column="0" Columnspan="10" Position="absolute" Row="0"/>
       <Text FontSize="24px" TextDecoration="underline"/>
     </Label>
 
-    <Label Name="L18" Content="__('db_animal'): ">
+    <Label Name="L23" Content="__('Zuchtstamm'): ">
       <Position Column="0" Position="absolute" Row="1"/>
     </Label>
 
-    <Field Name="F22" DSColumn="C19" FlowOrder="0" InternalData="yes">
-      <DataSource Name="DS21">
-        <Sql Statement="SELECT a.db_animal as id,  CASE WHEN c.ext_unit::text isnull THEN 'unknown' ELSE c.ext_unit::text END   || ':::' ||   CASE WHEN c.ext_id::text isnull THEN 'unknown' ELSE c.ext_id::text END   || ':::' ||   CASE WHEN b.ext_animal::text isnull THEN 'unknown' ELSE b.ext_animal::text END  as ext_trait FROM parents AS a LEFT OUTER JOIN  transfer AS b ON b.db_animal=a.db_animal LEFT OUTER JOIN  unit AS c ON c.db_unit=b.db_unit GROUP BY id,ext_trait ORDER BY ext_trait "/>
+    <Field Name="F27" DSColumn="C24" FlowOrder="1" InternalData="yes">
+      <DataSource Name="DS26">
+        <Sql Statement="SELECT a.db_parents as id,  CASE WHEN c.ext_id::text isnull THEN 'unknown' ELSE c.ext_id::text END   || ':::' ||   CASE WHEN b.ext_animal::text isnull THEN 'unknown' ELSE b.ext_animal::text END  as ext_trait FROM parents AS a LEFT OUTER JOIN  transfer AS b ON b.db_animal=a.db_parents LEFT OUTER JOIN  unit AS c ON c.db_unit=b.db_unit GROUP BY id,ext_trait ORDER BY ext_trait "/>
       </DataSource>
-      <ScrollingList Size="1"/>
+      <ScrollingList DefaultFunction="lastrecord" Size="1"/>
       <Position Column="1" Position="absolute" Row="1"/>
       <Miscellaneous />
       <Text/>
@@ -35,13 +35,13 @@
     </Field>
 
 
-    <Label Name="L23" Content="__('db_parents'): ">
+    <Label Name="L18" Content="__('Tiere'): ">
       <Position Column="0" Position="absolute" Row="2"/>
     </Label>
 
-    <Field Name="F27" DSColumn="C24" FlowOrder="1" InternalData="yes">
-      <DataSource Name="DS26">
-        <Sql Statement="SELECT a.db_parents as id,  CASE WHEN c.ext_unit::text isnull THEN 'unknown' ELSE c.ext_unit::text END   || ':::' ||   CASE WHEN c.ext_id::text isnull THEN 'unknown' ELSE c.ext_id::text END   || ':::' ||   CASE WHEN b.ext_animal::text isnull THEN 'unknown' ELSE b.ext_animal::text END  as ext_trait FROM parents AS a LEFT OUTER JOIN  transfer AS b ON b.db_animal=a.db_parents LEFT OUTER JOIN  unit AS c ON c.db_unit=b.db_unit GROUP BY id,ext_trait ORDER BY ext_trait "/>
+    <Field Name="F22" DSColumn="C19" FlowOrder="0" InternalData="yes">
+      <DataSource Name="DS21">
+        <Sql Statement="SELECT a.db_animal as id,  CASE WHEN c.ext_unit::text isnull THEN 'unknown' ELSE c.ext_unit::text END   || ':::' ||   CASE WHEN c.ext_id::text isnull THEN 'unknown' ELSE c.ext_id::text END   || ':::' ||   CASE WHEN b.ext_animal::text isnull THEN 'unknown' ELSE b.ext_animal::text END  as ext_trait FROM parents AS a LEFT OUTER JOIN  transfer AS b ON b.db_animal=a.db_animal LEFT OUTER JOIN  unit AS c ON c.db_unit=b.db_unit GROUP BY id,ext_trait ORDER BY ext_trait "/>
       </DataSource>
       <ScrollingList Size="1"/>
       <Position Column="1" Position="absolute" Row="2"/>
