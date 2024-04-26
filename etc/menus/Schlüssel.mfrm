@@ -20,7 +20,7 @@
        <Color BackGround="transparent" />
        <Format PaddingTop="10px"/>
     </Image>
-    <Field Name="do_savea6">
+    <Field Name="SVdo_savea6">
       <Button ButtonLabel="Schl&amp;uuml;ssel anlegen und korrigieren" URL="Schluessel/Codes.frm" Command="do_open_form"/>
       <Position Row="4" Column="1"/>
       <Miscellaneous/>
@@ -43,7 +43,7 @@
        <Color/>
        <Format />
     </Image>
-    <Field Name="do_save1a6">
+    <Field Name="SVdo_save1a6">
       <Button ButtonLabel="Schl&amp;uuml;ssel-&amp;Uuml;bersicht drucken" URL="/etc/reports/Schluessel/CodesPdf.rpt" Command="do_open_report"/>
       <Position Row="4" Column="5"/>
       <Miscellaneous/>
@@ -52,7 +52,7 @@
       <Format BorderStyle="groove" BorderColor="lightgray" />
     </Field>
     
-    <Field Name="do_open_forma6">
+    <Field Name="SVdo_open_forma6">
       <Button ButtonLabel="Schl&amp;uuml;ssel schlie&amp;szlig;en" URL="Schluessel/Codes_Ende.frm" Command="do_open_form"/>
       <Position Row="6" Column="1"/>
       <Miscellaneous/>
@@ -61,7 +61,7 @@
       <Format BorderStyle="groove" BorderColor="lightgray" MarginBottom="10px"/>
     </Field>
     
-    <Field Name="Field_85a6">
+    <Field Name="SVField_85a6">
       <Button ButtonLabel="Units mit Adressverweis anlegen und korrigieren" URL="Schluessel/Units_Adresse.frm" Command="do_open_form"/>
       <Position Row="7" Column="1"/>
       <Miscellaneous/>
@@ -74,7 +74,7 @@
        <Color BackGround="black" />
        <Format />
     </Image>
-    <Field Name="Field_851a6">
+    <Field Name="SVField_851a6">
       <Button ButtonLabel="Units-&amp;Uuml;bersicht drucken" URL="/etc/reports/Schluessel/Units.rpt" Command="do_open_report"/>
       <Position Row="7" Column="5"/>
       <Miscellaneous/>
@@ -83,7 +83,7 @@
       <Format BorderStyle="groove" BorderColor="lightgray"/>
     </Field>
     
-    <Field Name="Field_86a6">
+    <Field Name="SVField_86a6">
       <Button ButtonLabel="Units f&amp;uuml;r Nummern anlegen" URL="Schluessel/Units_Nummer.frm" Command="do_open_form"/>
       <Position Row="8" Column="1"/>
       <Miscellaneous/>
@@ -92,7 +92,7 @@
       <Format BorderStyle="groove" BorderColor="lightgray"/>
     </Field>
     
-    <Field Name="Field_88a6">
+    <Field Name="SVField_88a6">
       <Button ButtonLabel="Units schlie&amp;szlig;en" URL="Schluessel/Units_Ende.frm" Command="do_open_form"/>
       <Position Row="10" Column="1"/>
       <Miscellaneous/>
@@ -101,7 +101,7 @@
       <Format BorderStyle="groove" BorderColor="lightgray" MarginBottom="10px"/>
     </Field>
 <!-- 
-    <Field Name="Field_89a6">
+    <Field Name="SVField_89a6">
       <Button ButtonLabel="Events anlegen und korrigieren" URL="Schluessel/Events.frm" Command="do_open_form"/>
       <Position Row="11" Column="1"/>
       <Miscellaneous/>
@@ -114,7 +114,7 @@
        <Color BackGround="black" />
        <Format MarginBottom="10px"/>
     </Image>
-    <Field Name="Field_891a6">
+    <Field Name="SVField_891a6">
       <Button ButtonLabel="Events-&amp;Uuml;bersicht drucken" URL="/etc/reports/Schluessel/Events.rpt" Command="do_open_report"/>
       <Position Row="11" Column="5"/>
       <Miscellaneous/>
@@ -123,7 +123,7 @@
       <Format BorderStyle="groove" BorderColor="lightgray" MarginBottom="10px"/>
     </Field>
 -->    
-    <Field Name="Field_90a6">
+    <Field Name="SVField_90a6">
       <Button ButtonLabel="Adressen anlegen und korrigieren" URL="Schluessel/Adressen.frm" Command="do_open_form"/>
       <Position Row="12" Column="1"/>
       <Miscellaneous/>
@@ -137,7 +137,7 @@
        <Format MarginBottom="10px"/>
     </Image>
     
-    <Field Name="Field_901a6">
+    <Field Name="SVField_901a6">
       <Button ButtonLabel="Adress-&amp;Uuml;bersicht drucken" URL="/etc/reports/Schluessel/Adressen.rpt" Command="do_open_report"/>
       <Position Row="12" Column="5"/>
       <Miscellaneous/>
@@ -146,7 +146,7 @@
       <Format BorderStyle="groove" BorderColor="lightgray" MarginBottom="10px"/>
     </Field>
 <!--    
-    <Field Name="Field_110a6">
+    <Field Name="SVField_110a6">
       <Button ButtonLabel="Tier anlegen (einzeln)" URL="Schluessel/Tiere.frm" Command="do_open_form"/>
       <Position Row="14" Column="1"/>
       <Miscellaneous/>
@@ -154,7 +154,7 @@
       <Color BackGround="#00aaff"/>
       <Format BorderStyle="groove" BorderColor="lightgray"/>
     </Field>
-    <Field Name="Field_110a62">
+    <Field Name="SVField_110a62">
       <Button ButtonLabel="Tier anlegen (mit Pedigree)" URL="ExterneTiereParameter.pfrm" Command="do_open_form"/>
       <Position Row="15" Column="1"/>
       <Miscellaneous/>
@@ -163,7 +163,7 @@
       <Format BorderStyle="groove" BorderColor="lightgray" MarginBottom="10px"/>
     </Field>
     
-    <Field Name="Field_110a61">
+    <Field Name="SVField_110a61">
       <Button ButtonLabel="Etikett definieren" URL="Schluessel/Etiketten.frm" Command="do_open_form"/>
       <Position Row="16" Column="1"/>
       <Miscellaneous/>
