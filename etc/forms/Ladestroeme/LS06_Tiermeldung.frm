@@ -49,7 +49,7 @@
       <DataSource Name="LS06D2">
         <Sql Statement="select db_breedcolor, concat(b.ext_code,  ' - ', (select ext_code from codes where db_code=a.db_color)) from breedcolor a inner join codes b on a.db_breed=b.db_code  order by b.ext_code"/>
       </DataSource>
-      <ScrollingList Size="1"  StartCompareString="right" ReduceEntries="yes" />  
+      <ScrollingList Size="1" DefaultFunction="lastrecord" StartCompareString="right" ReduceEntries="yes" />  
       <Position Column="2" Columnspan="5" Position="absolute" Row="3"/>
       <Miscellaneous/>
       <Text/>
