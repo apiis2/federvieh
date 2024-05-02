@@ -14,7 +14,7 @@
     </Label>
  
     <Label Name="Label_1a2" Content="Eingabe">
-      <Position Column="3" Row="1"/>
+      <Position Column="0-6" Row="1"/>
       <Text FontSize="16px" TextAlign="center"/>
     </Label>
    
@@ -75,7 +75,7 @@
     </Field>
 -->
     <Label Name="Label_s1a2" Content="Schema">
-      <Position Column="3" Row="5"/>
+      <Position Column="0-6" Row="5"/>
       <Text FontSize="16px" TextAlign="center"/>
     </Label>
 
@@ -188,6 +188,62 @@
       <Format BorderStyle="groove" BorderColor="lightgray"/>
     </Field>
 -->
+    <Label Name="AdmL10" Content="Löschen">
+      <Position Column="0-6" Row="10"/>
+      <Text FontSize="16px" TextAlign="center"/>
+    </Label>
+
+    <Field Name="admin1">
+      <Button ButtonLabel="Tier suchen/l&amp;ouml;schen" URL="/etc/forms/admin_animal.pfrm" Command="do_open_report"/>
+      <Position Column="1" Row="11"/>
+      <Miscellaneous/>
+      <Text FontSize="12px" TextAlign="center"/>
+      <Color />
+      <Format BorderStyle="groove" BorderColor="lightgray"/>
+    </Field>
+    
+    <Field Name="admin3">
+      <Button ButtonLabel="Event je Tier suchen/&amp;auml;ndern/l&amp;ouml;schen" URL="/etc/forms/admin_event_tier.pfrm" Command="do_open_report"/>
+      <Position Column="3" Row="11"/>
+      <Miscellaneous/>
+      <Text FontSize="12px" TextAlign="center"/>
+      <Color />
+      <Format BorderStyle="groove" BorderColor="lightgray"/>
+    </Field>
+    
+    <Field Name="admin5">
+      <Button ButtonLabel="Event f&amp;uuml;r mehrere Tiere suchen/&amp;auml;ndern/l&amp;ouml;schen" URL="/etc/forms/admin_event.pfrm" Command="do_open_report"/>
+      <Position Column="5" Row="11"/>
+      <Miscellaneous/>
+      <Text FontSize="12px" TextAlign="center"/>
+      <Color />
+      <Format BorderStyle="groove" BorderColor="lightgray" />
+    </Field>
+
+    <Field Name="admin6">
+      <Button ButtonLabel="Datensatz l&amp;ouml;schen" URL="/etc/forms/admin_delete_record.pfrm" Command="do_open_report"/>
+      <Position Column="1" Row="12"/>
+      <Miscellaneous/>
+      <Text FontSize="12px" TextAlign="center"/>
+      <Color />
+      <Format BorderStyle="groove" BorderColor="lightgray" />
+    </Field>
+
+    <Label Name="AdmL13" Content="Verschiedenes">
+      <Position Column="0-6" Row="13"/>
+      <Text FontSize="16px" TextAlign="center"/>
+    </Label>
+
+
+    <Field Name="admin9">
+      <Button ButtonLabel="Daten exportieren" URL="/etc/export_data/ExportProject.pfrm" Command="do_open_report"/>
+      <Position Column="1" Row="14"/>
+      <Miscellaneous/>
+      <Text FontSize="12px" TextAlign="center"/>
+      <Color />
+      <Format BorderStyle="groove" BorderColor="lightgray" />
+    </Field>
+
     <Color BackGround="#ffffdd"/>
     <Format BorderStyle="ridge" BorderColor="#004ce4" Padding="10px"/>
  
