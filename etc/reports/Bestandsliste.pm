@@ -179,7 +179,7 @@ sub Bestandsliste {
             ((b.hb_ein_dt>= '$datvon'::date  and b.hb_ein_dt <='$datbis'::date)) 
             
             /* ist ein Zuchttier*/  
-            and b.db_selection=(select db_code from codes where class='SELECTION' and ext_code='0')
+            and b.db_selection=(select db_code from codes where class='EINSTUFUNG' and ext_code='1')
 
             /* und gehört zum Betrieb */
             and (e.ext_unit='breeder' or e.ext_unit='owner') 
@@ -198,7 +198,7 @@ sub Bestandsliste {
             (a.exit_dt>='$datvon'::date) 
                                                                                 
             )
-            and b.db_selection=(select db_code from codes where class='SELECTION' and ext_code='0')
+            and b.db_selection=(select db_code from codes where class='EINSTUFUNG' and ext_code='1')
             and (e.ext_unit='breeder' or e.ext_unit='owner') 
             and e.ext_id in ('" . join( "','", @betriebe ) . "') 
         ";
@@ -221,7 +221,7 @@ sub Bestandsliste {
             (a.exit_dt>='$datvon'::date)) 
                                                                                 
             )
-            /*and b.db_selection in (select db_code from codes where class='SELECTION' and $tg)*/
+            and b.db_selection in (select db_code from codes where class='EINSTUFUNG' and $tg)
             and (e.ext_unit='breeder' or e.ext_unit='owner') 
             and e.ext_id in ('" . join( "','", @betriebe ) . "') 
         ";
