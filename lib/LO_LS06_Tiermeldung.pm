@@ -15,6 +15,9 @@ use CreateTransfer;
 use CreateAnimal;
 use ExitLocation;
 use Federvieh;
+############ DEBUG
+#perl -d GUI 'json={"result":{"insert":"1","update":"0","errors":"0"},"form":"/home/b08mueul/apiis/federvieh/etc/forms/Ladestroeme/LS06_Tiermeldung.frm","formtype":"apiisajax","info":"","data":[{"ext_owner":["","",""],"ext_dam":["","",""],"ext_sire":["AS","",""],"ext_id_zuchtstamm":["","",""],"active":[false,"",""],"db_sex":["2501","2501",""],"ext_animal":["","",""],"db_breed":["","",""],"ext_zuchtstamm":["","",""],"ext_breeder":["","",""],"birth_dt":["","",""]}],"command":"do_save_block","errors":[null],"sid":"1ec48de91012d7f35103c20605baa183"}'
+##################### ende ######################
 
 our $apiis;
 
