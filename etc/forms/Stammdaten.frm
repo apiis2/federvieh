@@ -6,7 +6,7 @@
 ]>
 
 <Form Name="FP30">
-  <General Name="G177"  Content="__('Stammdaten')"  MenuID="M1" ToolTip="__('Eingabe/Ändern von Stammdaten')" Help="/doc/StammdatenFrm.html" AR="user" Difficulty='basic' StyleSheet="/etc/apiis.css" Description="Stammdaten"/>
+  <General Name="G177"  Content="__('Stammdaten')"  MenuID="M1" ToolTip="__('Eingabe/Ändern von Stammdaten')" Help="/doc/StammdatenFrm.html" AR="user" Difficulty='basic' StyleSheet="/etc/apiis.css" Description="Stammdaten "/>
 
   <Block Name="B178" Description="Update animal">
      
