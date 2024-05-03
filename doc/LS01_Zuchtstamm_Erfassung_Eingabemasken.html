@@ -1,0 +1,63 @@
+<html>
+<header>
+</header>
+<body style="background-color:#F3E2A9; font-family:Arial, sans-serif ; font-size:14px">
+<div  id="ls01">
+    <table width="800" ><TR><td style="background-color:white" >
+    <p>
+    <a href="http://federvieh.local/doc/Vorlage_LS01.xlsx">Vorlage</a>
+    |
+    <a href="http://federvieh.local/doc/Beispiel_LS01.xlsx">Beispiel</a>
+    <p> 
+<h3>Erfassung eines Zuchtstammes über Eingabemasken mit Erfassung der Abstammung</h3>
+Im nachfolgenden wird beschrieben, wie ein Zuchtstamm respektive dessen Tiere mit Abstammung über Eingabemasken erfasst werden können. Es wird folgendes Beispiel zugrunde gelegt:
+    <img width="1000" src="http://federvieh.local/doc/LS01_excel.png"><br>
+Der Zuchtstamm besteht aus dem Hahn '20AP3' und den Hennen 'C34H:223' und '20C28'. Diese wiederum haben Eltern - entweder klar als Vater und Mutter oder angegeben über einen Zuchtstamm. In der Datenbank sind alle Tiere als Schlüssel hinterlegt. Bei jeder Tiernummer, die angelegt wird, wird geprüft, ob sie in der Datenbank existiert. Im Beispiel gehen wir davon aus, dass das nicht der Fall ist. Es müssen also alle Tiere des Zuchtstammes angelegt werden und deren Elterntiere. 
+<h4>1. Anlegen der Elterntiere</h4>
+Aufruf der Maske: Menues...->Ladeströme->Tier anlegen<br><br>
+Es wird immer mit der letzten Generation begonnen. In unserem Fall mit dem Tier '18LO243'. Es ist eine Henne der Rasse 'Perlhühner - blau mit Perlung' (entspricht in der Regel der Rasse des Zuchtstammes) im Jahr 2018 geboren (lt. Ring). Vater, Mutter, Zuchtstamm, Züchter und Besitzer sind unbekannt und bleiben leer. Wenn kein Züchter angegeben ist, muss das Tier als nicht aktiv gekennzeichnet sein (ohne Haken). Die mit '*' gekennzeichneten Felder müssen ausgefüllt sein. 
+    <img width="1000" src="http://federvieh.local/doc/LS06_Tiermeldung1.png"><br>
+Wenn das Speichern erfolgreich war, dann wird in der neuen Maske ein Teil der Felder leer angezeigt, bei einem anderen Teil werden die Eingaben des letzten Datensatzes übernommen, um die Menge der Dateneingabe zu reduzieren. 
+    <img width="1000" src="http://federvieh.local/doc/LS06_Tiermeldung2.png"><br>
+In analoger Weise ist für die Tiere '19K15', '19L01' zu verfahren sowie für die Hähne '19K2', '19K12' und '19LW23' - nur das hier das Geschlecht auf '1-männlich' geändert werden muss. 
+<h4>2. Anlegen der Zuchtstämme der Eltern</h4>
+Als Zuchtstamm wird eine Gruppe von Tieren bezeichnet, die üblicherweise aus einem Hahn und mehreren Hennen besteht. Ändert sich die Zusammensetzung des Zuchtstammes, sollte sich auch die Bezeichnung des Zuchtstammes ändern. Damit sich die Bezeichnungen über die Züchter nicht doppeln, ist eine Zusatzkennung notwendig. Damit besteht eine vollständige Zuchtstammbezeichnung aus der UNIT und der ID. Beide können beliebig heißen, müssen nur über alle Züchter und Jahre eindeutig sein. Vorgeschlagen wird folgender:<br>
+UNIT: Züchternummer-Jahr (z.B. C384W-22)<br>
+ID: lfd. Nummer, Stall, .. (z.B. Stall1)<br>
+Die vollständige Nummer lautet dann UNIT:ID (z.B: C384W-22:Stall1)
+
+    
+    
+    
+Hinweis: Die grauen Bereiche dürfen nicht überschrieben werden.<p>
+    <h4>Züchter</h4>Züchternummer (nicht den Namen). Wenn nicht bekannt, dann beim Zuchtverband zu erfragen. 
+    <h4>gültig ab</h4>Ab dem Zeitpunkt werden Leistungen des Zuchtstammes wie z.B. Anzahl Eier diesem Zuchtstamm zugeordnet.  
+    <h4>Rasse</h4>Rassebezeichnung. Nur die in der Liste aufgeführten Rassen sind gültig. 
+    <h4>Farbe</h4>Farbschlag. Nur die in der Liste aufgeführten Farbschläge sind gültig. Hat eine Rasse keine Farbschläge, bleibt das Feld leer. 
+    <h4>ZuchtstammID</h4>Die Bezeichnung des Zuchtstammes muss in Verbindung mit der Züchternummer und dem Jahr eindeutig sein. Achtung: Enthält der Zuchtstamm Tiere, die bereits in einem anderen Zuchtstamm aufgeführt sind, dann wird der andere Zuchtstamm geschlossen.  <p>
+    Wie die Tiernummer besteht auch die ZuchtstammID aus drei Teilen
+    <ul>Nummernsystems: Hier immer "zuchtstamm" </ul>
+    <ul>Nummernkreis: Hier immer Züchternummer-Jahr z.B. C385H-22</ul>
+    <ul>Nummer: eine beliebige Bezeichnung z.B: 1 oder Stall5 oder ...</ul>
+    Die vollständige Zuchtstammnummer des Beispiels lautet: zuchtstamm:C285H-22:Stall5. Das es sich um eine Zuchtstammnummer handelt, ergibt sich aus dem Kontext der Spaltte, daher muss "zuchtstamm" nicht aufgeführt sein und wird durch das System ergänzt.  
+    <h4>Hahn</h4>In der Spalte werden die Hähne des Zuchtstammes aufgeführt. Sie können mit der Bundesringnummer oder mit einer gültigen Züchternummer bezeichnet sein. Die Ringnummer hat das Format <p>Format: JJBBZZZ (JahrJahr-BuchstabeBuchstabe-ZahlZahlZahl)(z.B. 20G10 oder 15AB347). Die Züchternummer kann beliebig sein. Muss aber die Züchternummer vorangestellt haben (z.B: C361H:223). Der Doppelpunkt dient der Abgrenzung zwischen Züchternummer und Tiernummer. 
+    <h4>Kükennummer</h4>Her kann gegebenenfalls die Flügelnummer angegeben werden. Das ist nur sinnvoll, wenn es Leistungen gibt, die nur über die Flügelnummer abgerufen werden können. Sofern es eine Züchter- oder Bundesringnummer gibt, kann das Feld leer bleiben.
+    <h4>ZuchtstammID</h4>Abstammung des Hahnes. Unter dieser ID sind in der Datenbank die Eltern des Hahnes hinterlegt. 
+    <h4>Hahn (Ring-/Züchternummer)</h4>Vater des Hahnes. S.u. "Hahn"
+    <h4>Hennen (Ring-/Züchternummer)</h4>Mutter des Hahnes. S.u. "Hahn
+
+    <h4>Hennen</h4>In den nächsten Zeilen werden alle Hennen des Zuchtstammes aufgeführt. Die Angaben zur Nummer, Kükennumer und Abstammung sind analog der Angaben beim Hahn.
+    <h4>Hinweise für den Koordinator</h4>
+    <h4>Züchter</h4>Die Nummer muss in der Klasse "breeder" definiert sein<p>
+    <img width="400" src="http://federvieh.local/doc/LS05_unit.png">
+    <h4>Rasse</h4>Muss der unter 'Externer Schlüssel' in der Klasse: 'BREED' angegebene Schlüssel sein<p>
+    <img width="400" src="http://federvieh.local/doc/LS05_codes_breed.png">
+    <h4>Farbe</h4>Muss der unter 'Externer Schlüssel' in der Klasse: 'FARBSCHLAG' angegebene Schlüssel sein<p>
+    <img width="400" src="http://federvieh.local/doc/LS05_codes_farbschlag.png">
+<p>    
+Eine Übersicht über Zu- und Abgänge in einem bestimmten Zeitraum je Züchter und Rasse kann über die <a onclick="javascript:show('bestandsliste');" href="#bestandsliste">Bestandsliste</a> aufgerufen werden.     
+
+    </td></TR>
+    </table>
+</div>
+</body>
