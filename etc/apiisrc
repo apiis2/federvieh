@@ -94,7 +94,7 @@ syslog_facility = local3
 syslog_priority = info
 
 # sql_logging for debugging and some kind of rudimentary database recovery:
-use_sql_logging = 1
+use_sql_logging = 0
 # if you set use_sql_logging to a true value, all sql statements, that pass
 # the internal structure will be logged into sql_logfile:
 sql_logfile     = $APIIS_HOME/var/log/sql.log
@@ -154,7 +154,6 @@ chick_debug=1;
 logo = etc/logo.png
 
 [DEFAULT]
-ext_unit_id = 'wing_id_system | Hvam2017'
-ext_unit='Ringnummer'
-ext_id='20'
+ext_unit='bundesring'
+ext_id='BDRG'
 
