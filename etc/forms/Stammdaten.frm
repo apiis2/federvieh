@@ -13,29 +13,43 @@
     <DataSource Name="DS179" Connect="no">
       <Record TableName="animal"/>
       <Column DBName="db_animal" Name="C82" Order="0" Type="DB" UseEntryView="1">
-          <IdSet Name="idset_Column_7"  SetName="10-herdbuch"/>
-          <IdSet Name="idset_Column_7a" SetName="20-jungtier"/>
-          <IdSet Name="idset_Column_7b" SetName="30-feldtest"/>
+          <IdSet Name="idset_Column_7"  SetName="bundesring"/>
       </Column>
       
-      <Column DBName="ext_unit" Name="C86" Order="1" RelatedColumn="C82" RelatedOrder="0" Type="Related"/>
-      <Column DBName="ext_id" Name="C88" Order="2" RelatedColumn="C82" RelatedOrder="1" Type="Related"/>
+      <Column DBName="ext_unit"   Name="C86" Order="1" RelatedColumn="C82" RelatedOrder="0" Type="Related"/>
+      <Column DBName="ext_id"     Name="C88" Order="2" RelatedColumn="C82" RelatedOrder="1" Type="Related"/>
       <Column DBName="ext_animal" Name="C90" Order="3" RelatedColumn="C82" RelatedOrder="2" Type="Related"/>
 
-      <Column DBName="db_sex" Name="C93" Order="4" Type="DB"/>
-      <Column DBName="birth_dt" Name="C102" Order="5" Type="DB"/>
+      <Column DBName="db_sire" Name="C82s" Order="4" Type="DB" UseEntryView="1">
+          <IdSet Name="idset_Column_7s"  SetName="bundesring"/>
+      </Column>
+      
+      <Column DBName="ext_unit" Name="C86s" Order="5"   RelatedColumn="C82s" RelatedOrder="0" Type="Related"/>
+      <Column DBName="ext_id" Name="C88s" Order="6"     RelatedColumn="C82s" RelatedOrder="1" Type="Related"/>
+      <Column DBName="ext_animal" Name="C90s" Order="7" RelatedColumn="C82s" RelatedOrder="2" Type="Related"/>
 
-      <Column DBName="db_parents" Name="C105" Order="6" Type="DB">
+      <Column DBName="db_dam" Name="C82d" Order="8" Type="DB" UseEntryView="1">
+          <IdSet Name="idset_Column_7d"  SetName="bundesring"/>
+      </Column>
+      
+      <Column DBName="ext_unit" Name="C86d"   Order="9" RelatedColumn="C82d" RelatedOrder="0" Type="Related"/>
+      <Column DBName="ext_id" Name="C88d"     Order="10" RelatedColumn="C82d" RelatedOrder="1" Type="Related"/>
+      <Column DBName="ext_animal" Name="C90d" Order="11" RelatedColumn="C82d" RelatedOrder="2" Type="Related"/>
+
+      <Column DBName="db_sex" Name="C93" Order="12" Type="DB"/>
+      <Column DBName="birth_dt" Name="C102" Order="13" Type="DB"/>
+
+      <Column DBName="db_parents" Name="C105" Order="14" Type="DB">
           <IdSet Name="idset_Column_71"  SetName="zuchtstamm"/>
       </Column>
-         <Column DBName="ext_unit" Name="C109" Order="7" RelatedColumn="C105" RelatedOrder="0" Type="Related"/>
-         <Column DBName="ext_id" Name="C111" Order="8" RelatedColumn="C105" RelatedOrder="1" Type="Related"/>
-         <Column DBName="ext_animal" Name="C113" Order="9" RelatedColumn="C105" RelatedOrder="2" Type="Related"/>
+      <Column DBName="ext_unit"   Name="C109" Order="15" RelatedColumn="C105" RelatedOrder="0" Type="Related"/>
+      <Column DBName="ext_id"     Name="C111" Order="16" RelatedColumn="C105" RelatedOrder="1" Type="Related"/>
+      <Column DBName="ext_animal" Name="C113" Order="17" RelatedColumn="C105" RelatedOrder="2" Type="Related"/>
 
       
       
-      <Column DBName="name" Name="C148" Order="17" Type="DB"/>
-      <Column DBName="db_breed" Name="C166" Order="18" Type="DB"/>
+      <Column DBName="name" Name="C148" Order="18" Type="DB"/>
+      <Column DBName="db_breed" Name="C166" Order="19" Type="DB"/>
       <Column DBName="guid" Name="C175" Order="20" Type="DB"/>
     </DataSource>
       
@@ -60,7 +74,7 @@
     </Field>
     <Field Name="Fanimal_ext_unit" AR="user" DSColumn="C86" FlowOrder="1" >
       <DataSource Name="DataSource_101">
-        <Sql Statement="select ext_code, ext_code from codes where class='ID_SET' order by ext_code"/>
+        <Sql Statement="select ext_code, ext_code from codes where class='ID_SET' and ext_code='bundesring'"/>
       </DataSource>
       <ScrollingList Size="1" DefaultFunction="apiisrc" Default="ext_unit" />  
       <Position Column="1" Position="absolute" Row="1"/>
@@ -71,7 +85,7 @@
     </Field>
     <Field Name="Fanimal_ext_id" AR="user" DSColumn="C88" FlowOrder="2" >
       <DataSource Name="DataSource_1015aa">
-        <Sql Statement="select distinct ext_id, ext_id from entry_unit where ext_unit in (select  ext_code from entry_codes where class='ID_SET' ) order by ext_id"/>
+        <Sql Statement="select 'BDRG', 'BDRG'"/>
       </DataSource>
       <ScrollingList Size="1" DefaultFunction="apiisrc" Default="ext_id" StartCompareString="right" ReduceEntries="yes" />  
       <Position Column="2" Position="absolute" Row="1"/>
@@ -90,15 +104,101 @@
     </Field>
     
 
+    <Label Name="L695s" Content="Vater:">
+      <Position Column="0" Position="absolute" Row="2"/>
+    </Label>
+
+    <Field Name="Fsire" AR="user" DSColumn="C82s" >
+      <TextField Override="no" Size="20"/>
+      <Position Column="1" Position="absolute" Row="2"/>
+      <Miscellaneous Visibility="hidden" Enabled="no"/>
+      <Text/>
+      <Color/>
+      <Format/>
+    </Field>
+    <Field Name="Fsire_ext_unit" AR="user" DSColumn="C86s" FlowOrder="1" >
+      <DataSource Name="DataSource_101s">
+        <Sql Statement="select ext_code, ext_code from codes where class='ID_SET' and ext_code='bundesring'"/>
+      </DataSource>
+      <ScrollingList Size="1" DefaultFunction="apiisrc" Default="ext_unit" />  
+      <Position Column="1" Position="absolute" Row="2"/>
+      <Miscellaneous />
+      <Text/>
+      <Color/>
+      <Format/>
+    </Field>
+    <Field Name="Fsire_ext_id" AR="user" DSColumn="C88s" FlowOrder="2" >
+      <DataSource Name="DataSource_1015aas">
+        <Sql Statement="select 'BDRG', 'BDRG'"/>
+      </DataSource>
+      <ScrollingList Size="1" DefaultFunction="apiisrc" Default="ext_id" StartCompareString="right" ReduceEntries="yes" />  
+      <Position Column="2" Position="absolute" Row="2"/>
+      <Miscellaneous />
+      <Text/>
+      <Color/>
+      <Format/>
+    </Field>
+    <Field Name="Fsire_ext_animal" AR="user" DSColumn="C90s" FlowOrder="3" >
+      <TextField Override="no" Size="10"/>
+      <Position Column="3" Position="absolute" Row="2"/>
+      <Miscellaneous />
+      <Text/>
+      <Color/>
+      <Format/>
+    </Field>
+    
+    <Label Name="L695d" Content="Mutter:">
+      <Position Column="0" Position="absolute" Row="3"/>
+    </Label>
+
+    <Field Name="Fdam" AR="user" DSColumn="C82d" >
+      <TextField Override="no" Size="20"/>
+      <Position Column="1" Position="absolute" Row="3"/>
+      <Miscellaneous Visibility="hidden" Enabled="no"/>
+      <Text/>
+      <Color/>
+      <Format/>
+    </Field>
+    <Field Name="Fdam_ext_unit" AR="user" DSColumn="C86d" FlowOrder="1" >
+      <DataSource Name="DataSource_101d">
+        <Sql Statement="select ext_code, ext_code from codes where class='ID_SET' and ext_code='bundesring'"/>
+      </DataSource>
+      <ScrollingList Size="1" DefaultFunction="apiisrc" Default="ext_unit" />  
+      <Position Column="1" Position="absolute" Row="3"/>
+      <Miscellaneous />
+      <Text/>
+      <Color/>
+      <Format/>
+    </Field>
+    <Field Name="Fdam_ext_id" AR="user" DSColumn="C88d" FlowOrder="2" >
+      <DataSource Name="DataSource_1015aad">
+        <Sql Statement="select 'BDRG', 'BDRG'"/>
+      </DataSource>
+      <ScrollingList Size="1" DefaultFunction="apiisrc" Default="ext_id" StartCompareString="right" ReduceEntries="yes" />  
+      <Position Column="2" Position="absolute" Row="3"/>
+      <Miscellaneous />
+      <Text/>
+      <Color/>
+      <Format/>
+    </Field>
+    <Field Name="Fdam_ext_animal" AR="user" DSColumn="C90d" FlowOrder="3" >
+      <TextField Override="no" Size="10"/>
+      <Position Column="3" Position="absolute" Row="3"/>
+      <Miscellaneous />
+      <Text/>
+      <Color/>
+      <Format/>
+    </Field>
+    
 
 
     <Label Name="L104" Content="Zuchtstamm:">
-      <Position Column="0" Position="absolute" Row="2"/>
+      <Position Column="0" Position="absolute" Row="4"/>
     </Label>
 
     <Field Name="F108" AR="user" DSColumn="C105" >
       <TextField Override="no" Size="20"/>
-      <Position Column="1" Position="absolute" Row="2"/>
+      <Position Column="1" Position="absolute" Row="4"/>
       <Miscellaneous Visibility="hidden" Enabled="no"/>
       <Text/>
       <Color/>
@@ -108,8 +208,8 @@
       <DataSource Name="DataSource_103">
         <Sql Statement="select ext_code, ext_code from codes where class='ID_SET' and ext_code='zuchtstamm'"/>
       </DataSource>
-      <ScrollingList Size="1" />  
-      <Position Column="1" Position="absolute" Row="2"/>
+      <ScrollingList Size="1" DefaultFunction="apiisrc" Default="ext_unit" />  
+      <Position Column="1" Position="absolute" Row="4"/>
       <Miscellaneous/>
       <Text/>
       <Color/>
@@ -119,8 +219,8 @@
       <DataSource Name="DataSource_1017">
         <Sql Statement="select distinct ext_id, ext_id from entry_unit where ext_unit in (select  ext_code from entry_codes where class='ID_SET' and ext_code='zuchtstamm') order by ext_id"/>
       </DataSource>
-      <ScrollingList Size="1" StartCompareString="right" ReduceEntries="yes" />  
-      <Position Column="2" Position="absolute" Row="2"/>
+      <ScrollingList Size="1" DefaultFunction="apiisrc" Default="ext_id" StartCompareString="right" ReduceEntries="yes" />  
+      <Position Column="2" Position="absolute" Row="4"/>
       <Miscellaneous/>
       <Text/>
       <Color/>
@@ -128,7 +228,7 @@
     </Field>
     <Field Name="F114" AR="user" DSColumn="C113" FlowOrder="6" >
       <TextField Override="no" Size="20"/>
-      <Position Column="3" Position="absolute" Row="2"/>
+      <Position Column="3" Position="absolute" Row="4"/>
       <Miscellaneous/>
       <Text/>
       <Color/>
@@ -137,7 +237,7 @@
 
 
     <Label Name="L92" Content="Geschlecht:">
-      <Position Column="0" Position="absolute" Row="4"/>
+      <Position Column="0" Position="absolute" Row="5"/>
     </Label>
 
     <Field Name="F94" AR="user" DSColumn="C93" FlowOrder="10" InternalData="yes">
@@ -146,7 +246,7 @@
         then ext_code else short_name end else long_name end from codes where class='SEX' order by ext_code"/>
       </DataSource>
       <ScrollingList Size="1"/>
-      <Position Column="1" Position="absolute" Row="4"/>
+      <Position Column="1" Position="absolute" Row="5"/>
       <Miscellaneous/>
       <Text/>
       <Color/>
@@ -155,12 +255,12 @@
 
 
     <Label Name="L101" Content="geboren:">
-      <Position Column="0" Position="absolute" Row="5"/>
+      <Position Column="0" Position="absolute" Row="6"/>
     </Label>
 
     <Field Name="F103" AR="user" DSColumn="C102" FlowOrder="11" >
       <TextField Override="no" Size="10"/>
-      <Position Column="1" Position="absolute" Row="5"/>
+      <Position Column="1" Position="absolute" Row="6"/>
       <Miscellaneous/>
       <Text/>
       <Color/>
