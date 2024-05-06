@@ -8,7 +8,7 @@ sub GetData {
     my $sql="Set datestyle to 'german'";
     my $sql_ref = $apiis->DataBase->sys_sql($sql);
     
-    my $sql="select distinct user_get_ext_id_animal(a.db_parents),b.opening_dt, b.guid from parents a inner join transfer b on b.db_animal=a.db_parents;";
+    my $sql="select distinct user_get_ext_id_animal(a.db_parents),b.opening_dt, b.guid from parents a inner join transfer b on b.db_animal=a.db_parents order by b.opening_dt desc;";
 
     my $sql_ref = $apiis->DataBase->sys_sql($sql);
     if ($sql_ref->status == 1) {
