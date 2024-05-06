@@ -14,48 +14,52 @@ Im nachfolgenden wird beschrieben, wie ein Zuchtstamm respektive dessen Tiere mi
     <img width="1000" src="http://federvieh.local/doc/LS01_excel.png"><br>
 Der Zuchtstamm besteht aus dem Hahn '20AP3' und den Hennen 'C34H:223' und '20C28'. Diese wiederum haben Eltern - entweder klar als Vater und Mutter oder angegeben über einen Zuchtstamm. In der Datenbank sind alle Tiere als Schlüssel hinterlegt. Bei jeder Tiernummer, die angelegt wird, wird geprüft, ob sie in der Datenbank existiert. Im Beispiel gehen wir davon aus, dass das nicht der Fall ist. Es müssen also alle Tiere des Zuchtstammes angelegt werden und deren Elterntiere. 
 <h4>1. Anlegen der Elterntiere</h4>
-Aufruf der Maske: Menues...->Ladeströme->Tier anlegen<br><br>
+Aufruf der Maske: <b>Menus...->Ladeströme->Tier anlegen</b><br><br>
 Es wird immer mit der letzten Generation begonnen. In unserem Fall mit dem Tier '18LO243'. Es ist eine Henne der Rasse 'Perlhühner - blau mit Perlung' (entspricht in der Regel der Rasse des Zuchtstammes) im Jahr 2018 geboren (lt. Ring). Vater, Mutter, Zuchtstamm, Züchter und Besitzer sind unbekannt und bleiben leer. Wenn kein Züchter angegeben ist, muss das Tier als nicht aktiv gekennzeichnet sein (ohne Haken). Die mit '*' gekennzeichneten Felder müssen ausgefüllt sein. 
-    <img width="1000" src="http://federvieh.local/doc/LS06_Tiermeldung1.png"><br>
+    <img width="900" src="http://federvieh.local/doc/LS06_Tiermeldung1.png"><br>
 Wenn das Speichern erfolgreich war, dann wird in der neuen Maske ein Teil der Felder leer angezeigt, bei einem anderen Teil werden die Eingaben des letzten Datensatzes übernommen, um die Menge der Dateneingabe zu reduzieren. 
     <img width="1000" src="http://federvieh.local/doc/LS06_Tiermeldung2.png"><br>
-In analoger Weise ist für die Tiere '19K15', '19L01' zu verfahren sowie für die Hähne '19K2', '19K12' und '19LW23' - nur das hier das Geschlecht auf '1-männlich' geändert werden muss. 
-<h4>2. Anlegen der Zuchtstämme der Eltern</h4>
-Als Zuchtstamm wird eine Gruppe von Tieren bezeichnet, die üblicherweise aus einem Hahn und mehreren Hennen besteht. Ändert sich die Zusammensetzung des Zuchtstammes, sollte sich auch die Bezeichnung des Zuchtstammes ändern. Damit sich die Bezeichnungen über die Züchter nicht doppeln, ist eine Zusatzkennung notwendig. Damit besteht eine vollständige Zuchtstammbezeichnung aus der UNIT und der ID. Beide können beliebig heißen, müssen nur über alle Züchter und Jahre eindeutig sein. Vorgeschlagen wird folgender:<br>
-UNIT: Züchternummer-Jahr (z.B. C384W-22)<br>
-ID: lfd. Nummer, Stall, .. (z.B. Stall1)<br>
-Die vollständige Nummer lautet dann UNIT:ID (z.B: C384W-22:Stall1)
+In analoger Weise ist für die Tiere '19K15', '19L01' zu verfahren sowie für die Hähne '19K2', '19K12' und '19LW23' - nur das hier das Geschlecht auf '1-männlich' geändert werden muss.<br>
 
-    
-    
-    
-Hinweis: Die grauen Bereiche dürfen nicht überschrieben werden.<p>
-    <h4>Züchter</h4>Züchternummer (nicht den Namen). Wenn nicht bekannt, dann beim Zuchtverband zu erfragen. 
-    <h4>gültig ab</h4>Ab dem Zeitpunkt werden Leistungen des Zuchtstammes wie z.B. Anzahl Eier diesem Zuchtstamm zugeordnet.  
-    <h4>Rasse</h4>Rassebezeichnung. Nur die in der Liste aufgeführten Rassen sind gültig. 
-    <h4>Farbe</h4>Farbschlag. Nur die in der Liste aufgeführten Farbschläge sind gültig. Hat eine Rasse keine Farbschläge, bleibt das Feld leer. 
-    <h4>ZuchtstammID</h4>Die Bezeichnung des Zuchtstammes muss in Verbindung mit der Züchternummer und dem Jahr eindeutig sein. Achtung: Enthält der Zuchtstamm Tiere, die bereits in einem anderen Zuchtstamm aufgeführt sind, dann wird der andere Zuchtstamm geschlossen.  <p>
+<h4>2. Ändern von Tierdaten</h4>
+Sollten sich Eingaben als fehlerhaft herausstellen oder müssen ergänzt werden, dann erfolgt das über <br>
+<p>Aufruf: <b>Menus...->Tier->Stammdaten</b></p>
+In die Felder für das Tier muss die Tiernummer vollständig eingegeben werden (Triplett: Unit|ID|Nummer) und danach mit Klick auf das Filtersymbol das Tier aus dem Speicher geholt werden. Gibt es die Nummer nicht, wird eine Fehlermeldung angezeigt. Unter "data" ist die Tiernummer aufgeführt und unter "msg_short" die Fehlermeldung: Found Foreignkey violation=Schlüsselverletzung=Die Nummer gibt es nicht in der Datenbank. 
+    <img width="1000" src="http://federvieh.local/doc/Fehler_Tier_nicht_vorhanden.png"><br>
+Wurde das Tier erfolgreich gefunden, dann können die Angaben geändert/ergänzt werden und mit Klick auf das Diskettensymbol in der Datenbank gespeichert werden. 
+
+
+<h4>3. Anlegen der Zuchtstämme der Eltern</h4>
+Als Zuchtstamm wird eine Gruppe von Tieren bezeichnet, die üblicherweise aus einem Hahn und mehreren Hennen besteht. Damit sich die Bezeichnungen über die Züchter nicht doppeln, ist eine Zusatzkennung notwendig. Damit besteht eine vollständige Zuchtstammbezeichnung aus der Züchternummer (UNIT) und einer, innerhalb der Züchternummer, eindeutigen Bezeichnung (ID).<br>
+Ein Zuchtstamm kann über einen Ladestrom angelegt werden. 
+<p><b>Menus...->Ladeströme->Zuchtstamm anlegen</b></p>
+<p><b>Menus...->Zuchtstammverwaltung->Ersterfassung eines Zuchtstammes</b></p>
+
+    <img width="400" src="http://federvieh.local/doc/LS01_Zuchtstammmeldung.png"><br>
+ <h4>Zuchtstamm*</h4>
     Wie die Tiernummer besteht auch die ZuchtstammID aus drei Teilen
     <ul>Nummernsystems: Hier immer "zuchtstamm" </ul>
-    <ul>Nummernkreis: Hier immer Züchternummer-Jahr z.B. C385H-22</ul>
-    <ul>Nummer: eine beliebige Bezeichnung z.B: 1 oder Stall5 oder ...</ul>
-    Die vollständige Zuchtstammnummer des Beispiels lautet: zuchtstamm:C285H-22:Stall5. Das es sich um eine Zuchtstammnummer handelt, ergibt sich aus dem Kontext der Spaltte, daher muss "zuchtstamm" nicht aufgeführt sein und wird durch das System ergänzt.  
-    <h4>Hahn</h4>In der Spalte werden die Hähne des Zuchtstammes aufgeführt. Sie können mit der Bundesringnummer oder mit einer gültigen Züchternummer bezeichnet sein. Die Ringnummer hat das Format <p>Format: JJBBZZZ (JahrJahr-BuchstabeBuchstabe-ZahlZahlZahl)(z.B. 20G10 oder 15AB347). Die Züchternummer kann beliebig sein. Muss aber die Züchternummer vorangestellt haben (z.B: C361H:223). Der Doppelpunkt dient der Abgrenzung zwischen Züchternummer und Tiernummer. 
-    <h4>Kükennummer</h4>Her kann gegebenenfalls die Flügelnummer angegeben werden. Das ist nur sinnvoll, wenn es Leistungen gibt, die nur über die Flügelnummer abgerufen werden können. Sofern es eine Züchter- oder Bundesringnummer gibt, kann das Feld leer bleiben.
-    <h4>ZuchtstammID</h4>Abstammung des Hahnes. Unter dieser ID sind in der Datenbank die Eltern des Hahnes hinterlegt. 
-    <h4>Hahn (Ring-/Züchternummer)</h4>Vater des Hahnes. S.u. "Hahn"
-    <h4>Hennen (Ring-/Züchternummer)</h4>Mutter des Hahnes. S.u. "Hahn
+    <ul>Nummernkreis: Hier immer Züchternummer (z.B. C361H)</ul>
+    <ul>Nummer: eine beliebige Bezeichnung z.B: 22-1 oder 22-Stall5 oder ...</ul>
+    Die vollständige Zuchtstammnummer des Beispiels lautet: zuchtstamm:C361H:22-1. Das es sich um eine Zuchtstammnummer handelt, ergibt sich aus dem Kontext der Spalte, daher muss "zuchtstamm" nicht aufgeführt sein und wird durch das System ergänzt.  
+    
+ <h4>gültig ab*</h4>Ab diesem Zeitpunkt ist der Zuchtstamm gültig. Da Tiere nur in einem Zuchtstamm zur gleichen Zeit sein können, dient das Datum vor allem der Kontrolle  
 
-    <h4>Hennen</h4>In den nächsten Zeilen werden alle Hennen des Zuchtstammes aufgeführt. Die Angaben zur Nummer, Kükennumer und Abstammung sind analog der Angaben beim Hahn.
-    <h4>Hinweise für den Koordinator</h4>
-    <h4>Züchter</h4>Die Nummer muss in der Klasse "breeder" definiert sein<p>
-    <img width="400" src="http://federvieh.local/doc/LS05_unit.png">
-    <h4>Rasse</h4>Muss der unter 'Externer Schlüssel' in der Klasse: 'BREED' angegebene Schlüssel sein<p>
-    <img width="400" src="http://federvieh.local/doc/LS05_codes_breed.png">
-    <h4>Farbe</h4>Muss der unter 'Externer Schlüssel' in der Klasse: 'FARBSCHLAG' angegebene Schlüssel sein<p>
-    <img width="400" src="http://federvieh.local/doc/LS05_codes_farbschlag.png">
+<h4>Hahn*</h4>Im Zuchtstamm muss es mindestens einen Hahn geben. Der Hahn muss bereits in der Datenbank als Tier angelegt sein. 
+
+<h4>1. Henne*</h4>Im Zuchtstamm muss es mindestens eine Henne geben. Die Henne muss bereits in der Datenbank als Tier angelegt sein. 
+
+<h4>Checks</h4> Es wird folgendes durch den Ladestrom geprüft
+    <ul>Das angegebene Tier unter "Hahn" ist männlich</ul>
+    <ul>Die angegebenen Tiere unter "Hennen" sind weiblich</ul>
+    <ul>Alle Tiere existieren in der Datenbank</ul>
+    <ul>Alle Tiere haben die gleiche Rasse, Farbschläge werden nicht kontrolliert</ul>
+    <ul>Der in der Zuchtstammnummer aufgeführte Züchter ist in der Datenbank angelegt</ul>
 <p>    
-Eine Übersicht über Zu- und Abgänge in einem bestimmten Zeitraum je Züchter und Rasse kann über die <a onclick="javascript:show('bestandsliste');" href="#bestandsliste">Bestandsliste</a> aufgerufen werden.     
+Eine Übersicht über alle Zuchtstämme kann über:<br>
+<p><b>Menus...->Zuchtstammverwaltung->Zuchtstammübersicht drucken</b></p>
+aufgerufen werden. Die Einträge sind nach dem Gültigkeitsdatum absteigend sortiert. Die unterstrichenen Nummern sind Hähne. Die in Klammern aufgeführten Nummern sind interne Datenbanknummern, die für das Löschen von Einträgen benötigt werden.
+Zu- und Abgänge in einem bestimmten Zeitraum je Züchter und Rasse kann über die <a onclick="javascript:show('be 
 
     </td></TR>
     </table>
