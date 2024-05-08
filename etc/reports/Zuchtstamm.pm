@@ -123,10 +123,10 @@ sub pdf {
     my $outkat;
     foreach (@kategorie) {
         if ($_->[2] eq '1') {
-            $outkat.="\\underline{$_->[0] (\\textit{$_->[3]})}";
+            $outkat.="\\underline{$_->[1] (\\textit{$_->[3]})}";
         }
         else {
-            $outkat.=" $_->[0] (\\textit{$_->[3]})";
+            $outkat.=" $_->[1] (\\textit{$_->[3]})";
         }
     }
 
