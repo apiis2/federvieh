@@ -60,8 +60,10 @@ sub LO_LS01_Zuchtstamm {
     my $zeile       =0;
     my $i           =0;
     my $onlycheck   ='off';
-    my $fileimport     =1                      if (exists $args->{ 'fileimport'});
+    my $vjahr='24';
+    my $fileimport     =1                   if (exists $args->{ 'fileimport'});
     $onlycheck=lc($args->{ 'onlycheck' })   if (exists $args->{ 'onlycheck' });
+    $vjahr=$args->{ 'jahr' }                if (exists $args->{ 'jahr' });
 
     #-- Wenn ein File geladen werden soll, dann zuerst umwandeln in
     #   einen JSON-String, damit einheitlich weiterverarbeitet werden kann
@@ -78,6 +80,9 @@ sub LO_LS01_Zuchtstamm {
 
             #-- initialisieren mit '' 
             map { if (!$_) {$_=''} } @data;
+
+            #-- Match-String bauen
+            my $match=join('',@data);
 
             #-- 1. zeile im dataset 
             if ($data[0]=~/^Züchter/) {
@@ -140,29 +145,41 @@ sub LO_LS01_Zuchtstamm {
             }
 
             #-- Tiernummern einsammeln   
-            elsif (($data[0]=~/^(Hahn|Hähne|RN-Tier)/) or 
-                   ($data[0]=~/Hahn.*?Kükennummer.*?ZuchtstammID.*?Hahn.*?Hennen/)) {
+            elsif ($match=~/^RN-TierKükennummerRN-VaterRN-Mutter/) {
   
                 $fields=[
                     {'type'=>'label',                          'value'=>$data[0], 'z'=>$zeile, 'pos'=>0},
                     {'type'=>'label',                          'value'=>$data[1], 'z'=>$zeile, 'pos'=>1},
                     {'type'=>'label',                          'value'=>$data[2], 'z'=>$zeile, 'pos'=>2},
                     {'type'=>'label',                          'value'=>$data[3], 'z'=>$zeile, 'pos'=>3},
-                    {'type'=>'label',                          'value'=>$data[4], 'z'=>$zeile, 'pos'=>4},
+#                    {'type'=>'label',                          'value'=>$data[4], 'z'=>$zeile, 'pos'=>4},
                 ];
                 $sex='1';
             }
 
+#            #-- Tiernummern einsammeln   
+#            elsif (($data[0]=~/^(Hahn|Hähne|RN-Tier)/) or 
+#                   ($data[0]=~/Hahn.*?Kükennummer.*?ZuchtstammID.*?Hahn.*?Hennen/)) {
+#  
+#                $fields=[
+#                    {'type'=>'label',                          'value'=>$data[0], 'z'=>$zeile, 'pos'=>0},
+#                    {'type'=>'label',                          'value'=>$data[1], 'z'=>$zeile, 'pos'=>1},
+#                    {'type'=>'label',                          'value'=>$data[2], 'z'=>$zeile, 'pos'=>2},
+#                    {'type'=>'label',                          'value'=>$data[3], 'z'=>$zeile, 'pos'=>3},
+#                    {'type'=>'label',                          'value'=>$data[4], 'z'=>$zeile, 'pos'=>4},
+#                ];
+#                $sex='1';
+#            }
             #-- Tiernummern einsammeln   
-            elsif (($data[0]=~/(^Henne|angepaart)/) or 
-                   ($data[0]=~/Hennen.*?Kükennummer.*?ZuchtstammID.*?Hahn.*?Hennen/)) {
+            elsif ($match=~/^Dieser Hahn wurde an folgende Hennen angepaart/) {# or 
+#                   ($data[0]=~/Hennen.*?Kükennummer.*?ZuchtstammID.*?Hahn.*?Hennen/)) {
   
                 $fields=[
                     {'type'=>'label',                          'value'=>$data[0], 'z'=>$zeile, 'pos'=>0},
                     {'type'=>'label',                          'value'=>$data[1], 'z'=>$zeile, 'pos'=>1},
                     {'type'=>'label',                          'value'=>$data[2], 'z'=>$zeile, 'pos'=>2},
                     {'type'=>'label',                          'value'=>$data[3], 'z'=>$zeile, 'pos'=>3},
-                    {'type'=>'label',                          'value'=>$data[4], 'z'=>$zeile, 'pos'=>4},
+#                    {'type'=>'label',                          'value'=>$data[4], 'z'=>$zeile, 'pos'=>4},
                 ];
                 $sex='2';
             }
@@ -172,9 +189,11 @@ sub LO_LS01_Zuchtstamm {
                 #-- Leerzeichen entfernen
                 $data[2]=~s/\s//g;
                 $data[3]=~s/\s//g;
-                $data[4]=~s/\s//g;
 
                 if ($xlsx_format eq 'new') {
+
+                    $data[4]=~s/\s//g;
+                    
                     $fields=[
                         {'type'=>'data','name'=>'ext_animal'.$i,    'value' =>$data[0], 'z'=>$zeile, 'pos'=>0},
                         {'type'=>'data','name'=>'ext_animal_kn'.$i, 'value' =>$data[1], 'z'=>$zeile, 'pos'=>1},
@@ -188,7 +207,7 @@ sub LO_LS01_Zuchtstamm {
                     $fields=[
                         {'type'=>'data','name'=>'ext_animal'.$i,    'value' =>$data[0], 'z'=>$zeile, 'pos'=>0},
                         {'type'=>'data','name'=>'ext_animal_kn'.$i, 'value' =>$data[1], 'z'=>$zeile, 'pos'=>1},
-                        {'type'=>'data','name'=>'ext_zuchtstamm'.$i,'value' =>$data[2]},
+                        {'type'=>'data','name'=>'ext_zuchtstamm'.$i,'value' =>$vjahr},
                         {'type'=>'data','name'=>'ext_sires'.$i,     'value' =>$data[2], 'z'=>$zeile, 'pos'=>2},
                         {'type'=>'data','name'=>'ext_dams'.$i,      'value' =>$data[3], 'z'=>$zeile, 'pos'=>3},
                         {'type'=>'data','name'=>'ext_sex'.$i,       'value' =>$sex}
@@ -210,11 +229,6 @@ sub LO_LS01_Zuchtstamm {
                 }
                 else {
 
-                    #-- wenn keine Zuchtstamm-ID angegeben wurde, dann die Nummer des ersten Hahnes als ZuchtstammID verwenden
-                    if (!$ext_zuchtstamm) {
-                        $ext_zuchtstamm=$data[0];
-                        $record->{'ext_zuchtstamm'}={'value'=>$data[0],'errors'=>[],'status'=>'0' };
-                    }    
                     $record->{'ext_zuchtstamm'.$i}  ={'value'=>$data[2],'errors'=>[],'status'=>'0' };
                     $record->{'ext_sires'.$i}       ={'value'=>$data[2],'errors'=>[],'status'=>'0','origin'=>$data[2] };
                     $record->{'ext_dams'.$i}        ={'value'=>$data[3],'errors'=>[],'status'=>'0','origin'=>$data[3] };
@@ -314,6 +328,25 @@ sub LO_LS01_Zuchtstamm {
 #                goto EXIT;
                 $rollback=1;
             }
+
+            #-- Zuchtstamm aus Jahr generierer (ARGV[4] und einer laufenden Nummer  
+            if (!exists $args->{'ext_zuchtstamm'}) {
+                
+                my $sql="select count(a.ext_animal) from transfer a inner join unit b on a.db_unit=b.db_unit where b.ext_unit='zuchtstamm' and b.ext_id='$args->{'ext_breeder'}' and ext_animal like '$vjahr%'";
+
+                my $sql_ref = $apiis->DataBase->sys_sql( $sql);
+                
+                my $vlfdnr=0;
+
+                while ( my $q = $sql_ref->handle->fetch ) {
+                    $vlfdnr=$q->[0];
+                }
+                
+                $vlfdnr++;
+                $args->{'ext_zuchtstamm'}=$vjahr.'-'.$vlfdnr;
+                $ext_zuchtstamm=$args->{'ext_zuchtstamm'};
+            }  
+
         }    
         ####################################################################################### 
         #
@@ -449,6 +482,8 @@ sub LO_LS01_Zuchtstamm {
             #
             ####################################################################################### 
             my @db_parents;
+            my @db_parents_sire;
+            my @db_parents_dam;
 
             #-- Schleife über die beiden Großeltern 
             foreach my $sex ('1','2') {
@@ -578,156 +613,177 @@ sub LO_LS01_Zuchtstamm {
                         push(@{$record->{'data'}->{$tfield}->{'errors'}},$apiis->errors);
                     }
                     else {
+                        
+                        #-- Väter und Mütter getrennt speichern 
+                        if ($sex eq '1') {
+                            push(@db_parents_sire,$db_animal);
+                        }
+                        else {
+                            push(@db_parents_dam,$db_animal);
+                        }    
+                        
                         #-- Abspeichern des Tieres als Elterntier im übergeordneten Zuchtstamm 
                         push(@db_parents,$db_animal);
                     }
                 }
             }
 
-            ####################################################################################### 
-            #
-            # Zuchtstamm für die Elterntiere anlegen
-            #
-            ####################################################################################### 
-            #-- Wenn es gültige Eltern gibt, dann Zuchtstamm anlegen 
-            my $db_parents;
-            my $sql;
-
-            #-- Prüfen, ob es diesen Zuchtstamm mit den Tieren bereits gibt. 
-            #-- er muss die gleichen Tiere in einer aufsteigend sortierten Reihenfolge haben.  
-            if (@db_parents) {
-
-                $record->{'no_parent'}   ={'value'=>$i,'errors'=>[],'status'=>'0' };
-#.. muelf: sql falsch
-                $sql="select z.db_parents from (select a.db_parents
-                            , STRING_AGG(a.db_animal::varchar,',' order by a.db_animal) as cmp
-                    from parents a where a.db_parents in 
-                        (select distinct db_parents from parents where db_animal in (".join(',',sort {$a<=>$b} @db_parents).")) 
-                    group by a.db_parents) z 
-                    where z.cmp='".join(',',sort {$a<=>$b} @db_parents)."'";
-            }
+            my $db_sire=1;
+            my $db_dam=2;
+            my $db_parents=3;
             
-            #-- wenn keine Tiere vorhanden sind, dann nur auf Name des Zuchtstammes prüfen 
-            else {
-                if ($xlsx_format eq 'old') {
-                    #-- im old-Format gibt es keine Zuchtstamm-ID, daher zwingende Rückgabe von null
-                    $sql="select db_code as db_parents from codes where db_code=-1";
+            #-- Zuchtstamm nur anlegen, wenn Vater oder Mutter nicht eindeutig sind.  
+            if ((($#db_parents_sire > 0) or ($#db_parents_dam > 0)) ) {
+
+                ####################################################################################### 
+                #
+                # Zuchtstamm für die Elterntiere anlegen
+                #
+                ####################################################################################### 
+                #-- Wenn es gültige Eltern gibt, dann Zuchtstamm anlegen 
+                my $sql;
+
+                #-- Prüfen, ob es diesen Zuchtstamm mit den Tieren bereits gibt. 
+                #-- er muss die gleichen Tiere in einer aufsteigend sortierten Reihenfolge haben.  
+                if (@db_parents) {
+
+                    $record->{'no_parent'}   ={'value'=>$i,'errors'=>[],'status'=>'0' };
+#.. muelf: sql falsch
+                    $sql="select z.db_parents from (select a.db_parents
+                                , STRING_AGG(a.db_animal::varchar,',' order by a.db_animal) as cmp
+                        from parents a where a.db_parents in 
+                            (select distinct db_parents from parents where db_animal in (".join(',',sort {$a<=>$b} @db_parents).")) 
+                        group by a.db_parents) z 
+                        where z.cmp='".join(',',sort {$a<=>$b} @db_parents)."'";
                 }
-                else {
-                        $sql="select db_animal as db_parents 
-                      from v_transfer 
-                      where ext_unit='$zuchtstammid->[0]:::$zuchtstammid->[1]' and ext_animal='$zuchtstammid->[2]'";
-                }        
-            }
-            my $sql_ref = $apiis->DataBase->sys_sql( $sql);
-
-            while ( my $q = $sql_ref->handle->fetch ) {
-                $db_parents=$q->[0];
-            }
-
-            if ($sql_ref->status) {
-                push(@{$record->{'data'}->{'ext_zuchtstamm'.$i}->{'errors'}},$sql_ref->errors);
-            }
-            #-- check db_unit und erstelle neu 
-            my $db_unit;
-   
-            #-- wenn ein Zuchtstamm gefunden wurde 
-            if ($db_parents) {
-                $args->{'db_parents'.$i}=$db_parents;
-            }
-
-            #-- wenn kein Zuchtstamm gefunden wurde und es auch keine Eltern des Tiere gibt, dann Eltern unbekannt
-            elsif ((!$db_parents) and (!@db_parents)) {
-                $args->{'db_parents'.$i}=3;
-            }
-
-            #-- wenn kein Zuchtstamm gefunden wurde, dann einen neuen erzeugen 
-            #-- mit den entsprechenden Einträgen in parents
-            else {
-
-                #-- schauen, ob die db_unit schon mal erstellt wurde 
-                if (exists $hs_db{ 'zuchtstamm:::'. $zuchtstammid->[1] }) {
-                    $db_unit=$hs_db{ 'zuchtstamm:::'. $zuchtstammid->[1]  };
-                    $args->{'db_unit_zs'.$i}=$db_unit;
-                }
-                else {
                 
-                    #-- db_unit erzeugen    
-                    ($db_unit, $exists)=GetDbUnit({'ext_unit'=>'zuchtstamm','ext_id'=>$zuchtstammid->[1]},'y');
-                    
-                    if ($db_unit) {
-                        $args->{'db_unit_zs'.$i}=$db_unit;
-                        $hs_db{ 'zuchtstamm:::'. $zuchtstammid->[1] }=$db_unit;
-                            
-                        #-- Nummer sichern, um bei rollback diesen Eintrag löschen zu können0
-                        $reverse{ 'zuchtstamm:::'. $zuchtstammid->[1] }=1;
+                #-- wenn keine Tiere vorhanden sind, dann nur auf Name des Zuchtstammes prüfen 
+                else {
+                    if ($xlsx_format eq 'old') {
+                        #-- im old-Format gibt es keine Zuchtstamm-ID, daher zwingende Rückgabe von null
+                        $sql="select db_code as db_parents from codes where db_code=-1";
                     }
                     else {
-                        push(@{$record->{'data'}->{'ext_animal'.$i}->{'errors'}}, 
-                            Apiis::Errors->new(
-                                type       => 'DATA',
-                                severity   => 'CRIT',
-                                from       => 'LS01_Zuchtstamm',
-                                ext_fields => ['ext_zuchtstamm'.$i],
-                                msg_short  =>"Keinen Eintrag für 'zuchtstamm:$zuchtstammid->[1]' in der Datenbank gefunden."
-                            ));
-                
+                            $sql="select db_animal as db_parents 
+                        from v_transfer 
+                        where ext_unit='$zuchtstammid->[0]:::$zuchtstammid->[1]' and ext_animal='$zuchtstammid->[2]'";
+                    }        
+                }
+                my $sql_ref = $apiis->DataBase->sys_sql( $sql);
+
+                while ( my $q = $sql_ref->handle->fetch ) {
+                    $db_parents=$q->[0];
+                }
+
+                if ($sql_ref->status) {
+                    push(@{$record->{'data'}->{'ext_zuchtstamm'.$i}->{'errors'}},$sql_ref->errors);
+                }
+                #-- check db_unit und erstelle neu 
+                my $db_unit;
+    
+                #-- wenn ein Zuchtstamm gefunden wurde 
+                if ($db_parents) {
+                    $args->{'db_parents'.$i}=$db_parents;
+                }
+
+                #-- wenn kein Zuchtstamm gefunden wurde und es auch keine Eltern des Tiere gibt, dann Eltern unbekannt
+                elsif ((!$db_parents) and (!@db_parents)) {
+                    $args->{'db_parents'.$i}=3;
+                }
+
+                #-- wenn kein Zuchtstamm gefunden wurde, dann einen neuen erzeugen 
+                #-- mit den entsprechenden Einträgen in parents
+                else {
+
+                    #-- schauen, ob die db_unit schon mal erstellt wurde 
+                    if (exists $hs_db{ 'zuchtstamm:::'. $zuchtstammid->[1] }) {
+                        $db_unit=$hs_db{ 'zuchtstamm:::'. $zuchtstammid->[1]  };
+                        $args->{'db_unit_zs'.$i}=$db_unit;
+                    }
+                    else {
+                    
+                        #-- db_unit erzeugen    
+                        ($db_unit, $exists)=GetDbUnit({'ext_unit'=>'zuchtstamm','ext_id'=>$zuchtstammid->[1]},'y');
+                        
+                        if ($db_unit) {
+                            $args->{'db_unit_zs'.$i}=$db_unit;
+                            $hs_db{ 'zuchtstamm:::'. $zuchtstammid->[1] }=$db_unit;
+                                
+                            #-- Nummer sichern, um bei rollback diesen Eintrag löschen zu können0
+                            $reverse{ 'zuchtstamm:::'. $zuchtstammid->[1] }=1;
+                        }
+                        else {
+                            push(@{$record->{'data'}->{'ext_animal'.$i}->{'errors'}}, 
+                                Apiis::Errors->new(
+                                    type       => 'DATA',
+                                    severity   => 'CRIT',
+                                    from       => 'LS01_Zuchtstamm',
+                                    ext_fields => ['ext_zuchtstamm'.$i],
+                                    msg_short  =>"Keinen Eintrag für 'zuchtstamm:$zuchtstammid->[1]' in der Datenbank gefunden."
+                                ));
+                    
+                            $apiis->del_errors;
+                        }
+                    }
+                    $db_parents=$apiis->DataBase->seq_next_val('seq_transfer__db_animal');
+
+                    #-- wenn zuchstamm "SYS" ist, dann db_animal=ext_animal
+                    if ($zuchtstammid->[1] eq 'SYS') {
+                        $zuchtstammid->[2]=$db_parents;
+                    }
+
+                    my $guid;
+                    $guid=CreateTransfer($apiis,
+                                {'db_animal'=>$db_parents,
+                                'db_unit'=>$args->{'db_unit_zs'.$i},
+                                'ext_unit'=>$zuchtstammid->[0],
+                                'ext_id'=>$zuchtstammid->[1],
+                                'ext_animal'=>$zuchtstammid->[2]
+                                }
+                    );
+                    
+                    #-- Wenn Fehler beim Eintrag in Tabelle transfer 
+                    if (!$guid) {
+                        push(@{$record->{'data'}->{'ext_zuchtstamm'.$i}->{'errors'}},$apiis->errors);
                         $apiis->del_errors;
                     }
-                }
-                $db_parents=$apiis->DataBase->seq_next_val('seq_transfer__db_animal');
+                    else {
+                        $args->{'db_parents'.$i}=$db_parents;
 
-                #-- wenn zuchstamm "SYS" ist, dann db_animal=ext_animal
-                if ($zuchtstammid->[1] eq 'SYS') {
-                    $zuchtstammid->[2]=$db_parents;
-                }
+                        #-- Zuchtstamm anlegen, einen Eintrag für jede Zuchtstamm-Tier-Kombination
+                        foreach my $db_animal (@db_parents) {
+                            
+                            #-- mit den Wurfdaten ein neues Tier in parents erzeugen
+                            my $parents = Apiis::DataBase::Record->new( tablename => 'parents' );
 
-                my $guid;
-                $guid=CreateTransfer($apiis,
-                            {'db_animal'=>$db_parents,
-                            'db_unit'=>$args->{'db_unit_zs'.$i},
-                            'ext_unit'=>$zuchtstammid->[0],
-                            'ext_id'=>$zuchtstammid->[1],
-                            'ext_animal'=>$zuchtstammid->[2]
+                            my $field="ext_zuchtstamm.$i";
+
+                            #-- interne Tiernummer
+                            $parents->column('db_parents')->intdata( $args->{'db_parents'.$i} );
+                            $parents->column('db_parents')->encoded(1);
+                            $parents->column('db_parents')->ext_fields( $field);
+
+                            #-- interne Tiernummer
+                            $parents->column('db_animal')->intdata($db_animal);
+                            $parents->column('db_animal')->encoded(1);
+                            $parents->column('db_animal')->ext_fields( $field );
+
+                            $parents->insert;
+
+                            #-- Fehlerbehandlung 
+                            if ( $parents->status ) {
+                                push(@{$record->{'data'}->{$field.$i}->{'errors'}},$parents->errors);
+                                $apiis->status(1);
                             }
-                );
-                
-                #-- Wenn Fehler beim Eintrag in Tabelle transfer 
-                if (!$guid) {
-                    push(@{$record->{'data'}->{'ext_zuchtstamm'.$i}->{'errors'}},$apiis->errors);
-                    $apiis->del_errors;
-                }
-                else {
-                    $args->{'db_parents'.$i}=$db_parents;
-
-                    #-- Zuchtstamm anlegen, einen Eintrag für jede Zuchtstamm-Tier-Kombination
-                    foreach my $db_animal (@db_parents) {
-                        
-                        #-- mit den Wurfdaten ein neues Tier in parents erzeugen
-                        my $parents = Apiis::DataBase::Record->new( tablename => 'parents' );
-
-                        my $field="ext_zuchtstamm.$i";
-
-                        #-- interne Tiernummer
-                        $parents->column('db_parents')->intdata( $args->{'db_parents'.$i} );
-                        $parents->column('db_parents')->encoded(1);
-                        $parents->column('db_parents')->ext_fields( $field);
-
-                        #-- interne Tiernummer
-                        $parents->column('db_animal')->intdata($db_animal);
-                        $parents->column('db_animal')->encoded(1);
-                        $parents->column('db_animal')->ext_fields( $field );
-
-                        $parents->insert;
-
-                        #-- Fehlerbehandlung 
-                        if ( $parents->status ) {
-                            push(@{$record->{'data'}->{$field.$i}->{'errors'}},$parents->errors);
-                            $apiis->status(1);
                         }
                     }
                 }
             }
+            elsif (($#db_parents_sire == 0) and ($#db_parents_dam == 0)) {
+                $args->{'db_parents'.$i}=3;
+                $db_sire=$db_parents_sire[0];
+                $db_dam =$db_parents_dam[0];
+            }    
 
             ####################################################################################### 
             #
@@ -743,7 +799,7 @@ sub LO_LS01_Zuchtstamm {
             $args->{'db_animal'}=undef;
 
             #-- check db_unit und erstelle neu 
-            $db_unit=undef;
+            my $db_unit=undef;
 
             if (exists $hs_db{ $ar_animal->[0].':::'.$ar_animal->[1] }) {
                 $db_unit=$hs_db{ $ar_animal->[0].':::'.$ar_animal->[1] };
@@ -804,8 +860,8 @@ sub LO_LS01_Zuchtstamm {
                                                 'ext_breeder'=>$ext_breeder,
                                                 'ext_selection'=>'1',
                                                 'db_breed'=>$db_breed,
-                                                'db_sire'=>1,
-                                                'db_dam'=>2,
+                                                'db_sire'=>$db_sire,
+                                                'db_dam'=>$db_dam,
                                                 'db_parents'=>$args->{'db_parents'.$i},
 
                                                 #-- ohne Location  
