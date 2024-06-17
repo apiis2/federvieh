@@ -444,7 +444,7 @@ EXIT: {
                                     map { 
                 
                                         #-- store if found 
-                                        push(@dellabel, $j) if ($_->{'-Name'} eq $field->{'-LabelName'}); 
+                                        push(@dellabel, $j) if (($field->{'-LabelName'} and ($_->{'-Name'} eq $field->{'-LabelName'})); 
 
                                         $j++;
 
