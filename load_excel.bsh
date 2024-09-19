@@ -10,75 +10,73 @@ done
 
 #-- Zuchtstämme einlesen
 cd  $FEDERVIEH/load/data/Vorwerkhühner/2019
-for FILE in *; do 
+for FILE in *.xlsx; do 
     echo "${FILE}";
-    perl $FEDERVIEH/lib/load.DS LO_LS01  "${FILE}" off ;
+    perl $FEDERVIEH/lib/load.DS LO_LS01  "${FILE}" off '19' on;
 done
 cd  $FEDERVIEH/load/data/Vorwerkhühner/2020
-for FILE in *; do 
+for FILE in *.xlsx; do 
     echo "${FILE}";
-    perl $FEDERVIEH/lib/load.DS LO_LS01  "${FILE}" off ;
+    perl $FEDERVIEH/lib/load.DS LO_LS01  "${FILE}" off '20' on;
 done
 cd  $FEDERVIEH/load/data/Vorwerkhühner/2021
-for FILE in *; do 
+for FILE in *.xlsx; do 
     echo "${FILE}";
-    perl $FEDERVIEH/lib/load.DS LO_LS01  "${FILE}" off ;
+    perl $FEDERVIEH/lib/load.DS LO_LS01  "${FILE}" off '21' on;
 done
 cd  $FEDERVIEH/load/data/Vorwerkhühner/2022
-for FILE in *; do 
+for FILE in *.xlsx; do 
     echo "${FILE}";
-    perl $FEDERVIEH/lib/load.DS LO_LS01  "${FILE}" off ;
+    perl $FEDERVIEH/lib/load.DS LO_LS01  "${FILE}" off '22' on;
 done
 
 #-- Zuchtstammmeldung
 cd $FEDERVIEH/load/data/Zuchtstammmeldungen_2018;
 
 #-- Zuchtstammmeldung
-for FILE in *; do 
+for FILE in *.xlsx; do 
     echo "${FILE}";
-    perl $FEDERVIEH/lib/load.DS LO_LS01  ${FILE} off ;
+    perl $FEDERVIEH/lib/load.DS LO_LS01  "${FILE}" off '18' on;
 done
 
 cd $FEDERVIEH/load/data/Zuchtstammmeldungen_2019;
 
 #-- Zuchtstammmeldung
-for FILE in *; do 
+for FILE in *.xlsx; do 
     echo "${FILE}";
-    perl $FEDERVIEH/lib/load.DS LO_LS01  ${FILE} off ;
+    perl $FEDERVIEH/lib/load.DS LO_LS01  "${FILE}" off '19' on;
 done
 
 cd $FEDERVIEH/load/data/Zuchtstammmeldungen_2020;
 
 #-- Zuchtstammmeldung
-for FILE in *; do 
+for FILE in *.xlsx; do 
     echo "${FILE}";
-    perl $FEDERVIEH/lib/load.DS LO_LS01  ${FILE} off ;
+    perl $FEDERVIEH/lib/load.DS LO_LS01  "${FILE}" off '20' on;
 done
 
 #-- Zuchtstammmeldung
 cd $FEDERVIEH/load/data/Zuchtstammmeldungen_2021;
 
 #-- Zuchtstammmeldung
-for FILE in *; do 
+for FILE in *.xlsx; do 
     echo "${FILE}";
-    perl $FEDERVIEH/lib/load.DS LO_LS01  ${FILE} off ;
+    perl $FEDERVIEH/lib/load.DS LO_LS01  "${FILE}" off '21' on;
 done
 
 #-- Zuchtstammmeldung
 cd $FEDERVIEH/load/data/Zuchtstammmeldungen_2023;
 
 #-- Zuchtstammmeldung
-for FILE in *; do 
+for FILE in *.xlsx; do 
     echo "${FILE}";
-    perl $FEDERVIEH/lib/load.DS LO_LS01  ${FILE} off ;
+    perl $FEDERVIEH/lib/load.DS LO_LS01  "${FILE}" off '23' on;
 done
-
 exit;
-
 cd $FEDERVIEH/load/data/Brut-_und_Kükenlisten_2019;
 
 #-- Brut-_und_Kükenlisten
-for FILE in *; do 
+for FILE in *.xlsx; do 
     echo "${FILE}";
     perl $FEDERVIEH/lib/load.DS LO_LS02  "${FILE}" off ;
 done
@@ -86,7 +84,7 @@ done
 cd $FEDERVIEH/load/data/Legeliste-Züchter_2019;
 
 #-- Legeliste-Züchter
-for FILE in *; do 
+for FILE in *.xlsx; do 
     echo "${FILE}";
     perl $FEDERVIEH/lib/load.DS LO_LS05  "${FILE}" off >Legeliste-Züchter_2019.log;
 done
@@ -94,7 +92,7 @@ done
 cd $FEDERVIEH/load/data/Bewertungsliste_2019;
 
 #-- Bewertungsliste
-for FILE in *; do 
+for FILE in *.xlsx; do 
     echo "${FILE}";
     perl $FEDERVIEH/lib/load.DS LO_LS03  "${FILE}" off ;
 done

@@ -1,6 +1,6 @@
-create or replace view v_animal as select user_get_ext_id_animal(db_animal) as animal, user_get_ext_code(db_sex) as sex, user_get_ext_id_animal(db_sire) as sire, user_get_ext_id_animal(db_dam) as dam, user_get_ext_id_animal(db_parents) as parents, user_get_ext_breedcolor(db_animal), user_get_ext_code(db_selection) as selection, db_litter as db_litter, name, birth_dt, hb_ein_dt, la_rep_dt, la_rep, last_change_dt, last_change_user, dirty, chk_lvl, guid, owner, version, synch from animal;
-
 CREATE OR REPLACE FUNCTION user_get_ext_breedcolor(int) RETURNS text AS $$ select b3.ext_code || case when c3.ext_code isnull then '' else ', ' || c3.ext_code end from breedcolor a3 inner join codes b3 on a3.db_breed=b3.db_code left outer join codes c3 on a3.db_color=c3.db_code where a3.db_breedcolor=$1; $$ LANGUAGE SQL;
+
+create or replace view v_animal as select user_get_ext_id_animal(db_animal) as animal, user_get_ext_code(db_sex) as sex, user_get_ext_id_animal(db_sire) as sire, user_get_ext_id_animal(db_dam) as dam, user_get_ext_id_animal(db_parents) as parents, user_get_ext_breedcolor(db_animal), user_get_ext_code(db_selection) as selection, db_litter as db_litter, name, birth_dt, hb_ein_dt, la_rep_dt, la_rep, last_change_dt, last_change_user, dirty, chk_lvl, guid, owner, version, synch from animal;
 
 CREATE OR REPLACE FUNCTION user_get_ext_zuchtstamm_of(int) RETURNS text AS $$ select concat(z1.cmp,': ', z.cmp) from
 (select STRING_AGG(a.ext_animal::varchar,', ' order by a.ext_animal) as cmp, 1 as z from (select user_get_ext_animal(x.db_animal) as ext_animal, user_get_ext_code(y.db_sex) as sex, x.db_parents from parents x inner join animal y on x.db_animal=y.db_animal where x.db_parents=$1 and user_get_ext_code(y.db_sex)='2') a ) z inner join (select STRING_AGG(b.ext_animal::varchar,', ' order by b.ext_animal) as cmp, 1 as z from (select user_get_ext_animal(x.db_animal) as ext_animal, user_get_ext_code(y.db_sex) as sex, x.db_parents from parents x inner join animal y on x.db_animal=y.db_animal where x.db_parents=$1 and user_get_ext_code(y.db_sex)='1') b) z1 on z1.z=z.z; $$ LANGUAGE SQL;
@@ -124,3 +124,66 @@ CREATE OR REPLACE FUNCTION user_get_ext_id_animal(int) RETURNS text AS $$ select
 
 CREATE OR REPLACE FUNCTION user_get_ext_address_via_sid(text) RETURNS text AS $$ select distinct a.ext_address from address a inner join unit b on a.db_address=b.db_address inner join ar_users c on c.user_id=b.user_id and c.user_session_id=$1 limit 1; $$ LANGUAGE SQL;
 
+CREATE VIEW v_animal AS
+SELECT a.guid AS v_guid,
+       a.db_animal,
+       c.ext_unit || ':::' || c.ext_id || ':::' || b.ext_animal AS ext_animal,
+       a.db_sire,
+       e.ext_unit || ':::' || e.ext_id || ':::' || d.ext_animal AS ext_sire,
+       a.db_dam,
+       g.ext_unit || ':::' || g.ext_id || ':::' || f.ext_animal AS ext_dam,
+       a.db_parents,
+       i.ext_unit || ':::' || i.ext_id || ':::' || h.ext_animal AS ext_parents,
+       a.db_sex,
+       j.ext_code AS ext_sex,
+       a.db_breed,
+       m.class || ':::' || m.ext_code || ':::' || m1.class || ':::' || m1.ext_code AS ext_breed,
+       a.db_litter,
+       a.db_selection,
+       n.ext_code AS ext_selection,
+       a.name,
+       a.birth_dt,
+       a.hb_ein_dt,
+       a.la_rep_dt,
+       a.la_rep,
+       a.last_change_dt,
+       a.last_change_user,
+       a.dirty,
+       a.chk_lvl,
+       a.guid,
+       a.owner,
+       a.version,
+       a.synch
+FROM animal a LEFT OUTER JOIN transfer b ON a.db_animal = b.db_animal
+              LEFT OUTER JOIN unit c ON b.db_unit = c.db_unit
+              LEFT OUTER JOIN transfer d ON a.db_sire = d.db_animal
+              LEFT OUTER JOIN unit e ON d.db_unit = e.db_unit
+              LEFT OUTER JOIN transfer f ON a.db_dam = f.db_animal
+              LEFT OUTER JOIN unit g ON f.db_unit = g.db_unit
+              LEFT OUTER JOIN transfer h ON a.db_parents = h.db_animal
+              LEFT OUTER JOIN unit i ON h.db_unit = i.db_unit
+              LEFT OUTER JOIN codes j ON a.db_sex = j.db_code
+              LEFT OUTER JOIN breedcolor k ON a.db_breed = k.db_breedcolor
+              LEFT OUTER JOIN codes m ON k.db_breed = m.db_code
+              LEFT OUTER JOIN codes m1 ON k.db_color = m1.db_code
+              LEFT OUTER JOIN codes n ON a.db_selection = n.db_code;
+
+CREATE VIEW v_units_breedcolors AS
+SELECT a.guid AS v_guid,
+       a.db_unit,
+       b.ext_unit || ':::' || b.ext_id AS ext_unit,
+       a.db_breedcolor,
+       e.class || ':::' || e.ext_code || ':::' || e1.class || ':::' || e1.ext_code AS ext_breedcolor,
+       a.last_change_dt,
+       a.last_change_user,
+       a.dirty,
+       a.chk_lvl,
+       a.guid,
+       a.owner,
+       a.version,
+       a.synch
+FROM units_breedcolors a LEFT OUTER JOIN unit b ON a.db_unit = b.db_unit
+                         LEFT OUTER JOIN breedcolor c ON a.db_breedcolor = c.db_breedcolor
+                         LEFT OUTER JOIN codes e ON c.db_breed = e.db_code
+                         LEFT OUTER JOIN codes e1 ON c.db_color = e1.db_code;
+              
