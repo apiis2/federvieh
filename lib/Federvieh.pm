@@ -556,7 +556,8 @@ sub PrintSQLRecordset {
     open(OUT, ">$ff");
 
     while ( my $q = $sql_ref->handle->fetch ) { 
-        print OUT join('|', @$q)."\n";
+        map { if (!$_) { $_=''} } @$q; 
+	print OUT join('|', @$q)."\n";
     }
     close(OUT);
 

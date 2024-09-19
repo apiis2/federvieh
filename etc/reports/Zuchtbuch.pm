@@ -28,7 +28,7 @@ sub Zuchtbuch {
 
     push(@$bodyd, {'tag'=>'div','value'=>'Zuchtbuch - Vorwerkhühner 2021','attr'=>[{'style'=>[{'font-size'=>'30px'}]}]});
    
-    push(@$bodyd, {'tag'=>'img','value'=>'','attr'=>[{'width'=>'500px'},{'src'=>'http://federvieh.local/tmp/titel_vwh.png'}]});
+    push(@$bodyd, {'tag'=>'img','value'=>'','attr'=>[{'width'=>'500px'},{'src'=>'/etc/titel_vwh.png'}]});
 
     ########################################################################################################
     #
