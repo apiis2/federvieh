@@ -197,7 +197,8 @@ sub LO_LS01_Zuchtstamm {
             }
 
 #            #-- Tiernummern einsammeln   
-            elsif ($match=~/HähneKükennummerZuchtstammIDVäterMütter/) {
+            elsif (($match=~/HähneKükennummerZuchtstammIDVäterMütter/) or 
+		   ($match=~/H.hn.*KükennummerZuchtstammIDHahn.*?Hennen.*?/)) {
   
                 $fields=[
                     {'type'=>'label',                          'value'=>$data[0], 'z'=>$zeile, 'pos'=>0},
@@ -208,7 +209,8 @@ sub LO_LS01_Zuchtstamm {
                 ];
                 $sex='1';
             }
-            elsif ($match=~/HennenKükennummerZuchtstammIDVäterMütter/) {
+            elsif (($match=~/HennenKükennummerZuchtstammIDVäterMütter/) or
+		   ($match=~/HennenKükennummerZuchtstammIDHahn.*?Hennen.*?/)) {
   
                 $fields=[
                     {'type'=>'label',                          'value'=>$data[0], 'z'=>$zeile, 'pos'=>0},
