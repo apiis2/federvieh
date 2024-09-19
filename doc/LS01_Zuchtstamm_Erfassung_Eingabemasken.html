@@ -5,27 +5,27 @@
 <div  id="ls01">
     <table width="800" ><TR><td style="background-color:white" >
     <p>
-    <a href="http://federvieh.local/doc/Vorlage_LS01.xlsx">Vorlage</a>
+    <a href="/doc/Vorlage_LS01.xlsx">Vorlage</a>
     |
-    <a href="http://federvieh.local/doc/Beispiel_LS01.xlsx">Beispiel</a>
+    <a href="/doc/Beispiel_LS01.xlsx">Beispiel</a>
     <p> 
 <h3>Erfassung eines Zuchtstammes über Eingabemasken mit Erfassung der Abstammung</h3>
 Im nachfolgenden wird beschrieben, wie ein Zuchtstamm respektive dessen Tiere mit Abstammung über Eingabemasken erfasst werden können. Es wird folgendes Beispiel zugrunde gelegt:
-    <img width="1000" src="http://federvieh.local/doc/LS01_excel.png"><br>
+    <img width="1000" src="/doc/LS01_excel.png"><br>
 Der Zuchtstamm besteht aus dem Hahn '20AP3' und den Hennen 'C34H:223' und '20C28'. Diese wiederum haben Eltern - entweder klar als Vater und Mutter oder angegeben über einen Zuchtstamm. In der Datenbank sind alle Tiere als Schlüssel hinterlegt. Bei jeder Tiernummer, die angelegt wird, wird geprüft, ob sie in der Datenbank existiert. Im Beispiel gehen wir davon aus, dass das nicht der Fall ist. Es müssen also alle Tiere des Zuchtstammes angelegt werden und deren Elterntiere. 
 <h4>1. Anlegen der Elterntiere</h4>
 Aufruf der Maske: <b>Menus...->Ladeströme->Tier anlegen</b><br><br>
 Es wird immer mit der letzten Generation begonnen. In unserem Fall mit dem Tier '18LO243'. Es ist eine Henne der Rasse 'Perlhühner - blau mit Perlung' (entspricht in der Regel der Rasse des Zuchtstammes) im Jahr 2018 geboren (lt. Ring). Vater, Mutter, Zuchtstamm, Züchter und Besitzer sind unbekannt und bleiben leer. Wenn kein Züchter angegeben ist, muss das Tier als nicht aktiv gekennzeichnet sein (ohne Haken). Die mit '*' gekennzeichneten Felder müssen ausgefüllt sein. 
-    <img width="900" src="http://federvieh.local/doc/LS06_Tiermeldung1.png"><br>
+    <img width="900" src="/doc/LS06_Tiermeldung1.png"><br>
 Wenn das Speichern erfolgreich war, dann wird in der neuen Maske ein Teil der Felder leer angezeigt, bei einem anderen Teil werden die Eingaben des letzten Datensatzes übernommen, um die Menge der Dateneingabe zu reduzieren. 
-    <img width="1000" src="http://federvieh.local/doc/LS06_Tiermeldung2.png"><br>
+    <img width="1000" src="/doc/LS06_Tiermeldung2.png"><br>
 In analoger Weise ist für die Tiere '19K15', '19L01' zu verfahren sowie für die Hähne '19K2', '19K12' und '19LW23' - nur das hier das Geschlecht auf '1-männlich' geändert werden muss.<br>
 
 <h4>2. Ändern von Tierdaten</h4>
 Sollten sich Eingaben als fehlerhaft herausstellen oder müssen ergänzt werden, dann erfolgt das über <br>
 <p>Aufruf: <b>Menus...->Tier->Stammdaten</b></p>
 In die Felder für das Tier muss die Tiernummer vollständig eingegeben werden (Triplett: Unit|ID|Nummer) und danach mit Klick auf das Filtersymbol das Tier aus dem Speicher geholt werden. Gibt es die Nummer nicht, wird eine Fehlermeldung angezeigt. Unter "data" ist die Tiernummer aufgeführt und unter "msg_short" die Fehlermeldung: Found Foreignkey violation=Schlüsselverletzung=Die Nummer gibt es nicht in der Datenbank. 
-    <img width="1000" src="http://federvieh.local/doc/Fehler_Tier_nicht_vorhanden.png"><br>
+    <img width="1000" src="/doc/Fehler_Tier_nicht_vorhanden.png"><br>
 Wurde das Tier erfolgreich gefunden, dann können die Angaben geändert/ergänzt werden und mit Klick auf das Diskettensymbol in der Datenbank gespeichert werden. 
 
 
@@ -35,7 +35,7 @@ Ein Zuchtstamm kann über einen Ladestrom angelegt werden.
 <p><b>Menus...->Ladeströme->Zuchtstamm anlegen</b></p>
 <p><b>Menus...->Zuchtstammverwaltung->Ersterfassung eines Zuchtstammes</b></p>
 
-    <img width="400" src="http://federvieh.local/doc/LS01_Zuchtstammmeldung.png"><br>
+    <img width="400" src="/doc/LS01_Zuchtstammmeldung.png"><br>
  <h4>Zuchtstamm*</h4>
     Wie die Tiernummer besteht auch die ZuchtstammID aus drei Teilen
     <ul>Nummernsystems: Hier immer "zuchtstamm" </ul>
