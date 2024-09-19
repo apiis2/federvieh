@@ -4,6 +4,23 @@ use strict;
 use warnings;
 our $apiis;
 
+sub CheckParents {
+    my $self = shift;
+    my $args = shift;
+    my ($ext_breed, $ext_sex);
+
+    my $sql="select b.db_breed, a.db_sex from animal a inner join breedcolor b on a.db_breedcolor=b.db_breedcolor where a.db_animal=$args->{'db_animal'}";
+
+    my $sql_ref = $apiis->DataBase->sys_sql( $sql);
+    while ( my $q = $sql_ref->handle->fetch ) { 
+        $ext_breed                    = $q->[0];
+        $ext_sex                      = $q->[1];
+    }
+
+
+    return ($ext_breed, $ext_sex);
+}
+
 sub SplitAnimalInputField {
     my $targs = shift;
 
