@@ -51,7 +51,7 @@ sub LO_LS01_Zuchtstamm {
     my $self     = shift;
     my $args     = shift;
  
-    my ($json, $chk_breedcolor, $sex, $ext_unit, $ext_id, $ext_animal, $vzuchtstamm);
+    my ($json, $chk_breedcolor, $sex, $ext_unit, $ext_id, $ext_animal, $vzuchtstamm, $printError, @allerrors);
     my ($db_breed,$zuchtjahr,$db_breeder,$ext_zuchtstamm,$ext_breeder, $ext_breed, $ext_sex,$err_zuchtstamm, $rollback);
 
     my $xlsx_format ='old';
@@ -64,7 +64,30 @@ sub LO_LS01_Zuchtstamm {
     my $fileimport     =1                   if (exists $args->{ 'fileimport'});
     $onlycheck=lc($args->{ 'onlycheck' })   if (exists $args->{ 'onlycheck' });
     $vjahr=$args->{ 'jahr' }                if (exists $args->{ 'jahr' });
+    $printError=$args->{ 'printError' }                if (exists $args->{ 'printError' });
 
+    my $vrecodebreeder={'La99Zw'=>'La98Zw',
+                     'L94Zw'=>'L93Zw',
+                     'G395G'=>'C377H',
+                     'G393G'=>'C377H',
+                     'Mario Esche'=>'Mario Esche', #Esche, Zwerg-Barnevelder, braun-schwarz-doppeltgesäumt 2
+                     'DJ340H'=>'D53H',
+                     'D97Zw'=>'La98Zw',
+                     'D54H'=>'D53H',
+                     'CJ386'=>'C357H',
+                     'C394H'=>'C377H',
+                     'C391'=>'C391',        #C391, Rump, Zwerg-Sussex, braun-porzellanfarbig 1
+                     'C386Zw'=>'C386Zw',    #C386Zw, Richter ZGM, Deutsche Zwerg-Wyandotten, weiß-blaucolumbia 5
+                     'C385Zw'=>'C33H',
+                     'C381Zw'=>'C379Zw',    #C381Zw, Herberger, Zwerg-Kraienköppe, rotgesattelt
+                     'C380Zw'=>'C379Zw',    #C381Zw, Herberger, Zwerg-Kraienköppe, rotgesattelt
+                     'C378Ej'=>'C377H',     #C378Ej, Lenk, P., Deutsche Pekingenten, weiß
+                     'C369Zw'=>'C367H',     #C369Zw, Stöckel, Altenglische Zwerg-Kämpfer, schwarz
+                     'C368H'=>'C367H',      #C368H, Stöckel, Orloff, schwarz
+                     'C351G'=>'C350G',      #C351H, Gottsmann, Diepholzer Gänse, weiß 2
+                     'D265Zw'=>'D108T',    #C265Zw, Hanisch, Zwerg-Cochin, blau 2
+                     ''=>'',
+    };
     #-- Wenn ein File geladen werden soll, dann zuerst umwandeln in
     #   einen JSON-String, damit einheitlich weiterverarbeitet werden kann
     if ( $fileimport ) {
@@ -86,6 +109,10 @@ sub LO_LS01_Zuchtstamm {
 
             #-- 1. zeile im dataset 
             if ($data[0]=~/^Züchter/) {
+               
+                if (exists $vrecodebreeder->{$data[1]}) {
+                    $data[1]=$vrecodebreeder->{$data[1]};
+                }
                 
                 $fields=[
                     {'type'=>'label',                     'value'=>$data[0], 'z'=>$zeile, 'pos'=>0},
@@ -156,22 +183,45 @@ sub LO_LS01_Zuchtstamm {
                 ];
                 $sex='1';
             }
+            #-- Tiernummern einsammeln   
+            elsif ($match=~/^'Hahn\/Hähne \(Ring-\/Züchternummer\)KükennummerVater \(Ring-\/Züchternummer\)Mutter \(Ring-\/Züchternummer\)'/) {
+  
+                $fields=[
+                    {'type'=>'label',                          'value'=>$data[0], 'z'=>$zeile, 'pos'=>0},
+                    {'type'=>'label',                          'value'=>$data[1], 'z'=>$zeile, 'pos'=>1},
+                    {'type'=>'label',                          'value'=>$data[2], 'z'=>$zeile, 'pos'=>2},
+                    {'type'=>'label',                          'value'=>$data[3], 'z'=>$zeile, 'pos'=>3},
+#                    {'type'=>'label',                          'value'=>$data[4], 'z'=>$zeile, 'pos'=>4},
+                ];
+                $sex='1';
+            }
 
 #            #-- Tiernummern einsammeln   
-#            elsif (($data[0]=~/^(Hahn|Hähne|RN-Tier)/) or 
-#                   ($data[0]=~/Hahn.*?Kükennummer.*?ZuchtstammID.*?Hahn.*?Hennen/)) {
-#  
-#                $fields=[
-#                    {'type'=>'label',                          'value'=>$data[0], 'z'=>$zeile, 'pos'=>0},
-#                    {'type'=>'label',                          'value'=>$data[1], 'z'=>$zeile, 'pos'=>1},
-#                    {'type'=>'label',                          'value'=>$data[2], 'z'=>$zeile, 'pos'=>2},
-#                    {'type'=>'label',                          'value'=>$data[3], 'z'=>$zeile, 'pos'=>3},
-#                    {'type'=>'label',                          'value'=>$data[4], 'z'=>$zeile, 'pos'=>4},
-#                ];
-#                $sex='1';
-#            }
+            elsif ($match=~/HähneKükennummerZuchtstammIDVäterMütter/) {
+  
+                $fields=[
+                    {'type'=>'label',                          'value'=>$data[0], 'z'=>$zeile, 'pos'=>0},
+                    {'type'=>'label',                          'value'=>$data[1], 'z'=>$zeile, 'pos'=>1},
+                    {'type'=>'label',                          'value'=>$data[2], 'z'=>$zeile, 'pos'=>2},
+                    {'type'=>'label',                          'value'=>$data[3], 'z'=>$zeile, 'pos'=>3},
+                    {'type'=>'label',                          'value'=>$data[4], 'z'=>$zeile, 'pos'=>4},
+                ];
+                $sex='1';
+            }
+            elsif ($match=~/HennenKükennummerZuchtstammIDVäterMütter/) {
+  
+                $fields=[
+                    {'type'=>'label',                          'value'=>$data[0], 'z'=>$zeile, 'pos'=>0},
+                    {'type'=>'label',                          'value'=>$data[1], 'z'=>$zeile, 'pos'=>1},
+                    {'type'=>'label',                          'value'=>$data[2], 'z'=>$zeile, 'pos'=>2},
+                    {'type'=>'label',                          'value'=>$data[3], 'z'=>$zeile, 'pos'=>3},
+                    {'type'=>'label',                          'value'=>$data[4], 'z'=>$zeile, 'pos'=>4},
+                ];
+                $sex='2';
+            }
             #-- Tiernummern einsammeln   
-            elsif ($match=~/^Dieser Hahn wurde an folgende Hennen angepaart/) {# or 
+            elsif (($match=~/^Dieser Hahn wurde an folgende Hennen angepaart/) or
+                  ($match=~/^Diese\(r\) Hahn\/Hähne wurde\(n\) an folgende Henne\(n\) angepaart/))  {# or 
 #                   ($data[0]=~/Hennen.*?Kükennummer.*?ZuchtstammID.*?Hahn.*?Hennen/)) {
   
                 $fields=[
@@ -315,14 +365,15 @@ sub LO_LS01_Zuchtstamm {
             $ext_breeder= $args->{'ext_breeder'};
 
             if (!$db_breeder) {            
-                push(@{$record->{'data'}->{'ext_breeder'}->{'errors'}}, 
-                    Apiis::Errors->new(
+                my $err= Apiis::Errors->new(
                         type       => 'DATA',
                         severity   => 'CRIT',
                         from       => 'LS01_Zuchtstamm',
                         ext_fields => ['ext_breeder'],
                         msg_short  =>"Keinen Eintrag für 'breeder:$args->{'ext_breeder'}' in der Datenbank gefunden."
-                    ));
+                    );
+                push(@{$record->{'data'}->{'ext_breeder'}->{'errors'}}, $err);
+                push(@allerrors, $err);
                     
 #                $apiis->status(1);    
 #                goto EXIT;
@@ -379,14 +430,15 @@ sub LO_LS01_Zuchtstamm {
 
             if (!$db_breed) {
             
-                push(@{$record->{'data'}->{'ext_breeder'}->{'errors'}}, 
-                    Apiis::Errors->new(
+                my $err=Apiis::Errors->new(
                         type       => 'DATA',
                         severity   => 'CRIT',
                         from       => 'LS01_Zuchtstamm',
                         ext_fields => ['ext_breed'],
                         msg_short  => $msg
-                    ));
+                    );
+                push(@{$record->{'data'}->{'ext_breed'}->{'errors'}}, $err);
+                push(@allerrors, $err);
 
 #                $apiis->status(1);    
 #                goto EXIT;
@@ -406,16 +458,18 @@ sub LO_LS01_Zuchtstamm {
 
             if ($args->{'ext_zuchtstamm'} eq '') {
 
-                push(@{$record->{'data'}->{'ext_breeder'}->{'errors'}}, 
-                    Apiis::Errors->new(
+                my $err=Apiis::Errors->new(
                         type       => 'DATA',
                         severity   => 'CRIT',
                         from       => 'LS01_Zuchtstamm',
                         ext_fields => ['ext_breeder'],
                         msg_short  =>"Keine Bezeichnung für den Zuchtstamm eingetragen."
-                    ));
+                    );
+                push(@{$record->{'data'}->{'ext_zuchtstamm'}->{'errors'}}, $err);
+                push(@allerrors, $err);
+
                     
-#                $apiis->status(1);    
+#                $apiis->status(1);   
 #                goto EXIT;
                 $rollback=1;
             }
@@ -425,14 +479,16 @@ sub LO_LS01_Zuchtstamm {
 
             if ($n_parent < 1) {
             
-                push(@{$record->{'data'}->{'ext_zuchtstamm'}->{'errors'}}, 
-                    Apiis::Errors->new(
+                my $err=Apiis::Errors->new(
                         type       => 'DATA',
                         severity   => 'CRIT',
                         from       => 'LS01_Zuchtstamm',
                         ext_fields => ['ext_zuchtstamm'],
                         msg_short  => 'Keine Hähne oder Hennen gefunden => Abbruch' 
-                    ));
+                    );
+                push(@{$record->{'data'}->{'ext_zuchtstamm'}->{'errors'}}, $err);
+                push(@allerrors, $err);
+
                     
                 $rollback=1;
 #                goto EXIT;
@@ -517,14 +573,16 @@ sub LO_LS01_Zuchtstamm {
 
                     if (!$ar_animal->[1] or !$ar_animal->[0]) {
 
-                        push(@{$record->{'data'}->{$tfield}->{'errors'}}, 
-                            Apiis::Errors->new(
+                       my $err=Apiis::Errors->new(
                                 type       => 'DATA',
                                 severity   => 'CRIT',
                                 from       => 'LS01_Zuchtstamm',
-                                ext_fields => ['ext_breeder'],
+                                ext_fields => ['ext_animal'.$i],
                                 msg_short  => __("Tiernummer '[_1]' entspricht nicht der Nomenklatur.", $nr)
-                            ));
+                            );
+                        push(@{$record->{'data'}->{'ext_animal'.$i}->{'errors'}}, $err);
+                        push(@allerrors, $err);
+
                         next;
                     }
                     
@@ -540,14 +598,16 @@ sub LO_LS01_Zuchtstamm {
                         ($db_unit, $exists)=GetDbUnit({'ext_unit'=>$ar_animal->[0],'ext_id'=>$ar_animal->[1]},'y');
         
                         if (!$db_unit) {            
-                            push(@{$record->{'data'}->{$tfield}->{'errors'}}, 
-                                Apiis::Errors->new(
+                            my $err=Apiis::Errors->new(
                                     type       => 'DATA',
                                     severity   => 'CRIT',
                                     from       => 'LS01_Zuchtstamm',
                                     ext_fields => [$tfield],
                                     msg_short  =>"Keinen Eintrag für '$ar_animal->[0]:$ar_animal->[1]' in der Datenbank gefunden."
-                                ));
+                                );
+                            push(@{$record->{'data'}->{$tfield}->{'errors'}}, $err);
+                            push(@allerrors, $err);
+
                         }
                     
                         $apiis->del_errors;
@@ -611,6 +671,8 @@ sub LO_LS01_Zuchtstamm {
 
                     if (!$db_animal) {            
                         push(@{$record->{'data'}->{$tfield}->{'errors'}},$apiis->errors);
+                        push(@allerrors, $apiis->errors);
+
                     }
                     else {
                         
@@ -677,6 +739,7 @@ sub LO_LS01_Zuchtstamm {
 
                 if ($sql_ref->status) {
                     push(@{$record->{'data'}->{'ext_zuchtstamm'.$i}->{'errors'}},$sql_ref->errors);
+                    push(@allerrors, $sql_ref->errors);
                 }
                 #-- check db_unit und erstelle neu 
                 my $db_unit;
@@ -713,14 +776,16 @@ sub LO_LS01_Zuchtstamm {
                             $reverse{ 'zuchtstamm:::'. $zuchtstammid->[1] }=1;
                         }
                         else {
-                            push(@{$record->{'data'}->{'ext_animal'.$i}->{'errors'}}, 
-                                Apiis::Errors->new(
+                            my $err=Apiis::Errors->new(
                                     type       => 'DATA',
                                     severity   => 'CRIT',
                                     from       => 'LS01_Zuchtstamm',
                                     ext_fields => ['ext_zuchtstamm'.$i],
                                     msg_short  =>"Keinen Eintrag für 'zuchtstamm:$zuchtstammid->[1]' in der Datenbank gefunden."
-                                ));
+                                );
+                            push(@{$record->{'data'}->{'ext_zuchtstamm'.$i}->{'errors'}}, $err);
+                            push(@allerrors, $err);
+
                     
                             $apiis->del_errors;
                         }
@@ -745,6 +810,8 @@ sub LO_LS01_Zuchtstamm {
                     #-- Wenn Fehler beim Eintrag in Tabelle transfer 
                     if (!$guid) {
                         push(@{$record->{'data'}->{'ext_zuchtstamm'.$i}->{'errors'}},$apiis->errors);
+                        push(@allerrors, $apiis->errors);
+
                         $apiis->del_errors;
                     }
                     else {
@@ -773,6 +840,7 @@ sub LO_LS01_Zuchtstamm {
                             #-- Fehlerbehandlung 
                             if ( $parents->status ) {
                                 push(@{$record->{'data'}->{$field.$i}->{'errors'}},$parents->errors);
+                                push(@allerrors, $parents->errors);
                                 $apiis->status(1);
                             }
                         }
@@ -809,15 +877,16 @@ sub LO_LS01_Zuchtstamm {
                 ($db_unit, $exists)=GetDbUnit({'ext_unit'=>$ar_animal->[0],'ext_id'=>$ar_animal->[1]},'y');
 
                 if (!$db_unit) {            
-                    push(@{$record->{'data'}->{'ext_animal'.$i}->{'errors'}}, 
-                        Apiis::Errors->new(
+                    my $err=Apiis::Errors->new(
                             type       => 'DATA',
                             severity   => 'CRIT',
                             from       => 'LS01_Zuchtstamm',
                             ext_fields => ['ext_animal'.$i],
                             msg_short  =>"Keinen Eintrag für '$ar_animal->[0]:$ar_animal->[1]' in der Datenbank gefunden."
-                        ));
-                    
+                        );
+                    push(@{$record->{'data'}->{'ext_animal'.$i}->{'errors'}},$err);
+                    push(@allerrors, $err);
+
                     $apiis->del_errors;
                 }
                 else {
@@ -874,7 +943,8 @@ sub LO_LS01_Zuchtstamm {
             #-- Fehlerbehandlung 
             if (!$db_animal ) {
                 push(@{$record->{'data'}->{'ext_animal'.$i}->{'errors'}},$apiis->errors);
-                    
+                push(@allerrors, $apiis->errors);
+
                 $apiis->del_errors;
             }
             else {
@@ -887,7 +957,7 @@ sub LO_LS01_Zuchtstamm {
         $tbd=Federvieh::CreateTBDX($tbd, $json->{'glberrors'}, $record, $zeile );
     }
     
-    if (@zuchtstamm) { 
+    if (@zuchtstamm and !$rollback) { 
 
         ####################################################################################### 
         #
@@ -969,14 +1039,16 @@ sub LO_LS01_Zuchtstamm {
             ($db_unit, $exists)=GetDbUnit({'ext_unit'=>'zuchtstamm','ext_id'=>$zuchtstammid->[1]},'y');
             
             if (!$db_unit) {
-                push(@{$err_zuchtstamm}, 
-                    Apiis::Errors->new(
+                my $err=Apiis::Errors->new(
                         type       => 'DATA',
                         severity   => 'CRIT',
                         from       => 'LS01_Zuchtstamm',
                         ext_fields => ['ext_zuchtstamm'],
                         msg_short  =>"Keinen Eintrag für 'zuchtstamm:$zuchtstammid->[1]' in der Datenbank gefunden."
-                    ));
+                    );
+                push(@{$err_zuchtstamm},$err);
+                push(@allerrors, $err);
+
                 $apiis->del_errors;
             }
 
@@ -1050,7 +1122,7 @@ sub LO_LS01_Zuchtstamm {
         
 EXIT:
     
-    if ((!$apiis->status) and ($onlycheck eq 'off')) {
+    if ((!$apiis->status) and (!$rollback) and ($onlycheck eq 'off')) {
         $apiis->DataBase->commit;
     }
     else {
@@ -1074,6 +1146,12 @@ EXIT:
 
     my $tr  =Federvieh::CreateTr( $json, $json->{'glberrors'} );
     my $data=Federvieh::CreateBody( $tbd, $tr, 'Ladestrom: LS01_Zuchtstamm');
+
+    if ($printError) {
+        foreach my $err (@allerrors) {
+            $err->print;
+        }
+    }
 
     if ($fileimport) {
         return JSON::to_json({'data'=>$data, 'tag'=>'body'});
