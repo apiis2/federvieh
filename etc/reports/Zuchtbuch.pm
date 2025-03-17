@@ -100,8 +100,8 @@ sub Zuchtbuch {
         $link=Federvieh::PrintSQLRecordset($apiis, $sql);
         $linkf=Federvieh::PrintSQLRecordset($apiis, $sqlf);
     
-        push(@$atag, {'tag'=>'a','value'=>$trait.' (Tiere) ','attr'=>[{'href'=>'http://federvieh.local'.$link}]});
-        push(@$atag, {'tag'=>'a','value'=>$trait.' (Tabelle) ','attr'=>[{'href'=>'http://federvieh.local'.$linkf}]});
+        push(@$atag, {'tag'=>'a','value'=>$trait.' (Tiere) ','attr'=>[{'href'=>''.$link}]});
+        push(@$atag, {'tag'=>'a','value'=>$trait.' (Tabelle) ','attr'=>[{'href'=>''.$linkf}]});
         push(@$atag, {'tag'=>'br'}); 
     }
 
@@ -224,36 +224,38 @@ sub Zuchtbuch {
                 'f1'=>"user_get_ext_code(z.db_event_type,'l')", 'data'=>$von, 'date'=>$bis,
                 'trait'=>['ZSt-Schlupf-Anzahl-Eiablage', $trait]}) ;
                 
-        my $sql_ref = $apiis->DataBase->sys_sql( $sqlf );
-        if ( $sql_ref->status and ($sql_ref->status == 1 )) {
-            $apiis->status( 1 );
-            $apiis->errors( $sql_ref->errors );
-            goto ERR;
-        }
-       
-        if ($flagdata) {
-            $sql=Federvieh::AddAnimalToSql($sql);
-            #$link=Federvieh::PrintSQLRecordset($apiis, $sql);
-            $linkf=Federvieh::PrintSQLRecordset($apiis, $sqlf);
-        
-            push(@$atag, {'tag'=>'a','value'=>$trait.' (Tiere) ','attr'=>[{'href'=>$link}]});
-            push(@$atag, {'tag'=>'a','value'=>$trait.' (Tabelle) ','attr'=>[{'href'=>$linkf}]});
-            push(@$atag, {'tag'=>'br'}); 
+	if ($sqlf) {
+		my $sql_ref = $apiis->DataBase->sys_sql( $sqlf );
+		if ( $sql_ref->status and ($sql_ref->status == 1 )) {
+		    $apiis->status( 1 );
+		    $apiis->errors( $sql_ref->errors );
+		    goto ERR;
+		}
+	       
+		if ($flagdata) {
+		    $sql=Federvieh::AddAnimalToSql($sql);
+		    #$link=Federvieh::PrintSQLRecordset($apiis, $sql);
+		    $linkf=Federvieh::PrintSQLRecordset($apiis, $sqlf);
+		
+		    push(@$atag, {'tag'=>'a','value'=>$trait.' (Tiere) ','attr'=>[{'href'=>$link}]});
+		    push(@$atag, {'tag'=>'a','value'=>$trait.' (Tabelle) ','attr'=>[{'href'=>$linkf}]});
+		    push(@$atag, {'tag'=>'br'}); 
 
-        }
+		}
 
-        while ( my $q = $sql_ref->handle->fetch ) {
+		while ( my $q = $sql_ref->handle->fetch ) {
 
-            $hs->{$q->[0]}=[] if (!exists $hs->{$q->[0]});
-            if ($trait eq 'ZSt-Schlupf-Anzahl-Eiablage') {
+		    $hs->{$q->[0]}=[] if (!exists $hs->{$q->[0]});
+		    if ($trait eq 'ZSt-Schlupf-Anzahl-Eiablage') {
 
-                $neier=$q->[1] if ($trait eq 'ZSt-Schlupf-Anzahl-Eiablage');
+			$neier=$q->[1] if ($trait eq 'ZSt-Schlupf-Anzahl-Eiablage');
 
-                push(@{$hs->{$q->[0]}},($q->[1]));
-            }
-            else {
-                push(@{$hs->{$q->[0]}},($q->[1], $q->[2]));
-            }
+			push(@{$hs->{$q->[0]}},($q->[1]));
+		    }
+		    else {
+			push(@{$hs->{$q->[0]}},($q->[1], $q->[2]));
+		    }
+	    	}   
         }
     }        
 
@@ -558,7 +560,7 @@ sub Zuchtbuch {
     my %hash = ( json => $json );
     my $outfile = r_plot_chicks($apiis, \%hash );
 
-    my $d={'tag'=>'img','value'=>'','attr'=>[{'src'=>'http://federvieh.local/tmp/'.$outfile} ]};
+    my $d={'tag'=>'img','value'=>'','attr'=>[{'src'=>'/tmp/'.$outfile} ]};
 
     push(@$bodyd, {'tag'=>'div','data'=>[$d],'attr'=>[{'style'=>[{'font-size'=>'30px'},{'margin-left'=>'100px'}]}]});
 
@@ -752,7 +754,7 @@ sub Zuchtbuch {
 
     #-- Grafik
     $filename=sprintf( "%08X", rand(0xffffffff));
-    $path=$apiis->APIIS_LOCAL.'http://federvieh.local/tmp/'.$filename;
+    $path=$apiis->APIIS_LOCAL.'/tmp/'.$filename;
 
     $hsg1={ 
                 "titel" =>["Schlupfrate in %"],
@@ -773,7 +775,7 @@ sub Zuchtbuch {
     %hash = ( json => $json );
     $outfile = r_plot_chicks($apiis, \%hash );
 
-    $d={'tag'=>'img','value'=>'','attr'=>[{'width'=>'50%'},{'src'=>'http://federvieh.local/tmp/'.$outfile},
+    $d={'tag'=>'img','value'=>'','attr'=>[{'width'=>'50%'},{'src'=>'/tmp/'.$outfile},
            ]};
 
     push(@$bodyd, {'tag'=>'div','data'=>[$d],'attr'=>[{'style'=>[{'font-size'=>'30px'},{'margin-left'=>'200px'}]}]});
@@ -1013,7 +1015,7 @@ sub Zuchtbuch {
 
     #-- Grafik
     $filename=sprintf( "%08X", rand(0xffffffff));
-    $path=$apiis->APIIS_LOCAL.'http://federvieh.local/tmp/'.$filename;
+    $path=$apiis->APIIS_LOCAL.'/tmp/'.$filename;
 
     $hsg1={ 
                 "titel" =>["Körpergewichte 20. Lebenswoche"],
@@ -1038,7 +1040,7 @@ sub Zuchtbuch {
     %hash = ( json => $json );
     $outfile = r_plot_chicks($apiis, \%hash );
 
-    $d={'tag'=>'img','value'=>'','attr'=>[{'width'=>'50%'},{'src'=>'http://federvieh.local/tmp/'.$outfile},
+    $d={'tag'=>'img','value'=>'','attr'=>[{'width'=>'50%'},{'src'=>'/tmp/'.$outfile},
            ]};
 
     push(@$bodyd, {'tag'=>'div','data'=>[$d],'attr'=>[{'style'=>[{'font-size'=>'30px'},{'margin-left'=>'200px'}]}]});
@@ -1143,7 +1145,7 @@ sub Zuchtbuch {
 
     #-- Grafik
     $filename=sprintf( "%08X", rand(0xffffffff));
-    $path=$apiis->APIIS_LOCAL.'http://federvieh.local/tmp/'.$filename;
+    $path=$apiis->APIIS_LOCAL.'/tmp/'.$filename;
 
     $hsg1={ 
                 "titel" =>["Körpergewichte am Bewertungstag"],
@@ -1168,7 +1170,7 @@ sub Zuchtbuch {
     %hash = ( json => $json );
     $outfile = r_plot_chicks($apiis, \%hash );
 
-    $d={'tag'=>'img','value'=>'','attr'=>[{'width'=>'50%'},{'src'=>'http://federvieh.local/tmp/'.$outfile},
+    $d={'tag'=>'img','value'=>'','attr'=>[{'width'=>'50%'},{'src'=>'/tmp/'.$outfile},
            ]};
 
     push(@$bodyd, {'tag'=>'div','data'=>[$d],'attr'=>[{'style'=>[{'font-size'=>'30px'},{'margin-left'=>'200px'}]}]});
@@ -1622,7 +1624,7 @@ sub Zuchtbuch {
 
     #-- Grafik
     $filename=sprintf( "%08X", rand(0xffffffff));
-    $path=$apiis->APIIS_LOCAL.'http://federvieh.local/tmp/'.$filename;
+    $path=$apiis->APIIS_LOCAL.'/tmp/'.$filename;
 
     $hsg1={ 
                 "titel" =>["Bruteigewicht in g"],
@@ -1643,7 +1645,7 @@ sub Zuchtbuch {
     %hash = ( json => $json );
     $outfile = r_plot_chicks($apiis, \%hash );
 
-    $d={'tag'=>'img','value'=>'','attr'=>[{'width'=>'50%'},{'src'=>'http://federvieh.local/tmp/'.$outfile},
+    $d={'tag'=>'img','value'=>'','attr'=>[{'width'=>'50%'},{'src'=>'/tmp/'.$outfile},
            ]};
 
     push(@$bodyd, {'tag'=>'div','data'=>[$d],'attr'=>[{'style'=>[{'font-size'=>'30px'},{'margin-left'=>'200px'}]}]});
@@ -1787,7 +1789,7 @@ sub Zuchtbuch {
 
     #-- Grafik
     $filename=sprintf( "%08X", rand(0xffffffff));
-    $path=$apiis->APIIS_LOCAL.'http://federvieh.local/tmp/'.$filename;
+    $path=$apiis->APIIS_LOCAL.'/tmp/'.$filename;
 
     $hsg1={ 
                 "titel" =>["Entwicklung der Körpergewichte von Hähnen über die Jahre"],
@@ -1808,7 +1810,7 @@ sub Zuchtbuch {
     %hash = ( json => $json );
     $outfile = r_plot_chicks($apiis, \%hash );
 
-    $d={'tag'=>'img','value'=>'','attr'=>[{'width'=>'50%'},{'src'=>'http://federvieh.local/tmp/'.$outfile},
+    $d={'tag'=>'img','value'=>'','attr'=>[{'width'=>'50%'},{'src'=>'/tmp/'.$outfile},
            ]};
 
     push(@$bodyd, {'tag'=>'div','data'=>[$d],'attr'=>[{'style'=>[{'font-size'=>'30px'},{'margin-left'=>'200px'}]}]});
@@ -1952,7 +1954,7 @@ sub Zuchtbuch {
 
     #-- Grafik
     $filename=sprintf( "%08X", rand(0xffffffff));
-    $path=$apiis->APIIS_LOCAL.'http://federvieh.local/tmp/'.$filename;
+    $path=$apiis->APIIS_LOCAL.'/tmp/'.$filename;
 
     $hsg1={ 
                 "titel" =>["Entwicklung der Körpergewichte von Hennen über die Jahre"],
@@ -1973,7 +1975,7 @@ sub Zuchtbuch {
     %hash = ( json => $json );
     $outfile = r_plot_chicks($apiis, \%hash );
 
-    $d={'tag'=>'img','value'=>'','attr'=>[{'width'=>'50%'},{'src'=>'http://federvieh.local/tmp/'.$outfile},
+    $d={'tag'=>'img','value'=>'','attr'=>[{'width'=>'50%'},{'src'=>'/tmp/'.$outfile},
            ]};
 
     push(@$bodyd, {'tag'=>'div','data'=>[$d],'attr'=>[{'style'=>[{'font-size'=>'30px'},{'margin-left'=>'200px'}]}]});
