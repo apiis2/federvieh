@@ -108,7 +108,7 @@ sub pdf {
   # rffr
   foreach my $adr ( @{$data} ) {
     my @zuchtstamm = @{$adr->{'ext_zuchtstamm'}};
-    my @kommunikation =  @{$adr->{'Kommunikation'}};
+    my @kommunikation = @{$adr->{'Kommunikation'}};
     my @status =  @{$adr->{'Status'}};
     my @kategorie =  @{$adr->{'Kategorie'}};
     my @bank =  @{$adr->{'Bank'}};
@@ -123,17 +123,17 @@ sub pdf {
     my $outkat;
     foreach (@kategorie) {
         if ($_->[2] eq '1') {
-            $outkat.="\\underline{$_->[1] (\\textit{$_->[3]})}";
+            $outkat.="\\underline{$_->[1] }";
         }
         else {
-            $outkat.=" $_->[1] (\\textit{$_->[3]})";
+            $outkat.=" $_->[1] ";
         }
     }
 
     $self->{'_longtablecontent'} .=  "\\fbox{\\begin{minipage}[t][\\totalheight][l]{80mm} \\parindent-1.2mm
 ";
     $self->{'_longtablecontent'} .=  " \\rule[0mm]{0mm}{0mm}\n";
-    $self->{'_longtablecontent'} .= "\\textbf{@zuchtstamm (\\textit{@kommunikation) }} \n" if ( @zuchtstamm );
+    $self->{'_longtablecontent'} .= "\\textbf{@zuchtstamm } \n" if ( @zuchtstamm );
     $self->{'_longtablecontent'} .= "  \\newline gültig ab: @bank   \n" if ( @bank );
     $self->{'_longtablecontent'} .= "  \\newline Status: @status   \n" if ( @status );
     $self->{'_longtablecontent'} .= "\\end{minipage}\\hspace{5mm}\n";
