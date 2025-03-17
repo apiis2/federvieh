@@ -303,7 +303,7 @@ sub Steckbrief {
     #
     #############################################################################
 
-    $sql="select user_get_ext_id_animal(c.db_animal), c.birth_dt,user_get_ext_code(c.db_sex), user_get_ext_code(d.db_breed), user_get_ext_code(d.db_color),user_get_ext_zuchtstamm_of(c.db_parents) from parents b inner join animal c on b.db_animal=c.db_animal inner join breedcolor d on c.db_breed=d.db_breedcolor where b.db_parents=$db_animal";
+    $sql="select user_get_full_db_animal(c.db_animal), c.birth_dt,user_get_ext_code(c.db_sex), user_get_ext_code(d.db_breed), user_get_ext_code(d.db_color),user_get_ext_zuchtstamm_of(c.db_parents) from parents b inner join animal c on b.db_animal=c.db_animal inner join breedcolor d on c.db_breed=d.db_breedcolor where b.db_parents=$db_animal";
     
     $sql_ref = $apiis->DataBase->sys_sql( $sql );
     if ( $sql_ref->status and ($sql_ref->status == 1 )) {
