@@ -21,7 +21,7 @@
     </DataSource>
       
 
-    <Label Name="L694" Content="__('Korrektur - Tiernummern/Zuchtstamm')">
+    <Label Name="L694" Content="__('Tiernummern/Zuchtstamm schließen')">
       <Position Column="0" Columnspan="3" Position="absolute" Row="0"/>
       <Text FontSize="24px" TextDecoration="underline"/>
       <Format PaddingBottom="10px"/>
