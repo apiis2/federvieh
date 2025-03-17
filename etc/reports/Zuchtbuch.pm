@@ -100,8 +100,8 @@ sub Zuchtbuch {
         $link=Federvieh::PrintSQLRecordset($apiis, $sql);
         $linkf=Federvieh::PrintSQLRecordset($apiis, $sqlf);
     
-        push(@$atag, {'tag'=>'a','value'=>$trait.' (Tiere) ','attr'=>[{'href'=>''.$link}]});
-        push(@$atag, {'tag'=>'a','value'=>$trait.' (Tabelle) ','attr'=>[{'href'=>''.$linkf}]});
+        push(@$atag, {'tag'=>'a','value'=>$trait.' (Tiere) ','attr'=>[{'href'=>'/tmp/'.$link}]});
+        push(@$atag, {'tag'=>'a','value'=>$trait.' (Tabelle) ','attr'=>[{'href'=>'/tmp/'.$linkf}]});
         push(@$atag, {'tag'=>'br'}); 
     }
 
