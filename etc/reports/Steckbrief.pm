@@ -65,7 +65,7 @@ sub Steckbrief {
     #
     #############################################################################
 
-    $sql="select ext_unit,ext_id, ext_animal, a.opening_dt, a.closing_dt, a.guid from transfer a inner join unit b on a.db_unit=b.db_unit where db_animal=$db_animal";
+    $sql="select db_animal,  ext_unit,ext_id, ext_animal, a.opening_dt, a.closing_dt, a.guid from transfer a inner join unit b on a.db_unit=b.db_unit where db_animal=$db_animal";
     
     $sql_ref = $apiis->DataBase->sys_sql( $sql );
     if ( $sql_ref->status and ($sql_ref->status == 1 )) {
@@ -86,6 +86,7 @@ sub Steckbrief {
         push( @$td, {'tag'=>'td','value'=>$q->[ 3 ]});
         push( @$td, {'tag'=>'td','value'=>$q->[ 4 ]});
         push( @$td, {'tag'=>'td','value'=>$q->[ 5 ]});
+        push( @$td, {'tag'=>'td','value'=>$q->[ 6 ]});
 
         #-- undef => '' 
         map { if (!$_->{'value'}) { $_->{'value'}=''} } @$td;
@@ -99,9 +100,9 @@ sub Steckbrief {
     my $ltiernummer='Tiernummer';
     $ltiernummer='ZuchtstammID' if ($ext_unit eq 'zuchtstamm');
 
-    $thd={'tag'=>'tr', 'data'=>[{'tag'=>'th','value'=>'Nummernsystem'},{'tag'=>'th','value'=>'Nummernkreis'},
-                                   {'tag'=>'th','value'=>$ltiernummer},{'tag'=>'th','value'=>'aktiv seit'},
-                                   {'tag'=>'th','value'=>'inaktiv seit'},{'tag'=>'th','value'=>'GUID'}]};
+    $thd={'tag'=>'tr', 'data'=>[{'tag'=>'th','value'=>'Interne Tiernummer'},{'tag'=>'th','value'=>'Nummernsystem'},{'tag'=>'th','value'=>'Nummernkreis'},
+                                {'tag'=>'th','value'=>$ltiernummer},{'tag'=>'th','value'=>'aktiv seit'},
+                                {'tag'=>'th','value'=>'inaktiv seit'},{'tag'=>'th','value'=>'GUID'}]};
 
     $cap={'tag'    =>'caption',
                     'value' =>$ltiernummer,
@@ -121,7 +122,7 @@ sub Steckbrief {
     #############################################################################
 
     if ($ext_unit ne 'zuchtstamm') {
-        $sql="select db_sire, db_dam, user_get_ext_id_animal(db_parents), user_get_ext_code(db_sex), user_get_ext_code(b.db_breed), birth_dt, name, user_get_ext_code(db_selection), hb_ein_dt from animal a inner join breedcolor b on a.db_breed=b.db_breedcolor where db_animal=$db_animal";
+        $sql="select user_get_full_db_animal(db_sire), user_get_full_db_animal(db_dam), user_get_full_db_animal(db_parents), user_get_ext_code(db_sex), user_get_ext_code(b.db_breed), birth_dt, name, user_get_ext_code(db_selection), hb_ein_dt from animal a inner join breedcolor b on a.db_breed=b.db_breedcolor where db_animal=$db_animal";
         
         $sql_ref = $apiis->DataBase->sys_sql( $sql );
         if ( $sql_ref->status and ($sql_ref->status == 1 )) {
