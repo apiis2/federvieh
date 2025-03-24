@@ -105,6 +105,10 @@ Select 'json2html' as key ,'HTML' as value union
 select 'json2pdf','PDF'
 ;
 
+CREATE OR REPLACE View ScrollinglistChooseJahr AS  
+select distinct date_part('year',event_dt)::text as year from event union select '' as year order by year
+;
+
 CREATE OR REPLACE View ScrollinglistBreederBestand AS  
 Select  f.ext_id as key, f.ext_id as value
 from entry_locations a 
