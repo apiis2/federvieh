@@ -50,7 +50,6 @@ sub Bestandsliste {
     $vaktiv = 'Alle, '              if ( $tiergruppe eq '12');
     $vaktiv = 'Jungtiere, '         if ( $tiergruppe eq 'j');
     $vaktiv = 'Zuchttiere, '        if ( $tiergruppe eq 'z');
-    $vaktiv = 'Herdbuchaufnahme, '  if ( $tiergruppe eq 'h');
     $farbe  = 1                     if ( $farbe );
     $datum  = 1                     if ( $datum );
     $zusammenfassung=1              if ( $zusammenfassung);
@@ -96,23 +95,11 @@ sub Bestandsliste {
         $sql .= " and f.ext_id in ('" . join( "','", @betriebe ) . "') ";
     }
     else {
-        if ($tiergruppe eq 'h') {
-            $sql.="  from ( select a.db_location from locations a inner join animal b on a.db_animal=b.db_animal 
-                            where a.exit_dt isnull and 
-                            ((b.hb_ein_dt>= '$datbis'::date  and b.hb_ein_dt <='$datbis'::date))
-                            group by a.db_location ) a 
-              inner join unit f on a.db_location=f.db_unit
-              left outer join address g on f.db_address=g.db_address
-              where      (f.ext_unit='breeder' or f.ext_unit='owner') 
-              ";
-        }
-        else {
             $sql.="  from ( select db_location from locations where exit_dt isnull group by db_location ) a 
               inner join unit f on a.db_location=f.db_unit
               left outer join address g on f.db_address=g.db_address
               where      (f.ext_unit='breeder' or f.ext_unit='owner') 
               ";
-        }
     }
 #   $sql .= " and b.db_selection=(select db_code from codes where
 #                           class='SELECTION' and ext_code='1')
@@ -173,20 +160,7 @@ sub Bestandsliste {
     inner join codes  d on z.db_breed   = d.db_code
     inner join unit e on a.db_location  = e.db_unit ";
 
-    if ($tiergruppe eq 'h') {
-        $sql.= "where   
-            /* Tier hatte Herdbuchaufnahme in der Zeit */
-            ((b.hb_ein_dt>= '$datvon'::date  and b.hb_ein_dt <='$datbis'::date)) 
-            
-            /* ist ein Zuchttier*/  
-            and b.db_selection=(select db_code from codes where class='EINSTUFUNG' and ext_code='1')
-
-            /* und gehört zum Betrieb */
-            and (e.ext_unit='breeder' or e.ext_unit='owner') 
-            and e.ext_id in ('" . join( "','", @betriebe ) . "') 
-        ";
-    }
-    elsif ( $tiergruppe eq 'a') {
+    if ( $tiergruppe eq 'z') {
         $sql.=" where   
             /* Tier ist nicht mehr aktiv und Zu/Abgang waehrend des Zuchtjahres*/
             /* oder Tier ist nach dem Zuchtjahr abgegangen
@@ -221,7 +195,7 @@ sub Bestandsliste {
             (a.exit_dt>='$datvon'::date)) 
                                                                                 
             )
-            and b.db_selection in (select db_code from codes where class='EINSTUFUNG' and $tg)
+            /*and b.db_selection in (select db_code from codes where class='EINSTUFUNG' and $tg)*/
             and (e.ext_unit='breeder' or e.ext_unit='owner') 
             and e.ext_id in ('" . join( "','", @betriebe ) . "') 
         ";
@@ -710,10 +684,7 @@ sub pdf {
         my $vonbis = $data->{ $bnr }->{ 'Bestandsliste' }->{ 'Title2' }[ 0 ];
         my @vb = split( '-', $vonbis );
 
-        if ( $data->{ 'Config' }[ 0 ] eq 'h') {
-            $self->{ '_longtablecontent' }.= "\\vspace{30mm} \\textbf{\\large  Herdbuchaufnahme ($bnr) vom $vb[0] bis $vb[1] } \n";
-        }
-        elsif ( $data->{ 'Config' }[ 0 ] eq 'a') {
+        if ( $data->{ 'Config' }[ 0 ] eq 'a') {
             $self->{ '_longtablecontent' }.= "\\vspace{30mm} \\textbf{\\large  Abgänge ($bnr) im Zeitraum vom $vb[0] bis $vb[1] } \n";
         }
         else {
