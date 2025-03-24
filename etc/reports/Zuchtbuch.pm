@@ -9,11 +9,23 @@ use strict;
 use warnings;
 
 sub Zuchtbuch {
-    my ( $self, $ext_breed, $von, $bis, $flagdata ) = @_;
+    my ( $self, $jahr ) = @_;
 
-    $von='01.01.2020';
-    $bis='31.12.2022';
-    $flagdata=1;
+    my ($von, $bis,$bereich);
+    
+    if ($jahr eq '') {
+    	$von='01.01.2000';
+    	$bis='31.12.3000';
+	$bereich=' (alle Jahre)';
+
+    }
+    else {
+    	$von='01.01.'.$jahr;
+    	$bis='31.12.'.$jahr;
+	$bereich="$von - $bis";
+    }
+
+    my $flagdata=1;
 
     my $sql      = "Set datestyle to 'german'";
     my $sql_ref  = $apiis->DataBase->sys_sql( $sql );
@@ -26,7 +38,7 @@ sub Zuchtbuch {
     
     my ($link, $linkf);
 
-    push(@$bodyd, {'tag'=>'div','value'=>'Zuchtbuch - Vorwerkhühner 2021','attr'=>[{'style'=>[{'font-size'=>'30px'}]}]});
+    push(@$bodyd, {'tag'=>'div','value'=>"Zuchtbuch - Vorwerkhühner $bereich",'attr'=>[{'style'=>[{'font-size'=>'30px'}]}]});
    
     push(@$bodyd, {'tag'=>'img','value'=>'','attr'=>[{'width'=>'500px'},{'src'=>'/etc/titel_vwh.png'}]});
 
@@ -128,7 +140,7 @@ sub Zuchtbuch {
                                    ]};
 
     my $cap={'tag'    =>'caption',
-                    'value' =>'Durchschnittliche Bruteigewichte in der Zuchtsaison 2021',
+                    'value' =>'Durchschnittliche Bruteigewichte ',
                     'attr'  =>[{'style'=>[{'font-size'=>'20px'},{'text-align'=>'left'}]}]};
 
     my $trh={'tag'=>'thead', 'data'=>[$thd],        'attr'=>[{'style'=>[{'background-color'=>'lightgray'},{'text-align'=>'left'},
@@ -193,7 +205,7 @@ sub Zuchtbuch {
                                    ]};
 
     $cap={'tag'    =>'caption',
-                    'value' =>'Aufstellung der Bruteigewichte je Züchter und Schlupf in der in der Zuchtsaison 2021',
+                    'value' =>'Aufstellung der Bruteigewichte je Züchter und Schlupf ',
                     'attr'  =>[{'style'=>[{'font-size'=>'20px'},{'text-align'=>'left'}]}]};
 
     $trh={'tag'=>'thead', 'data'=>[$thd],        'attr'=>[{'style'=>[{'background-color'=>'lightgray'},{'text-align'=>'left'},

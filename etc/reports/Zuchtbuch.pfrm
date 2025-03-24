@@ -16,10 +16,25 @@
     </Label>
 
     
+    <Label Name="Label_1491c" Content="Jahr:">
+      <Position Column="0" Position="absolute" Row="2"/>
+    </Label>
+    <Field Name="jahr" Check="NotNull" AR="user" FlowOrder="1" ToolTip="__('Jahr')" LabelName="Label_1491c" >
+      <DataSource Name="DataSource_493c">
+        <SqlFunction Action="do_execute_sql" View="ScrollinglistChooseJahr"/>  
+      </DataSource>
+      <ScrollingList Size="1" Default="''"/>
+      <Position Column="1" Position="absolute" Row="2"/>
+      <Miscellaneous/>
+      <Text/>
+      <Color/>
+      <Format/>
+    </Field>
+    
     <Label Name="Label_1491b" Content="Ausgabe als:">
       <Position Column="0" Position="absolute" Row="3"/>
     </Label>
-    <Field Name="_exportfilter" Check="NotNull" AR="user" FlowOrder="1" ToolTip="__('Ausgabeformat des Zuchtbuches')" LabelName="Label_1491b" >
+    <Field Name="_exportfilter" Check="NotNull" AR="user" FlowOrder="2" ToolTip="__('Ausgabeformat des Zuchtbuches')" LabelName="Label_1491b" >
       <DataSource Name="DataSource_493b">
         <SqlFunction Action="do_execute_sql" View="ScrollinglistChooseHTMLPDF"/>  
 <!--         <Sql Statement="select 'json2html','HTML' union select 'json2pdf','PDF'"/>  -->

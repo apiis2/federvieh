@@ -6,7 +6,7 @@
     UseForm="/etc/reports/Zuchtbuch.pfrm"
     StrictParameter="no"
     AR="user" Content="__('Zuchtbuch')" Difficulty="basic" 
-    DataSource="Zuchtbuch({jahr},{ext_breed})"
+    DataSource="Zuchtbuch({jahr},{_exportfilter})"
     StyleSheet="/etc/apiis.css" 
     PageFooter="All_Pages" PageHeader="All_Pages"/>
   <Detail Name="Detail_0">
