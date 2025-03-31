@@ -22,6 +22,22 @@ use POSIX qw(strftime);
 use Time::Local;
 our $apiis;
 
+sub CheckDate {
+    my $vdate=shift;
+
+    #-- wenn Tag nur einstellig
+    if ($vdate=~/^.\./) {
+        $vdate='0'.$vdate;
+    }
+    if ($vdate=~/^.*\..\./) {
+        $vdate=~s/^(.*?)\.(.)(\..*)/$1.0$2$3/g;
+    }
+    if ($vdate=~/\...$/) {
+        $vdate=~s/^(.*)\.(..)$/$1.20$2/g;
+    }
+
+    return $vdate;
+}
 sub LO_LS21_Vorwerkhuehner {
     my $self     = shift;
     my $args     = shift;
@@ -99,7 +115,18 @@ sub LO_LS21_Vorwerkhuehner {
                 $data[3]='VWH8(Hü)';
             }
 
-            ($vyear)=($data[4]=~/^(..)/);
+            $data[12]=CheckDate($data[12]); 
+            $data[18]=CheckDate($data[18]); 
+            $data[27]=CheckDate($data[27]); 
+
+            if (!$vyear) {
+                ($vyear)=($data[4]=~/^(..)/);
+            }
+
+            #-- wenn ZuchtstammID ohne Jahr, dann Jahr aus Schlupfdatum lesen 
+            if ((!$vyear) and ($data[12] ne '')) {
+                ($vyear)=($data[12]=~/^.+?(..)$/);
+            }
 
             #-- Kükennummer setzen, wenn diese leer und Bundesringnummer nicht dem Format folgt
             if ((($data[13] eq '') or ($data[13] eq $data[8])) and ($data[16]!~/^\D{1,2}\d{1,}$/)) {
@@ -108,7 +135,6 @@ sub LO_LS21_Vorwerkhuehner {
             if ($data[16]!~/^\D{1,2}\d{1,}$/) {
                 $data[16]='';
             }
-
 #            if ($data[12] eq '') {
 #                $data[12]='01.01.20'.$vyear ;
 #            }
@@ -218,44 +244,49 @@ sub LO_LS21_Vorwerkhuehner {
 
         #Zähler für debugging 
         $z++;
+
         #-- Daten aus Hash holen
         foreach (keys %{ $record->{ 'data' } }) {
             $args->{$_}=$record->{ 'data' }->{$_}->{'value'};
         }
+       
+
+        if ( ($args->{'schlupf'} ne '') and ( $args->{'ext_parent'} ne '') and ($args->{ 'ext_forster' } ne '')) {
+            my $vzst=$args->{ 'ext_forster' }.':::'.$args->{'ext_parent'}.':::'.$args->{'schlupf'};
+
+            #-- Zuchtstamm initialisieren 
+            $zst->{$vzst}={'ZSt-Schlupf-Anzahl-Geschlüpft'    =>undef,
+                        'ZSt-Schlupf-Anzahl-Klarei'        =>undef, 
+                        'ZSt-Schlupf-Anzahl-Absterber'     =>undef, 
+                        'ZSt-Schlupf-Anzahl-Steckenbleiber'=>undef, 
+                        'ZSt-Schlupf-Anzahl-Unbekannt'     =>undef, 
+                        'ZSt-Schlupf-Eigewicht'            =>0,
+                        'ZSt-Schlupf-Anzahl-Eiablage'      =>0,
+                        'SchlupfDt'              =>undef,
+                        'event'                  =>undef,
+                        'ext_unit'               =>$args->{'ext_unit_parent'},
+                        'ext_id'                 =>$args->{'ext_id_parent'},
+                        'ext_animal'             =>$args->{'ext_parent'},
+                        'ext_unit_event'         => $args->{'ext_unit_location_fo'},
+                        'ext_id_event'           => $args->{'ext_forster'},
+                        'ext_standard_events_id' => $args->{'event_schlupf'},
+                        'db_parents'             => undef, 
+                        'erledigt'               => undef
+            } if (!exists ($zst->{$vzst}) );
+
+            $zst->{$vzst}->{'ZSt-Schlupf-Anzahl-Eiablage'}++; 
         
-        my $vzst=$args->{ 'ext_forster' }.':::'.$args->{'ext_parent'}.':::'.$args->{'schlupf'};
+            #-- Schlupfdatum überschreiben, wenn leer
+            $zst->{$vzst}->{'SchlupfDt'}=$args->{'schlupfdatum'} if ($args->{'schlupfdatum'} and !$zst->{$vzst}->{'SchlupfDt'});
 
-        #-- Zuchtstamm initialisieren 
-        $zst->{$vzst}={'ZSt-Schlupf-Anzahl-Geschlüpft'    =>undef,
-                       'ZSt-Schlupf-Anzahl-Klarei'        =>undef, 
-                       'ZSt-Schlupf-Anzahl-Absterber'     =>undef, 
-                       'ZSt-Schlupf-Anzahl-Steckenbleiber'=>undef, 
-                       'ZSt-Schlupf-Anzahl-Unbekannt'     =>undef, 
-                       'ZSt-Schlupf-Eigewicht'            =>0,
-                       'ZSt-Schlupf-Anzahl-Eiablage'      =>0,
-                       'SchlupfDt'              =>undef,
-                       'event'                  =>undef,
-                       'ext_unit'               =>$args->{'ext_unit_parent'},
-                       'ext_id'                 =>$args->{'ext_id_parent'},
-                       'ext_animal'             =>$args->{'ext_parent'},
-                       'ext_unit_event'         => $args->{'ext_unit_location_fo'},
-                       'ext_id_event'           => $args->{'ext_forster'},
-                       'ext_standard_events_id' => $args->{'event_schlupf'},
-                       'db_parents'             => undef, 
-                       'erledigt'               => undef
-        } if (!exists ($zst->{$vzst}));
-
-        $zst->{$vzst}->{'ZSt-Schlupf-Anzahl-Eiablage'}++; 
-    
-        $zst->{$vzst}->{'SchlupfDt'}=$args->{'schlupfdatum'} if ($args->{'schlupfdatum'} and !$zst->{$vzst}->{'SchlupfDt'});
-
-        $zst->{$vzst}->{'ZSt-Schlupf-Anzahl-Geschlüpft'}++     if ($args->{'schlupfergebnis'} eq '1'); 
-        $zst->{$vzst}->{'ZSt-Schlupf-Anzahl-Klarei'}++         if ($args->{'schlupfergebnis'} eq '2'); 
-        $zst->{$vzst}->{'ZSt-Schlupf-Anzahl-Absterber'}++      if ($args->{'schlupfergebnis'} eq '3'); 
-        $zst->{$vzst}->{'ZSt-Schlupf-Anzahl-Steckenbleiber'}++ if ($args->{'schlupfergebnis'} eq '4'); 
-        $zst->{$vzst}->{'ZSt-Schlupf-Anzahl-Unbekannt'}++      if ($args->{'schlupfergebnis'} eq '9'); 
+            $zst->{$vzst}->{'ZSt-Schlupf-Anzahl-Geschlüpft'}++     if ($args->{'schlupfergebnis'} eq '1'); 
+            $zst->{$vzst}->{'ZSt-Schlupf-Anzahl-Klarei'}++         if ($args->{'schlupfergebnis'} eq '2'); 
+            $zst->{$vzst}->{'ZSt-Schlupf-Anzahl-Absterber'}++      if ($args->{'schlupfergebnis'} eq '3'); 
+            $zst->{$vzst}->{'ZSt-Schlupf-Anzahl-Steckenbleiber'}++ if ($args->{'schlupfergebnis'} eq '4'); 
+            $zst->{$vzst}->{'ZSt-Schlupf-Anzahl-Unbekannt'}++      if ($args->{'schlupfergebnis'} eq '9'); 
+        }
     }
-
+   
     $z=0;
     #-- Schleife über alle Records und INFO füllen
     foreach my $record ( @{ $json->{ 'recordset' } } ) {
@@ -270,9 +301,9 @@ sub LO_LS21_Vorwerkhuehner {
             $args->{$_}=$record->{ 'data' }->{$_}->{'value'};
         }
 #print $z."\n";
-#if ($z==622) {
-#    print "kk";
-#}
+if ($z==29) {
+    print "kk";
+}
         #-- Datenbehandlung=Erweiterung um Jahr, wenn zweistellig  
         foreach my $vd ('schlupfdatum','abgangsdatum') {
             
@@ -301,7 +332,7 @@ sub LO_LS21_Vorwerkhuehner {
         }
    
         #-- Default setzen 
-        if (!$args->{'schlupf'}) {
+        if (!defined $args->{'schlupf'}) {
             $args->{'schlupf'}=0;
 
             my $a= Apiis::Errors->new(
@@ -312,7 +343,7 @@ sub LO_LS21_Vorwerkhuehner {
                         msg_short  =>"Kein Schlupf definiert => wird auf '0' gesetzt."
                     );
             
-            push(@{$record->{'data'}->{ 'text_sex' }->{'warnings'}},$a); 
+            push(@{$record->{'data'}->{ 'schlupf' }->{'warnings'}},$a); 
         }
 
         my $vzst=$args->{ 'ext_forster' }.':::'.$args->{'ext_parent'}.':::'.$args->{'schlupf'};
@@ -329,7 +360,7 @@ sub LO_LS21_Vorwerkhuehner {
                         msg_short  =>"Kein Schlupfdatum definiert => gesamter Datensatz wird ignoriert."
                     );
             
-            push(@{$record->{'data'}->{ 'text_sex' }->{'errorss'}},$a);
+            push(@{$record->{'data'}->{ 'schlupf' }->{'errors'}},$a);
 
             goto EXIT;
         }
@@ -427,8 +458,8 @@ sub LO_LS21_Vorwerkhuehner {
         }
 
         if (!$zst->{$vzst}->{'erledigt'}) {
+
             $zst->{$vzst}->{'erledigt'}=1;
-            
             
             #-- Leistungen wegschreiben
             #-- Event erzeugen
@@ -467,7 +498,8 @@ sub LO_LS21_Vorwerkhuehner {
                                     'ext_bezug' => 'Zuchtstamm',
                                     'variant'   => 1,
                                     'ext_trait' => $trait,
-                                    'result'    => $zst->{$vzst}->{ $trait } 
+                                    'result'    => $zst->{$vzst}->{ $trait }, 
+                                    'ext_event' => 'Aufzüchter: '.$args->{'ext_forster'}.', Datum: '.$zst->{$vzst}->{'SchlupfDt'}
                                     },
                                     'y');
             
@@ -1017,45 +1049,48 @@ sub LO_LS21_Vorwerkhuehner {
             
             if ($apiis->status) {                    
                 push(@{$record->{'data'}->{ $ext_fielde }->{'errors'}},$apiis->errors); 
+                push(@{$record->{'data'}->{ $ext_field  }->{'errors'}},$apiis->errors); 
                 $apiis->status(1);
                 $apiis->del_errors;
             }
             elsif ($db_event) {
                 if ($exists) {
                     $record->{'data'}->{ $ext_fielde }->{'status'}='3';
+                    $record->{'data'}->{ $ext_field  }->{'status'}='3';
                 }
                 else {
                     $record->{'data'}->{ $ext_fielde }->{'status'}='0';
+                    $record->{'data'}->{ $ext_field  }->{'status'}='0';
                 }    
-            }
 
-            my $guid;
-            ($guid,$exists)=GetDbPerformance({
-                                'db_animal' => $db_animal,
-                                'db_event'  => $db_event,
-                                'ext_trait' => $trait,
-                                'ext_method'=> $targs->{'ext_methode'},
-                                'ext_bezug' => $targs->{'ext_bezug'},
-                                'variant'   => $targs->{'variant'},
-                                'ext_trait' => $targs->{'ext_trait'},
-                                'result'    => $result,
-                                'sample'    => $targs->{'sample'}
-                                },
-                                'y');
-            
-            if (!$guid) {
-                push(@{$record->{'data'}->{ $ext_field }->{'errors'}},$apiis->errors); 
-               
-                $record->{'data'}->{$ext_field}->{'status'}='2';
-                $apiis->status(1);
-                $apiis->del_errors;
-            }
-            if ($guid) {
-                if ($exists) {
-                    $record->{'data'}->{$ext_field}->{'status'}='3';
+                my $guid;
+                ($guid,$exists)=GetDbPerformance({
+                                    'db_animal' => $db_animal,
+                                    'db_event'  => $db_event,
+                                    'ext_trait' => $trait,
+                                    'ext_method'=> $targs->{'ext_methode'},
+                                    'ext_bezug' => $targs->{'ext_bezug'},
+                                    'variant'   => $targs->{'variant'},
+                                    'ext_trait' => $targs->{'ext_trait'},
+                                    'result'    => $result,
+                                    'sample'    => $targs->{'sample'}
+                                    },
+                                    'y');
+                
+                if (!$guid) {
+                    push(@{$record->{'data'}->{ $ext_field }->{'errors'}},$apiis->errors); 
+                
+                    $record->{'data'}->{$ext_field}->{'status'}='2';
+                    $apiis->status(1);
+                    $apiis->del_errors;
                 }
-                else {
-                    $record->{'data'}->{$ext_field}->{'status'}='0';
+                if ($guid) {
+                    if ($exists) {
+                        $record->{'data'}->{$ext_field}->{'status'}='3';
+                    }
+                    else {
+                        $record->{'data'}->{$ext_field}->{'status'}='0';
+                    }
                 }
             }
         }
