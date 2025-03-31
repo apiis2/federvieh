@@ -108,12 +108,12 @@ sub LO_LS21_Vorwerkhuehner {
                 $sex='1';
             }
      
-            if ($data[0] eq 'Lothar') {
-                $data[1]='VWH8(Hü)';
-            }
-            if ($data[2] eq 'Lothar') {
-                $data[3]='VWH8(Hü)';
-            }
+#            if ($data[0] eq 'Lothar') {
+#                $data[1]='VWH8(Hü)';
+#            }
+#            if ($data[2] eq 'Lothar') {
+#                $data[3]='VWH8(Hü)';
+#            }
 
             $data[12]=CheckDate($data[12]); 
             $data[18]=CheckDate($data[18]); 
@@ -301,7 +301,7 @@ sub LO_LS21_Vorwerkhuehner {
             $args->{$_}=$record->{ 'data' }->{$_}->{'value'};
         }
 #print $z."\n";
-if ($z==29) {
+if ($z==411) {
     print "kk";
 }
         #-- Datenbehandlung=Erweiterung um Jahr, wenn zweistellig  
@@ -385,9 +385,10 @@ if ($z==29) {
        
         #-- Zuchtstamm holen
         my $guid=undef;
-        $args->{'ext_id_parent'}=$args->{'ext_id_parent'}.'-'.$args->{'schlupfjahr'};
         
-        ($args->{'ext_parent'})=($args->{'ext_parent'}=~/^(\d\d)/);
+        #mue 31.03. raus, Zuchtstämme müssen korrekt übergeben werden. 
+        #$args->{'ext_id_parent'}=$args->{'ext_id_parent'}.'-'.$args->{'schlupfjahr'};
+        #($args->{'ext_parent'})=($args->{'ext_parent'}=~/^(\d\d)/);
 
         ($args->{'db_parents'}, $guid) = GetDbAnimal({  'ext_unit'  =>$args->{'ext_unit_parent'},
                                                         'ext_id'    =>$args->{'ext_id_parent'},
@@ -524,7 +525,8 @@ if ($z==29) {
                             'variant'   => '1',
                             'ext_trait' => 'ZSt-Schlupf-Eigewicht',
                             'result'    => $args->{'eigewicht'},
-                            'sample'    => $args->{'ext_animal_ei'}
+                            'sample'    => $args->{'ext_animal_ei'},
+                            'ext_event' => 'Aufzüchter: '.$args->{'ext_forster'}.', Datum: '.$zst->{$vzst}->{'SchlupfDt'}
                             },
                             'y');
         
@@ -1073,7 +1075,8 @@ if ($z==29) {
                                     'variant'   => $targs->{'variant'},
                                     'ext_trait' => $targs->{'ext_trait'},
                                     'result'    => $result,
-                                    'sample'    => $targs->{'sample'}
+                                    'sample'    => $targs->{'sample'},
+                                    'ext_event' => 'Aufzüchter: '.$args->{'ext_forster'}.', Datum: '.$targs->{'event_dt'}
                                     },
                                     'y');
                 
