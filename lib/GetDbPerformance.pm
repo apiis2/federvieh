@@ -25,8 +25,7 @@ sub GetDbPerformance {
     $args->{'sample'}       =1  if (!exists $args->{'sample'} or (!$args->{'sample'}));
 
     #-- Wenn Nummer unvollstndig ist, dann Fehlerobject erzeugen
-    if (($args->{'db_animal'}        eq '') or 
-        ($args->{'db_event'}  eq '')) {    
+    if (($args->{'db_animal'}        eq '')) {    
 
             $apiis->errors(
                 Apiis::Errors->new(
@@ -34,9 +33,23 @@ sub GetDbPerformance {
                     severity   => 'CRIT',
                     from       => 'LO::GetDbPerformance',
                     ext_fields => ['ext_event'],
-                    msg_short  => "db_animal oder db_event nicht besetzt: "
-                        . $args->{'db_animal'} . ' | '
-                        . $args->{'db_event'} . '',
+                    msg_short  => "Keine Tiernummer vorhanden"
+                )
+            );
+            $apiis->status(1);
+            goto EXIT;
+    }
+
+    #-- Wenn Nummer unvollstndig ist, dann Fehlerobject erzeugen
+    if (($args->{'db_event'}  eq '')) {    
+
+            $apiis->errors(
+                Apiis::Errors->new(
+                    type       => 'DATA',
+                    severity   => 'CRIT',
+                    from       => 'LO::GetDbPerformance',
+                    ext_fields => ['ext_event'],
+                    msg_short  => "Event unvollständig - " . $args->{'ext_event'} 
                 )
             );
             $apiis->status(1);
