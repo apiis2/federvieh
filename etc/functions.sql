@@ -90,9 +90,7 @@ select standard_breeds_id as key, label as value from standard_breeds order by l
 
 CREATE OR REPLACE View ScrollinglistEingrenzungBestand AS  
 select '12' as key, 'Gesamtbestand' as value union
-select 'z', 'Zuchttiere' union
-select 'j', 'Jungtiere'  union
-select 'h', 'Herdbuchtiere'
+select 'z', 'Zuchttiere' 
 ;
 
 CREATE OR REPLACE View ScrollinglistSortierungBestand AS  
