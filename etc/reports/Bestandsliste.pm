@@ -44,11 +44,16 @@ sub Bestandsliste {
 ##############
     $tiergruppe='12'                if (!$tiergruppe);
 
-    $datvon = '01.01.1900'          if (!$datvon or ($datvon eq ''));
-    $datbis = $apiis->today()       if (!$datbis or ($datbis eq ''));
+    if (((!$datvon or ($datvon eq '')) and (!$datbis or ($datbis eq '')))) {
+        $datvon = $apiis->today()       if (!$datvon or ($datvon eq ''));
+        $datbis = $apiis->today()       if (!$datbis or ($datbis eq ''));
+    }
+    else {
+        $datvon = '01.01.1900'          if (!$datvon or ($datvon eq ''));
+        $datbis = $apiis->today()       if (!$datbis or ($datbis eq ''));
+    }
 
     $vaktiv = 'Alle, '              if ( $tiergruppe eq '12');
-    $vaktiv = 'Jungtiere, '         if ( $tiergruppe eq 'j');
     $vaktiv = 'Zuchttiere, '        if ( $tiergruppe eq 'z');
     $farbe  = 1                     if ( $farbe );
     $datum  = 1                     if ( $datum );
@@ -177,12 +182,9 @@ sub Bestandsliste {
             and e.ext_id in ('" . join( "','", @betriebe ) . "') 
         ";
     }
+    
+    #--  Gesamtbestand
     else {
-
-        my $tg=" ext_code='12' ";
-#        $tg=" (ext_code='1' or ext_code='2' or ext_code='9') " if ($tiergruppe eq '12');
-#        $tg=" ( ext_code='1' )" if ($tiergruppe eq 'z');
-#        $tg=" ( ext_code='2'  )" if ($tiergruppe eq 'j');
 
         $sql.=" where   
             /* Tier ist noch aktiv und Zu/Abgang waehrend des Zuchtjahres*/
@@ -195,7 +197,6 @@ sub Bestandsliste {
             (a.exit_dt>='$datvon'::date)) 
                                                                                 
             )
-            /*and b.db_selection in (select db_code from codes where class='EINSTUFUNG' and $tg)*/
             and (e.ext_unit='breeder' or e.ext_unit='owner') 
             and e.ext_id in ('" . join( "','", @betriebe ) . "') 
         ";
