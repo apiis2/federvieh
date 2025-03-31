@@ -21,7 +21,7 @@ sub CheckLO {
         return 'LO_LS01_Zuchtstamm'     if ($v=~/RN-Tier.*?Kükennummer.*?RN-Vater.*?RN-Mutter/);
         return 'LO_LS01_Zuchtstamm'     if ($v=~/Hahn.*?Kükennummer.*?ZuchtstammID.*?Hahn.*?Hennen/);
         return 'LO_LS13_eNest'          if ($v=~/TransponderEPC/);
-        return 'LO_LS21_Vorwerkhuehner' if ($v=~/ZuchtstammID.+?2=Klarei/); 
+        return 'LO_LS21_Vorwerkhuehner' if ($v=~/Züchter-Na.*?Züchter-Nr.*?Aufzüchter-Na.*?Aufzüchter-N.*?ZuchtstammID.*?Ring-Nr. Vater.*?Ring-Nr. Mutter.*?Schlupf.*?Ei- Nr.*?Legetag.*?Gew.-gr.*?Schlupf-ergeb.*?Schlupf-datum.*?Küken-marke.*?Schlupfgewicht.*?Geschlecht.*?Ring-Nr.*?Abgangs-ursache.*?Abgangs-datum.*?KG.*?2.Wo.*?KG.*?10.Wo.*?KG.*?20.Wo.*?Eindruck.*?Phänotyp.*?Gesamt.*?Zucht.*?KG.*?Bewertungstag.*?Bewertungsdatum/); 
         return 'LO_LS30_Merkmale'       if ($v=~/Variante.+?Bezug.+?Methode/);
         return 'LO_LS31_Rasseschemas'   if ($v=~/Schemaname.+?Rassen/);
         return 'LO_LS32_Eventschemas'   if ($v=~/Merkmalsschema.+?Rasseschema/);
@@ -33,7 +33,7 @@ sub CheckLO {
 
 #-- upload a general ascii-file
 sub FileUpload {
-    my ($self,$filename,$LO_old,$onlycheck) = @_;
+    my ($self,$filename,$LO_old,$onlycheck,$vjahr,$printError) = @_;
     
     my ($json,$LO);
 
@@ -48,6 +48,8 @@ sub FileUpload {
     $args->{'data'}     = [];
     $args->{'onlycheck'} = $onlycheck;
     $args->{'fileimport'}=1 ;
+    $args->{'jahr'}=$vjahr ;
+    $args->{'printError'}=$printError ;
 
     #-- Check LO
     open( IN, "$filename" ) || die "error: kann $filename nicht öffnen";
