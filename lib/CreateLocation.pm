@@ -67,7 +67,7 @@ sub CreateLocation {
     $locations->column( 'db_entry_action' )->extdata( $args->{'ext_entry_action'} );
     $locations->column( 'db_entry_action' )->ext_fields( 'ext_entry_action' );
 
-    if ($args->{'exit_dt'} ) {
+    if (exists $args->{'exit_dt'} and ($args->{'exit_dt'}) ) {
         #-- Exit-Datum = Schlachtdatum
         $locations->column( 'exit_dt' )->extdata( $args->{'exit_dt'} );
         $locations->column( 'exit_dt' )->ext_fields( 'exit_dt' );
