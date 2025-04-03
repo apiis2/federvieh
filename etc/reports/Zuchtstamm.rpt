@@ -2,7 +2,7 @@
 <!DOCTYPE GUI PUBLIC "1" "report.dtd">
 <Report>
   <General
-    DataSource="GetData()"
+    DataSource="Zuchtstamm({_breeder},{_onlyactive})"
     CreatePDF="pdf()"
     UseForm="/etc/forms/Zuchtstamm.pfrm"
     Name="Zuchtstammliste" PageFooter="All_Pages" PageHeader="All_Pages"/>

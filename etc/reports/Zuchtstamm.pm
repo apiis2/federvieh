@@ -1,16 +1,34 @@
 use lib $apiis->APIIS_HOME."/federvieh/lib";
 use SQLStatements;
 
-sub GetData {
+sub Zuchtstamm {
     my $self = shift;
     my $ext_unit = shift;  
+    my $onlyactive=shift;
 
     my $sql="Set datestyle to 'german'";
     my $sql_ref = $apiis->DataBase->sys_sql($sql);
-    
-    my $sql="select distinct user_get_ext_id_animal(a.db_parents),b.opening_dt, b.guid from parents a inner join transfer b on b.db_animal=a.db_parents order by b.opening_dt desc;";
+   
+    $like=' = ';
+    if ($ext_unit=~/%/) {
+        $like= ' like ';    
+    }
 
-    my $sql_ref = $apiis->DataBase->sys_sql($sql);
+    my $sql="select distinct user_get_ext_id_animal(a.db_parents),b.opening_dt, 1,b.closing_dt from parents a 
+             inner join transfer  b on b.db_animal=a.db_animal 
+             inner join locations c on b.db_animal=c.db_animal where 1=1";
+
+    if ($ext_unit) {
+        $sql.=" and c.db_location in (select a.db_location from locations a inner join unit b on a.db_location=b.db_unit where b.ext_id $like '$ext_unit')";
+    }
+
+    if ($onlyactive) {
+        $sql.=" and b.closing_dt isnull "
+    }
+    
+    $sql.=" order by b.opening_dt desc;";
+
+     $sql_ref = $apiis->DataBase->sys_sql($sql);
     if ($sql_ref->status == 1) {
         $apiis->status(1);
         $apiis->errors($sql_ref->errors);
@@ -26,24 +44,30 @@ sub GetData {
         $zuchtstamm->{ext_zuchtstamm}=[$q->[0]];
         
         my $data=[];
-        push(@$data,$q->[2]) if ($q->[2]);
-        $zuchtstamm->{Kommunikation}=[join(', ',@$data)] if ($#{$data}>-1);
-        
-        my $data=[];
         push(@$data,$q->[1]) if ($q->[1]);
-        $zuchtstamm->{Bank}=[join(', ',@$data)] if ($#{$data}>-1);
+        push(@$data,$q->[3]) if ($q->[3]);
+        $zuchtstamm->{opening_dt}=[join(', ',@$data)] if ($#{$data}>-1);
         
         $zuchtstamm->{Kategorie}=[];
         $ar_daten[$i]=$zuchtstamm;
         $i++;
     }
 
-    my $sql;
-    if (!$ext_unit or ($ext_unit eq 'Alle Gruppen')) {
-        $sql="select user_get_ext_id_animal(a.db_parents), user_get_ext_id_animal(a.db_animal),user_get_ext_sex_of(a.db_animal), a.guid from parents a"
+    $sql="select distinct user_get_ext_id_animal(a.db_parents), user_get_ext_id_animal(a.db_animal),user_get_ext_sex_of(a.db_animal) as sex  from parents a 
+             inner join transfer  b on b.db_animal=a.db_animal 
+             inner join locations c on b.db_animal=c.db_animal where 1=1";
+
+    if ($ext_unit) {
+        $sql.=" and c.db_location in (select a.db_location from locations a inner join unit b on a.db_location=b.db_unit where b.ext_id $like '$ext_unit')";
     }
- 
-    my $sql_ref = $apiis->DataBase->sys_sql($sql);
+
+    if ($onlyactive) {
+        $sql.=" and b.closing_dt isnull "
+    }
+    
+    $sql.=" order by sex;";
+
+    $sql_ref = $apiis->DataBase->sys_sql($sql);
     if ($sql_ref->status == 1) {
         $apiis->status(1);
         $apiis->errors($sql_ref->errors);
@@ -59,7 +83,7 @@ sub GetData {
         push(@ar_daten, $zuchtstamm);    
     }
 
-    return \@ar_daten;
+    return \@ar_daten, {'breeder'=>$ext_unit, 'onlyactive'=>$onlyactive};
 }
 
 
@@ -108,16 +132,12 @@ sub pdf {
   # rffr
   foreach my $adr ( @{$data} ) {
     my @zuchtstamm = @{$adr->{'ext_zuchtstamm'}};
-    my @kommunikation = @{$adr->{'Kommunikation'}};
     my @status =  @{$adr->{'Status'}};
     my @kategorie =  @{$adr->{'Kategorie'}};
-    my @bank =  @{$adr->{'Bank'}};
+    my @opening_dt =  @{$adr->{'opening_dt'}};
     map { $_ = Apiis::Misc::MaskForLatex( $_ ) } @zuchtstamm;
     map { $_ = Apiis::Misc::MaskForLatex( $_ ) } @ext_zuchtstamm;
-    map { $_ = Apiis::Misc::MaskForLatex( $_ ) } @kommunikation;
-    map { $_ = Apiis::Misc::MaskForLatex( $_ ) } @status;
     map { $_ = Apiis::Misc::MaskForLatex( $_ ) } @kategorie;
-    map { $_ = Apiis::Misc::MaskForLatex( $_ ) } @bank;
 
     # my $outkat = join( ' \\newline ', @kategorie );
     my $outkat;
@@ -134,8 +154,8 @@ sub pdf {
 ";
     $self->{'_longtablecontent'} .=  " \\rule[0mm]{0mm}{0mm}\n";
     $self->{'_longtablecontent'} .= "\\textbf{@zuchtstamm } \n" if ( @zuchtstamm );
-    $self->{'_longtablecontent'} .= "  \\newline gültig ab: @bank   \n" if ( @bank );
-    $self->{'_longtablecontent'} .= "  \\newline Status: @status   \n" if ( @status );
+    $self->{'_longtablecontent'} .= "  \\newline gültig ab: $opening_dt[0]   \n";
+    $self->{'_longtablecontent'} .= "  \\newline gültig bis: $opening_dt[1]   \n";
     $self->{'_longtablecontent'} .= "\\end{minipage}\\hspace{5mm}\n";
 
     $self->{'_longtablecontent'} .=  "\\begin{minipage}[t]{90mm}";
@@ -148,7 +168,7 @@ sub pdf {
 #     $self->{'_longtablecontent'} .=  " \n";
 #     $self->{'_longtablecontent'} .= " @zuchtstamm & \\hfill {\\bf @ext_zuchtstamm }\\\\[4mm]  \n";
 #     $self->{'_longtablecontent'} .= " @kommunikation &  \\\\  \n" if ( @kommunikation );
-#     $self->{'_longtablecontent'} .= " @bank &  \\\\  \n" if ( @bank );
+#     $self->{'_longtablecontent'} .= " @opening_dt &  \\\\  \n" if ( @opening_dt );
 #     $self->{'_longtablecontent'} .= " @Status & $outkat \\\\  \n";
 #     $self->{'_longtablecontent'} .= "\\end{tabular*} \n\n \\vspace{2mm}";
 
