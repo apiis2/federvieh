@@ -15,8 +15,8 @@ sub Zuchtstamm {
     }
 
     my $sql="select distinct user_get_ext_id_animal(a.db_parents),b.opening_dt, 1,b.closing_dt from parents a 
-             inner join entry_transfer  b on b.db_animal=a.db_animal 
-             inner join locations c on b.db_animal=c.db_animal where 1=1";
+             inner join transfer  b on b.db_animal=a.db_parents 
+             inner join locations c on a.db_animal=c.db_animal where 1=1";
 
     if ($ext_unit) {
         $sql.=" and c.db_location in (select a.db_location from locations a inner join unit b on a.db_location=b.db_unit where b.ext_id $like '$ext_unit')";
@@ -54,8 +54,8 @@ sub Zuchtstamm {
     }
 
     $sql="select distinct user_get_ext_id_animal(a.db_parents), user_get_ext_id_animal(a.db_animal),user_get_ext_sex_of(a.db_animal) as sex  from parents a 
-             inner join entry_transfer  b on b.db_animal=a.db_animal 
-             inner join locations c on b.db_animal=c.db_animal where 1=1";
+             inner join transfer  b on b.db_animal=a.db_parents 
+             inner join locations c on a.db_animal=c.db_animal where 1=1";
 
     if ($ext_unit) {
         $sql.=" and c.db_location in (select a.db_location from locations a inner join unit b on a.db_location=b.db_unit where b.ext_id $like '$ext_unit')";
@@ -122,6 +122,11 @@ sub pdf {
 
   $self->{'_longtablecontent'} .= $latex_header;
   my $breeder=$data->{'breeder'};
+  
+  if (!$breeder) {
+      $breeder='Alle';
+  }
+
   $breeder = Apiis::Misc::MaskForLatex( $breeder);
   
   my $onlyactive='';
