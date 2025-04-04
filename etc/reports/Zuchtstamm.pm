@@ -15,7 +15,7 @@ sub Zuchtstamm {
     }
 
     my $sql="select distinct user_get_ext_id_animal(a.db_parents),b.opening_dt, 1,b.closing_dt from parents a 
-             inner join transfer  b on b.db_animal=a.db_animal 
+             inner join entry_transfer  b on b.db_animal=a.db_animal 
              inner join locations c on b.db_animal=c.db_animal where 1=1";
 
     if ($ext_unit) {
@@ -29,7 +29,7 @@ sub Zuchtstamm {
     $sql.=" order by b.opening_dt desc;";
 
      $sql_ref = $apiis->DataBase->sys_sql($sql);
-    if ($sql_ref->status == 1) {
+    if ($sql_ref->status and ($sql_ref->status == 1)) {
         $apiis->status(1);
         $apiis->errors($sql_ref->errors);
         return;
@@ -54,7 +54,7 @@ sub Zuchtstamm {
     }
 
     $sql="select distinct user_get_ext_id_animal(a.db_parents), user_get_ext_id_animal(a.db_animal),user_get_ext_sex_of(a.db_animal) as sex  from parents a 
-             inner join transfer  b on b.db_animal=a.db_animal 
+             inner join entry_transfer  b on b.db_animal=a.db_animal 
              inner join locations c on b.db_animal=c.db_animal where 1=1";
 
     if ($ext_unit) {
@@ -68,7 +68,7 @@ sub Zuchtstamm {
     $sql.=" order by sex;";
 
     $sql_ref = $apiis->DataBase->sys_sql($sql);
-    if ($sql_ref->status == 1) {
+    if ($sql_ref->status and ($sql_ref->status == 1)) {
         $apiis->status(1);
         $apiis->errors($sql_ref->errors);
         return;
@@ -83,14 +83,13 @@ sub Zuchtstamm {
         push(@ar_daten, $zuchtstamm);    
     }
 
-    return \@ar_daten, {'breeder'=>$ext_unit, 'onlyactive'=>$onlyactive};
+    return {'daten'=>\@ar_daten, 'breeder'=>$ext_unit, 'onlyactive'=>$onlyactive};
 }
 
 
 sub pdf {
   my $self =shift;
   my $data = shift;
-  my $structure = shift;
 
   #use Data::Dumper;
   #print "++++>".Dumper($data)."<++++\n";
@@ -122,15 +121,22 @@ sub pdf {
 ';
 
   $self->{'_longtablecontent'} .= $latex_header;
+  my $breeder=$data->{'breeder'};
+  $breeder = Apiis::Misc::MaskForLatex( $breeder);
+  
+  my $onlyactive='';
+  if ($data->{'onlyactive'}) {
+        $breeder.=", nur aktive Zuchtstämme";
+  }
 
   $self->{'_longtablecontent'} .= "\\lhead{ }
-           \\chead{\\textbf{Zuchtstämme} }
+           \\chead{\\textbf{Zuchtstämme (Züchter: ".$breeder.")} }
            \\rhead{\\today\\\\Seite: \\thepage}
            \\lfoot{\\tiny }
            \\cfoot{}\n\n";
 
   # rffr
-  foreach my $adr ( @{$data} ) {
+  foreach my $adr ( @{$data->{'daten'}} ) {
     my @zuchtstamm = @{$adr->{'ext_zuchtstamm'}};
     my @status =  @{$adr->{'Status'}};
     my @kategorie =  @{$adr->{'Kategorie'}};
