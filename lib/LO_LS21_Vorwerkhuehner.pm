@@ -234,6 +234,8 @@ sub LO_LS21_Vorwerkhuehner {
     #-- Ab hier ist es egal, ob die Daten aus einer Datei
     #   oder aus einer Maske kommen
 
+    my $sql_refdat = $apiis->DataBase->sys_sql( "Set datestyle to 'german'");
+
     my $zst={};
 
     #-- Daten für den Zuchtstamm sammeln 
