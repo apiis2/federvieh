@@ -18,7 +18,7 @@ use Federvieh;
 
 ####################################################################
 #perl -d GUI '{"form":"/home/b08mueul/apiis/federvieh/etc/forms/Ladestroeme/LS01_Zuchtstammmeldung.frm","data":[{"ext_animal6":["","",""],"ext_zuchtstamm":["1","",""],"ext_animal1":["19K2","",""],"ext_animal3":["","",""],"ext_animal5":["","",""],"ext_animal7":["","",""],"opening_dt":["01.01.2022","",""],"ext_id_zuchtstamm":["C361H-22","",""],"ext_animal8":["","",""],"ext_animal9":["","",""],"ext_animal11":["","",""],"ext_animal2":["18LO243","",""],"ext_animal4":["","",""],"ext_animal10":["","",""]}],"info":"","result":{"error":"","insert":"","update":""},"command":"do_save_block","sid":"9de09bc8c91da48a58784ab366d44290","formtype":"apiisajax"}';
-
+#perl -d GUI '{"form":"/home/b08mueul/apiis/federvieh/etc/forms/Ladestroeme/LS01_Zuchtstammmeldung.frm","data":[{"ext_animal9":["","",""],"ext_animal10":["","",""],"ext_animal7":["","",""],"ext_animal5":["","",""],"ext_animal11":["","",""],"ext_animal3":["","",""],"ext_id_zuchtstamm":["L400H","",""],"ext_animal8":["","",""],"ext_animal4":["","",""],"ext_animal1":["23JA873","",""],"ext_animal2":["22JJ831","",""],"ext_zuchtstamm":["2024a","",""],"ext_animal6":["","",""],"opening_dt":["07.04.2024","",""]}],"sid":"2a2d53f0b89acfa027b3ccb9029217d3","info":"","result":{"update":"0","errors":"0","insert":"1"},"errors":[null],"command":"do_save_block","form":"/home/b08mueul/apiis/federvieh/etc/forms/Ladestroeme/LS01_Zuchtstammmeldung.frm","formtype":"apiisajax"}';
 our $apiis;
 
 sub _get_triplet {
@@ -337,7 +337,7 @@ sub LO_LS01a_Zuchtstamm {
 
             $args->{$ext_animal}=uc($args->{$ext_animal});
 
-            if (($args->{$ext_animal} ne '') and ($args->{$ext_animal}!~/\d\d[a-zA-Z]+\d{1,5}/)) {
+            if (($args->{$ext_animal} ne '') and ($args->{$ext_animal}!~/\d\d[a-zA-Z]{1,2}\d{1,5}/)) {
            
                 $self->status(1);
                 $self->errors(
@@ -403,8 +403,33 @@ sub LO_LS01a_Zuchtstamm {
                         push(@{$hs_breed{$q->[0]}},$args->{$ext_animal});    
                         push(@{$hs_sex{$q->[1]}},  $args->{$ext_animal});    
                     }
+            
+                    #-- Check, ob Tier noch in einem anderen offenen Zuchtstamm ist
+                    my $open_zuchtstamm;
+
+                    $sql="select user_get_ext_id_animal(a.db_parents) from parents a inner join transfer b on a.db_parents=b.db_animal where closing_dt isnull and a.db_animal=user_get_db_animal('bundesring','BDRG', '$args->{$ext_animal}')";
+
+                    $sql_ref=$apiis->DataBase->sys_sql( $sql);
+
+                    while ( my $q = $sql_ref->handle->fetch ) {
+                        $open_zuchtstamm=$q->[0];
+                    }
+                    
+                    if ($open_zuchtstamm ) {
+                        my $error= Apiis::Errors->new(
+                                type       => 'DATA',
+                                severity   => 'CRIT',
+                                from       => 'LS01a_Zuchtstamm',
+                                ext_fields => [$ext_animal],
+                                msg_short  => "Tier: bundesring|BDRG|$args->{$ext_animal} ist noch im aktiven Zuchtstamm $open_zuchtstamm registriert. Zuchtstamm schließen."
+                        );
+
+                        $self->status(1);
+                        $self->errors($error);
+                        $rollback=1;
+                    }  
                 }
-            }    
+            } 
         } 
         #-- Check Anzahl Hähne
         if (!exists $hs_sex{'1'}) {
@@ -483,7 +508,7 @@ sub LO_LS01a_Zuchtstamm {
             my  ($cnt_parents, $db_parents);
 
             #-- gibt es den Zuchtstamm in transfer und wieviel Tiere hat er in parents? 
-            my $sql="select a.db_animal, count(b.db_parents) from transfer a 
+            my $sql="select a.db_animal, count(b.db_parents) from entry_transfer a 
                 left outer join parents b on a.db_animal=b.db_parents
                 inner join unit c on a.db_unit=c.db_unit
                 where c.ext_unit='zuchtstamm' and c.ext_id='$args->{'ext_id_zuchtstamm'}' and a.ext_animal='$args->{'ext_zuchtstamm'}'
@@ -555,8 +580,18 @@ sub LO_LS01a_Zuchtstamm {
                     }
                 }
             }
-            else {
-                #-- Fehler
+            else { 
+                my $error= Apiis::Errors->new(
+                        type       => 'DATA',
+                        severity   => 'CRIT',
+                        from       => 'LS01a_Zuchtstamm',
+                        ext_fields => ['ext_zuchtstamm'],
+                        msg_short  => "Der Zuchtstamm ($args->{'ext_id_zuchtstamm'}|$args->{'ext_zuchtstamm'}) ist noch aktiv. Tiere können zu aktiven Zuchtstämmen nicht hinzugefügt werden."
+                );
+
+                $self->status(1);
+                $self->errors($error);
+                $rollback=1;
             }
         }
         
