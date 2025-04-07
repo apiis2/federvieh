@@ -65,7 +65,7 @@
     </Image>
 
     <Field Name="ZSVField_82ba2">
-      <Button ButtonLabel="Zuchtstamm schlie&amp;szen" URL="transfer_zst.pfrm" Command="do_open_form"/>
+      <Button ButtonLabel="Zuchtstamm schlie&amp;szlig;en" URL="transfer_zst.pfrm" Command="do_open_form"/>
       <Position Column="1" Row="3"/>
       <Miscellaneous/>
       <Text FontSize="12px" TextAlign="center"/>
