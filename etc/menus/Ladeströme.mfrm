@@ -36,7 +36,7 @@
     </Field>
 
     <Field Name="LOVLO1">
-      <Button ButtonLabel="Zuchtstamm anlegen" URL="Ladestroeme/LS01_Zuchtstammmeldung.frm" Command="do_open_form"/>
+      <Button ButtonLabel="Zuchtstamm anlegen (nur Bundesring-Nummern)" URL="Ladestroeme/LS01_Zuchtstammmeldung_nur_BDRG.frm" Command="do_open_form"/>
       <Position Row="3" Column="1"/>
       <Miscellaneous/>
       <Text FontSize="12px" TextAlign="center"/>
@@ -44,8 +44,17 @@
       <Format BorderStyle="groove" BorderColor="lightgray"/>
     </Field>
 
+    <Field Name="LOVLO1a">
+      <Button ButtonLabel="Zuchtstamm anlegen (alle Nummernsysteme)" URL="Ladestroeme/LS01_Zuchtstammmeldung.frm" Command="do_open_form"/>
+      <Position Row="4" Column="1"/>
+      <Miscellaneous/>
+      <Text FontSize="12px" TextAlign="center"/>
+      <Color BackGround="#ffc600"/>
+      <Format BorderStyle="groove" BorderColor="lightgray"/>
+    </Field>
+
     <Image Name="Image_71ca2" Alt="Test" Src="/icons/blank1.gif">
-       <Position Column="2" Row="2" Width="1px"/>
+       <Position Column="2" Row="5" Width="1px"/>
        <Color BackGround="white" />
        <Format MarginTop="30px"/>
     </Image>
