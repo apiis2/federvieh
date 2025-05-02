@@ -80,47 +80,14 @@ sub LO_LS02 {
     #   einen JSON-String, damit einheitlich weiterverarbeitet werden kann
     if ( $fileimport ) {
 
-        #-- Datei öffnen
-        open( IN, "$fileimport" ) || die "error: kann $fileimport nicht öffnen";
+        foreach my $dd (@{$args->{'data'}} ) {
 
-        $json = { 'Info'        => [],
-                  'RecordSet'   => [],
-                  'Bak'         => [],
-                };
-        
-        #-- Excel-Tabelle öffnen 
-        my $book = Spreadsheet::Read->new ($fileimport, dtfmt => "dd.mm.yyyy");
-        my $sheet = $book->sheet (1);
+            $zeile++;
 
-        #-- Fehlermeldung, wenn es nicht geht 
-        if(defined $book->[0]{'error'}){
-            print "Error occurred while processing $fileimport:".
-                $book->[0]{'error'}."\n";
-            exit(-1);
-        }
-        
-        my $max_rows = $sheet->{'maxrow'};
-        my $max_cols = $sheet->{'maxcol'};
+            my $fields=[];
+            my $record={};
+            my @data=@$dd;
 
-        #--Schleife über alle Zeilen 
-        for my $row_num (1..($max_rows))  {
-
-            #-- declare
-            my @data;
-            my $record;
-            my $sdata;
-            my $hs = {}; 
-            my $col='A';
-
-            #-- Schleife über alle Spalten       
-            for my $col_num (1..($max_cols)){
-
-                #-- einen ";" String erzeugen  
-                push(@data, encode_utf8 $sheet->{$col.$row_num});
-            
-                $col++;
-            }
-      
             #-- initialisieren mit '' 
             map { if (!$_) {$_=''} } @data;
 
@@ -133,92 +100,130 @@ sub LO_LS02 {
             #-- 1. zeile im Dataset 
             if ($data[0]=~/Züchter/) {
             
-                $ext_breeder  =$data[1] ;
-                next;
-            }
-            #-- 3. Zeile 
-            elsif ($data[0]=~/Rasse/) {
-                $breed  =$data[1] ;
-                next;
-            }
-            #-- 4. Zeile
-            elsif ($data[0]=~/Farbe/) {
-                $color  =$data[1] ;
-
+                $fields=[
+                    {'type'=>'label',                     'value'=>$data[0], 'z'=>$zeile, 'pos'=>0},
+                    {'type'=>'data','name'=>'ext_breeder','value'=>$data[1], 'z'=>$zeile, 'pos'=>1}
+                ];
+                $record->{'ext_breeder'}={'value'=>$data[1],'errors'=>[],'status'=>'0','origin'=>$data[1]};
+                $ext_breeder=$data[1];
                 next;
             }
 
             #-- Schlüsselword muss sein 
-            elsif (($data[0]=~/Brutbeginn/)) {
+            elsif (($data[0]=~/Schlupfdatum/)) {
+                
                 next;
             }
             elsif ($data[0]=~/^\d+.\d+.\d+/) {
 
                 $data[0]=~s/\//./g;
                 $data[0]=~s/\.(\d{2})$/.20$1/g;
+            
+
+                $fields=[
+                    {'type'=>'data','name'=>'birth_dt'.$i,          'value' =>$data[0], 'z'=>$zeile, 'pos'=>0},
+                    {'type'=>'data','name'=>'zst_id'.$i,            'value' =>$data[1], 'z'=>$zeile, 'pos'=>1},
+                    {'type'=>'data','name'=>'zst_id_sire'.$i,       'value' =>$data[2], 'z'=>$zeile, 'pos'=>2},
+                    {'type'=>'data','name'=>'zst_id_dam'.$i,        'value' =>$data{3], 'z'=>$zeile, 'pos'=>3},
+                    {'type'=>'data','name'=>'gelege_id'.$i,         'value' =>$data[4], 'z'=>$zeile, 'pos'=>4},
+                    {'type'=>'data','name'=>'angesetzte_eier'.$i,   'value' =>$data[5], 'z'=>$zeile, 'pos'=>5},
+                    {'type'=>'data','name'=>'unbefruchtete_eier'.$i,'value' =>$data[6], 'z'=>$zeile, 'pos'=>6},
+                    {'type'=>'data','name'=>'geschlüpft'.$i,        'value' =>$data[7], 'z'=>$zeile, 'pos'=>7},
+                    {'type'=>'data','name'=>'bdrg_male'.$i,         'value' =>$data[8], 'z'=>$zeile, 'pos'=>8},
+                    {'type'=>'data','name'=>'bdrg_female'.$i,       'value' =>$data[9], 'z'=>$zeile, 'pos'=>9},
+                    {'type'=>'data','name'=>'bn_male'.$i,           'value' =>$data[10], 'z'=>$zeile, 'pos'=>10},
+                    {'type'=>'data','name'=>'bn_female'.$i,         'value' =>$data[11], 'z'=>$zeile, 'pos'=>11},
+                    {'type'=>'data','name'=>'fn_male'.$i,           'value' =>$data[12], 'z'=>$zeile, 'pos'=>12},
+                    {'type'=>'data','name'=>'fn_female'.$i,         'value' =>$data[13], 'z'=>$zeile, 'pos'=>13}
+                ];
+
+
+                $record->{'birth_dt'.$i}      ={'value'=>$data[0],'errors'=>[],'status'=>'0','origin'=>$data[0] };
+                
+                $record->{'ext_unit_zst'.$i}       ={'value'=>'zuchststamm',    'errors'=>[],'status'=>'0' };
+                $record->{'ext_id_zst'.$i}         ={'value'=>$ext_breeder,    'errors'=>[],'status'=>'0' };
+                $record->{'ext_animal_zst'.$i}     ={'value'=>$data[1],    'errors'=>[],'status'=>'0','origin'=>$data[1] };
+
+                $record->{'ext_animal_sire'.$i}    ={'value'=>$data[2],    'errors'=>[],'status'=>'0','origin'=>$data[2] };
+                $record->{'ext_animal_dam'.$i}     ={'value'=>$data[3],    'errors'=>[],'status'=>'0','origin'=>$data[3] };
+                
+                $record->{'gelege-id'.$i}          ={'value'=>$data[4],    'errors'=>[],'status'=>'0','origin'=>$data[4] };
+                $record->{'set_eggs_no'.$i}        ={'value'=>$data[5],    'errors'=>[],'status'=>'0','origin'=>$data[5] };
+                $record->{'unfertilized_no'.$i}    ={'value'=>$data[6],    'errors'=>[],'status'=>'0','origin'=>$data[6] };
+                $record->{'born_alive_no'.$i}      ={'value'=>$data[7],    'errors'=>[],'status'=>'0','origin'=>$data[7] };
+
+                $record->{'ext_animal_bdrg_male'.$i}       ={'value'=>$data[8],    'errors'=>[],'status'=>'0','origin'=>$data[8] };
+                $record->{'ext_animal_bdrg_female'.$i}     ={'value'=>$data[9],    'errors'=>[],'status'=>'0','origin'=>$data[9] };
+                
+                $record->{'ext_animal_bn_male'.$i}       ={'value'=>$data[10],    'errors'=>[],'status'=>'0','origin'=>$data[10] };
+                $record->{'ext_animal_bn_female'.$i}     ={'value'=>$data[11],    'errors'=>[],'status'=>'0','origin'=>$data[11] };
+                
+                $record->{'ext_animal_fn_male'.$i}       ={'value'=>$data[12],    'errors'=>[],'status'=>'0','origin'=>$data[12] };
+                $record->{'ext_animal_fn_female'.$i}     ={'value'=>$data[13],    'errors'=>[],'status'=>'0','origin'=>$data[13] };
+                
+                $i++;
             }
-              
-            #-- define format for record 
-            $record = {
-                    'ext_breeder'           => [ $ext_breeder,'',[] ],
-                    'ext_breed'             => [ $breed,'',[] ],
-                    'ext_color'             => [ $color,'',[] ],
-
-                    'litter_dt'             => [ $data[0],'',[] ],
-#                   'laid_id'             => [ $data[3],'',[] ],
-                    'set_eggs_no'           => [ $data[3],'',[] ],
-                    'unfertilized_no'       => [ $data[4],'',[] ],
-                    'dead_eggs_no'          => [ $data[5],'',[] ],
-                    'born_alive_no'         => [ $data[6],'',[] ],
-
-                    'ext_unit_sire'         => [ '','',[] ],
-                    'ext_id_sire'           => [ '','',[] ],
-                    'ext_animal_sire'       => [ $data[1],'',[] ],
-
-                    'ext_unit_dam'          => [ '','',[] ],
-                    'ext_id_dam'            => [ '','',[] ],
-                    'ext_animal_dam'        => [ $data[2],'',[] ],
-
-                    'ext_unit_1'            => [ '','',[] ],
-                    'ext_id_1'              => [ '','',[] ],
-                    'ext_animal_1'          => [ $data[7],'',[] ],
-            };
-
+            
             #-- Datensatz mit neuem Zeiger wegschreiben
-            push( @{ $json->{ 'RecordSet' } },{ 'Info' => [], 'Data' => { %{$record} },'Insert'=>[], 'Tables'=>['animal1','animal2','animal3']} );
-
+            push( @{ $json->{ 'recordset' } },{'fields'=>$fields, 'infos' => [], 'errors'=>[], 'data' => { %{$record} }} );
         }
 
-        #-- Datei schließen
-        close( IN );
-
-        #-- file
-        $json->{ 'Header'}={'zuchtjahr'=>'Zjahr', 'ext_breeder'=>"Züchter",'ext_breed'=>'Rasse', 'ext_color'=>'Farbe', 'ext_animal_sire'=>'Hahn', 'ext_animal_dam'=>'Henne', 'ext_animal_1'=>'Küken'};
-
-        $json->{ 'Fields'}=['zuchtjahr', 'ext_breeder','ext_breed', 'ext_color', 'ext_animal_sire', 'ext_animal_dam', 'ext_animal_1'];
-
-        $json->{ 'Tables'}  = ['litter', 'animal1','animal2','animal3']; 
+        $json->{ 'glberrors'}={} ;
     }
     else {
 
         #-- String in einen Hash umwandeln
-        if (exists $args->{ 'JSON' }) {
-            $json = from_json( $args->{ 'JSON' } );
+        if (exists $args->{ 'json' }) {
+            $json = from_json( $args->{ 'json' } );
         }
         else {
-            $json={ 'RecordSet' => [{Info=>[],'Data'=>{}}]};
-            map { $json->{ 'RecordSet'}->[0]->{ 'Data' }->{$_}=[];
-                  $json->{ 'RecordSet'}->[0]->{ 'Data' }->{$_}[0]=$args->{$_}} keys %$args;
+            $json={ 'recordset' => [{infos=>[],'errors'=>[],'data'=>{}}]};
+            map { $json->{ 'recordset'}->[0]->{ 'data' }->{$_}=[];
+                  $json->{ 'recordset'}->[0]->{ 'data' }->{$_}[0]=$args->{$_}} keys %$args;
         }
     }
 
     my $db_breedcolor;
     my $db_breeder;
 
-    #-- Ab hier ist es egal, ob die Daten aus einer Datei
-    #   oder aus einer Maske kommen
-    #-- Schleife über alle Records und INFO füllen
-    foreach my $record ( @{ $json->{ 'RecordSet' } } ) {
+#######################################################################################################
+#-- Ab hier ist es egal, ob die Daten aus einer Datei
+#   oder aus einer Maske kommen
+#-- Schleife über alle Records und INFO füllen
+#######################################################################################################
+    my %hs_db;
+    my %reverse;
+    
+    my $tbd=[];
+    my $n_parent;
+    $i=0;
+    my @zuchtstamm;
+
+    #-- globale Fehler zählen
+    foreach my $record ( @{ $json->{ 'recordset' } } ) {
+    
+        #-- Daten aus Hash holen
+        foreach (@{ $record->{ 'fields' } }) {
+            $json->{'glberrors'}->{ $_->{'name'}}=0 if ($_->{'type'} eq 'data');
+        }
+        $n_parent= $record->{ 'data' }->{'no_parent'}->{'value'} if (exists  $record->{ 'data' }->{'no_parent'})
+    }
+
+    #-- Zeilenweise durch das Recordset
+    foreach my $record ( @{ $json->{ 'recordset' } } ) {
+       
+        my $sql1;
+        my $msg;
+        my $zuchtstammid;
+        my $args={};
+
+        #-- Daten aus Hash holen
+        foreach (@{ $record->{ 'fields' } }) {
+
+            if ($_->{'type'} eq 'data') {
+                $args->{$_->{'name'}}=$_->{'value'};
+            }
+        }
 
         $args={};
         $args->{'db_sire'}=1;
@@ -229,6 +234,76 @@ sub LO_LS02 {
             $args->{$_}=$record->{ 'Data' }->{$_}->[0];
         }
 
+        ####################################################################################### 
+        #
+        # Check Breeder
+        #
+        ####################################################################################### 
+        if (exists $args->{'ext_breeder'}) {
+
+            ($db_breeder, $exists) = GetDbUnit({'ext_unit'=>'breeder','ext_id'=>$args->{'ext_breeder'}},'n');
+            $ext_breeder= $args->{'ext_breeder'};
+
+            if (!$db_breeder) {            
+                my $err= Apiis::Errors->new(
+                        type       => 'DATA',
+                        severity   => 'CRIT',
+                        from       => 'LS02_Zuchtstamm',
+                        ext_fields => ['ext_breeder'],
+                        msg_short  =>"Keinen Eintrag für 'Züchter:$args->{'ext_breeder'}' in der Datenbank gefunden."
+                    );
+                push(@{$record->{'data'}->{'ext_breeder'}->{'errors'}}, $err);
+                push(@allerrors, $err);
+                    
+                $rollback=1;
+            }
+        }
+
+        my %animals;
+        foreach (split([,; ],$args->{'ext_animal_sire'.$i}])) {
+            $animals{$_}=['1','bundesring','BDRG',$_];
+        }
+        foreach (split([,; ],$args->{'ext_animal_dam'.$i}])) {
+            $animals{$_}=['2','bundesring','BDRG',$_];
+
+        }
+        my $ext_breed=undef;
+
+        my $vanimal="'".join("','",keys %animals)."'";
+        my @result;
+
+        my $sql="   select  c.ext_unit, 
+                            c.ext_id, 
+                            b.ext_animal, 
+                            user_get_ext_location_of(a.db_animal),
+                            user_get_ext_breed_of(a.db_animal,'l') breed,
+                            user_get_ext_sex_of(a.db_animal) as sex, user_get_is_member_of_line(a.db_animal)
+                    from animal a 
+                    inner join transfer b on a.db_animal=b.db_animal 
+                    inner join unit c on b.db_unit=c.db_unit
+                    where b.ext_animal in ($vanimal) and c.ext_unit='bundesring' and c.ext_id='BDRG'" 
+
+        my $sql_ref = $apiis->DataBase->sys_sql( $sql);
+
+        while ( my $q = $sql_ref->handle->fetch ) {
+            push(@result, [@$q]);
+        }
+
+        ####################################################################################### 
+        #
+        # Check Breed : Rassen von Vater und Mutter müssen übereinstimmen  bzw. in checkallel definiert sein
+        #
+        ####################################################################################### 
+        $check;
+
+        map {
+            if ($vbreedold and ($vbreedold ne $_->[4])) {
+                $check=1
+            }
+            $vbreedold=$_->[4];
+        } @result
+
+
         #-- duplizieren
         $args->{'ext_id_location'}=$args->{'ext_breeder'};
         $args->{'ext_unit_location'}='breeder';
@@ -237,21 +312,6 @@ sub LO_LS02 {
         if (!$args->{'laid_id'}) {
             $args->{'laid_id'}=1;
         }
-
-        #-- erstmalig reingehen, und db_breedcolor suchen. 
-        if (!$db_breedcolor) {   
-
-            #-- interne ID holen
-            my $sql="select db_breedcolor from breedcolor 
-                        where db_breed=(select db_code from codes where class='BREED' and ext_code='$args->{'ext_breed'}') and 
-                            db_color=(select db_code from codes where class='FARBSCHLAG' and ext_code='$args->{'ext_color'}') ";
-
-            my $sql_ref = $apiis->DataBase->sys_sql( $sql);
-            while ( my $q = $sql_ref->handle->fetch ) {
-                $db_breedcolor=$q->[0];
-            }
-        }
-        $args->{'db_breed'}=$db_breedcolor;
 
         #-- erstmalig reingehen, und db_breeder suchen. 
         if (!$db_breeder) {   
