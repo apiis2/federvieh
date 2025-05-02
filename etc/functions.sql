@@ -1,3 +1,5 @@
+CREATE OR REPLACE FUNCTION user_get_is_member_of_line(int) RETURNS text AS $$ select user_get_ext_id_animal(a.db_parents) from parents a inner join entry_transfer b on a.db_parents=b.db_animal where a.db_animal=$1; $$ LANGUAGE SQL;
+
 CREATE OR REPLACE FUNCTION user_get_ext_breedcolor(int) RETURNS text AS $$ select b3.ext_code || case when c3.ext_code isnull then '' else ', ' || c3.ext_code end from breedcolor a3 inner join codes b3 on a3.db_breed=b3.db_code left outer join codes c3 on a3.db_color=c3.db_code where a3.db_breedcolor=$1; $$ LANGUAGE SQL;
 
 create or replace view v_animal as select user_get_ext_id_animal(db_animal) as animal, user_get_ext_code(db_sex) as sex, user_get_ext_id_animal(db_sire) as sire, user_get_ext_id_animal(db_dam) as dam, user_get_ext_id_animal(db_parents) as parents, user_get_ext_breedcolor(db_animal), user_get_ext_code(db_selection) as selection, db_litter as db_litter, name, birth_dt, hb_ein_dt, la_rep_dt, la_rep, last_change_dt, last_change_user, dirty, chk_lvl, guid, owner, version, synch from animal;
