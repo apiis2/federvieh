@@ -11,7 +11,8 @@ use Federvieh;
 use Spreadsheet::Read;
 use Encode;
 our $apiis;
-
+use Apiis::Misc;
+use CreateTransfer;
 
 sub LO_LS02 {
     my $self     = shift;
@@ -472,11 +473,11 @@ sub LO_LS02 {
                             }
                             
                             if ($_->[3] ne $ext_breeder) {
-                                $checkloc=1;
+                                $checkloc=$_->[3];
                             }
                             
                             if ($_->[6] ne '') {
-                                $checkzst=1;
+                                $checkzst=$_->[6];
                             }
                         }
                     } @result;
@@ -487,7 +488,7 @@ sub LO_LS02 {
                                 severity   => 'CRIT',
                                 from       => 'LS02_Zuchtstamm',
                                 ext_fields => [$lanimal.$i],
-                                msg_short  =>"Das angegebene Tier $vanimal hat das falsche Geschlecht ($_->[5]). => Nummer kontrollieren"
+                                msg_short  =>"Das angegebene Tier $vanimal hat das falsche Geschlecht. => Nummer kontrollieren"
                             );
                         push(@{$record->{'data'}->{$lanimal.$i}->{'errors'}}, $err);
                         push(@allerrors, $err);
@@ -512,7 +513,7 @@ sub LO_LS02 {
                                 severity   => 'CRIT',
                                 from       => 'LS02_Zuchtstamm',
                                 ext_fields => [$lanimal.$i],
-                                msg_short  =>"Das Tier $vanimal steht im Bestand des Züchters $_->[3] => Tier ummelden"
+                                msg_short  =>"Das Tier $vanimal steht im Bestand des Züchters $checkloc => Tier ummelden"
                             );
                         push(@{$record->{'data'}->{$lanimal.$i}->{'errors'}}, $err);
                         push(@allerrors, $err);
@@ -525,7 +526,7 @@ sub LO_LS02 {
                                 severity   => 'CRIT',
                                 from       => 'LS02_Zuchtstamm',
                                 ext_fields => [$lanimal.$i],
-                                msg_short  =>"Das Tier $vanimal ist noch Teil des aktiven Zuchtstammes $_->[6] => Zuchtstamm schließen"
+                                msg_short  =>"Das Tier $vanimal ist noch Teil des aktiven Zuchtstammes $checkzst => Zuchtstamm schließen"
                             );
                         push(@{$record->{'data'}->{$lanimal.$i}->{'errors'}}, $err);
                         push(@allerrors, $err);
@@ -570,6 +571,8 @@ sub LO_LS02 {
 
         #-- Leerzeichen entfernen -> darf kein Trenner sein
         $snummern=~s/\s//g;
+        $snummern=~s/^[,|;|\s]+//g;
+        $snummern=~s/(,|;|\s){2,}/,/g;
 
         #-- in einzelne Nummern zerhacken 
         @nummern=split(/,|;/,$snummern);
@@ -589,13 +592,13 @@ sub LO_LS02 {
         }
         
         #-- mehr geschlüpfte Küken, als angesetzte Eier 
-        if ($args->{'angesetzte_eier'.$i}<$args->{'geschlüpft'.$i) {
+        if ($args->{'angesetzte_eier'.$i}<$args->{'geschlüpft'.$i}) {
             my $err= Apiis::Errors->new(
                     type       => 'DATA',
                     severity   => 'CRIT',
                     from       => 'LS02_Zuchtstamm',
                     ext_fields => ['geschlüpft'.$i, 'angesetzte_eier'.$i],
-                    msg_short  =>"Mehr geschlüpfte Küken als angesetzte Eier: $_[7]>$args->{'angesetzte_eier'.$i}"
+                    msg_short  =>"Mehr geschlüpfte Küken als angesetzte Eier: $args->{'geschlüpft'.$i}>$args->{'angesetzte_eier'.$i}"
                 );
             push(@{$record->{'data'}->{'geschlüpft'.$i}->{'errors'}}, $err);
             push(@{$record->{'data'}->{$args->{'angesetzte_eier'.$i}}->{'errors'}}, $err);
@@ -603,18 +606,17 @@ sub LO_LS02 {
         }
         
         #-- mehr Küken mit Nummern als geschlüpfte Küken 
-        if ($args->{'geschlüpft'.$i<$#nummern) {
+        if (($args->{'geschlüpft'.$i}<($#nummern+1)) or ($args->{'angesetzte_eier'.$i}<($#nummern+1))) {
             my $err= Apiis::Errors->new(
                     type       => 'DATA',
                     severity   => 'CRIT',
                     from       => 'LS02',
                     ext_fields => ['geschlüpft'.$i],
-                    msg_short  =>"Mehr Küken mit Nummern, als geschlüpft sind: $#nummern>$args->{'geschlüpft'.$i}"
+                    msg_short  =>"Mehr Küken mit Nummern, als geschlüpft bzw. angesetzt sind: ".($#nummern+1).">$args->{'geschlüpft'.$i}"
                 );
             push(@{$record->{'data'}->{'geschlüpft'.$i}->{'errors'}}, $err);
             push(@allerrors, $err);
         }
-
 
         ####################################################################################
         #
@@ -632,7 +634,7 @@ sub LO_LS02 {
         ####################################################################################### 
         
         #-- Nur ausführen, wenn eine Zuchtstamm-ID angegeben wurde
-        if ((exists $args->{'ext_animal_zst'.$i}) and ( $args->{'ext_animal_zst'.$i} )) {  
+        if ((exists $args->{'zst_id'.$i}) and ( $args->{'zst_id'.$i} )) {  
         
             my  ($cnt_parents, $db_parents);
 
@@ -640,7 +642,7 @@ sub LO_LS02 {
             my $sql="select a.db_animal, count(b.db_parents) from entry_transfer a 
                 left outer join parents b on a.db_animal=b.db_parents
                 inner join unit c on a.db_unit=c.db_unit
-                where c.ext_unit='zuchtstamm' and c.ext_id='$args->{'ext_id_zst'.$i}' and a.ext_animal='$args->{'ext_unit_zst'.$i}'
+                where c.ext_unit='zuchtstamm' and c.ext_id='$ext_breeder' and a.ext_animal='$args->{'zst_id'.$i}'
                 group by a.db_animal";
             
             my $sql_ref = $apiis->DataBase->sys_sql( $sql);
@@ -679,7 +681,7 @@ sub LO_LS02 {
                     $args->{'opening_dt'.$i}=$vdat[0];
 
 
-                    ($db_unit, $exists)=GetDbUnit({'ext_unit'=>'zuchtstamm','ext_id'=>$args->{'ext_id_zst'.$i}},'y');
+                    ($db_unit, $exists)=GetDbUnit({'ext_unit'=>'zuchtstamm','ext_id'=>$ext_breeder},'y');
                     
                     #-- neue Tiernummer generieren 
                     $db_parents=$apiis->DataBase->seq_next_val('seq_transfer__db_animal');
@@ -688,8 +690,8 @@ sub LO_LS02 {
                     my $guid=CreateTransfer($apiis,
                                 {'db_animal'=>$db_parents,
                                 'ext_unit'=>'zuchtstamm',
-                                'ext_id'=>$args->{'ext_id_zst'.$i},
-                                'ext_animal'=>$args->{'ext_zst'.$i},
+                                'ext_id'=>$ext_breeder,
+                                'ext_animal'=>$args->{'zst_id'.$i},
                                 'opening_dt'=>$args->{'opening_dt'.$i},
                                 'create'=>1,
                     });
@@ -749,7 +751,7 @@ sub LO_LS02 {
                         severity   => 'CRIT',
                         from       => 'LS01a_Zuchtstamm',
                         ext_fields => ['ext_zuchtstamm'],
-                        msg_short  => "Der Zuchtstamm ($args->{'ext_id_zst'.$i}|$args->{'ext_zst'.$i}) ist noch aktiv. Tiere können zu aktiven Zuchtstämmen nicht hinzugefügt werden."
+                        msg_short  => "Der Zuchtstamm ($ext_breeder|$args->{'zst_id'.$i}) ist noch aktiv. Tiere können zu aktiven Zuchtstämmen nicht hinzugefügt werden."
                 );
 
                 $self->status(1);
