@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE Form PUBLIC "1" "../form3.dtd">
+<!DOCTYPE Form PUBLIC "1" "../form3.dtd"[
+  <!ENTITY NavigationButtons_Fields SYSTEM "http://federvieh.local/etc/navigationbuttons.xml">
+  <!ENTITY ActionButtons_Fields     SYSTEM "http://federvieh.local/etc/actionbuttons.xml">
+]>
 
 <Form Name="standard_traits_content">
   
-    <General Name="standard_traits_content_General"  MenuID="M1" AR="user" Content="__('Standard Merkmale')" Difficulty="advanced" StyleSheet="/etc/apiis.css" Description="Zuordnung der Merkmale zu Schemas" ToolTip="__'(Zuordnung der Merkmale zu Schemas')" Help="/doc/Standard_Merkmale_Zuordnung.html"/>
+    <General Name="standard_traits_content_General"  MenuID="M1" AR="user" Content="__('Standard Merkmale')" Difficulty="advanced" StyleSheet="/etc/apiis.css" Description="Zuordnung der Merkmale zu Schemas" ToolTip="__('Zuordnung der Merkmale zu Schemas')" Help="/doc/Standard_Merkmale_Zuordnung.html"/>
 
   <Block Name="standard_traits_content_Block" Description="Update standard_contenttraits">
      
@@ -41,7 +44,7 @@
       <Position Column="0" Position="absolute" Row="2"/>
     </Label>
 
-    <Field Name="F2" DSColumn="C2" FlowOrder="2" LabelName="L2" ToolTip="__('Beschreibung des Merkmals')">
+    <Field Name="F2" DSColumn="C2" FlowOrder="2" InternalData="yes" LabelName="L2" ToolTip="__('Beschreibung des Merkmals')">
       <DataSource Name="DS2">
         <SqlFunction Action="do_execute_sql" View="ScrollinglistGetAllTraits"/>
       </DataSource>
