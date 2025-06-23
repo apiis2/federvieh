@@ -7,7 +7,7 @@
 RATINGCLASS  ''             ''       ''      2111 'Z'   'Z'
 RATINGCLASS  ''             ''       ''      2111 'KVE' 'KVE'   
 ID_SET  ''             ''       ''      2111 'bundesring'    
-ID_SET  ''             ''       ''      2111 'züchternummer'    
+ID_SET  ''             ''       ''      2111 'bestandsnummer'    
 ID_SET  ''             ''       ''      2111 'zuchtstamm'    
 ID_SET  ''             ''       ''      2111 'einummer'    
 ID_SET  ''             ''       ''      2111 'kükennummer'    
