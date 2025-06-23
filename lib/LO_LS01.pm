@@ -22,7 +22,7 @@ sub _get_animal_number {
     my ($ext_unit_animal, $ext_id_animal, $ext_animal);
 
     if ($data=~/:/) {
-        $ext_unit_animal='züchternummer';
+        $ext_unit_animal='bestandsnummer';
         ($ext_id_animal, $ext_animal) = ($data=~/^(.+):(.+)$/);
     }    
     elsif ($data=~/^\d{2}\D{1,2}\d+$/) { 
@@ -31,7 +31,7 @@ sub _get_animal_number {
         $ext_animal=$data;
     }
     elsif ($ext_breeder) {
-        $ext_unit_animal='züchternummer'; 
+        $ext_unit_animal='bestandsnummer'; 
         $ext_id_animal=$ext_breeder;
         $ext_animal=$data;
     }

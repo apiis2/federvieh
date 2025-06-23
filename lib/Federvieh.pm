@@ -47,7 +47,7 @@ sub SplitAnimalInputField {
                $vt->{'ext_animal'}=$vt->{'ext_animal'};
            }
            else {
-               $vt->{'ext_unit'}='züchternummer';
+               $vt->{'ext_unit'}='bestandsnummer';
                $vt->{'ext_id'}=$vt->{'ext_breeder'};
            }
 
