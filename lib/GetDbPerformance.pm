@@ -234,7 +234,7 @@ sub GetDbPerformance {
         }
 
         #-- wenn kein Datensatz gefunden wurden, dann Event neu anlegen 
-        if ($args->{'result'}) {
+        if (defined $args->{'result'}) {
         
             $performances->column('result')->intdata( $args->{'result'} );
             
