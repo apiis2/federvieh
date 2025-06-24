@@ -451,8 +451,10 @@ sub CreateTBD {
            
             my $style=[];
             if ($err->[0]) {
-                push(@{$style},{'background-color'=>$color});
-
+                push(@{$style},{'background-color'=>'lightsalmon'});
+                
+                $value='???' if ($value eq '');
+                
                 $a={'data'=>[{'tag'=>'a','attr'=>[{'class'=>'tip'}, 
                                                   {'href'=>'javascript:void(0)'},
                                                   {'onclick'=>"javascript:ToggleMe('".$field.$z."')"},
