@@ -1,6 +1,6 @@
 ####################################################################
 # load object: LO_LS21
-# $Id: LO_LS21_Vorwerkhuehner_Daten.pm,v 1.2 2022/02/26 18:52:27 ulf Exp $
+# $Id: LO_LS21_Vorwerkhuehner.pm,v 1.2 2022/02/26 18:52:27 ulf Exp $
 #####################################################################
 # Mit dem Ladeobjekt werden Merkmalesdefinitionen in die DB geschrieben
 #--  test-data
@@ -171,7 +171,7 @@ sub LO_LS21_Vorwerkhuehner {
             'schlupfergebnis'       => {'type'=>'data','status'=>'1','origin'=>$data[11],'pos'=>12, 'value'=> $data[11],'errors'=>[]},
             'schlupfdatum'          => {'type'=>'data','status'=>'1','origin'=>$data[12],'pos'=>13, 'value'=> $data[12],'errors'=>[]},
             
-            'ext_unit_animal_kn'    => {'type'=>'data','status'=>'1',                        'value'=> 'kükennummer','errors'=>[]},
+            'ext_unit_animal_kn'    => {'type'=>'data','status'=>'1',                        'value'=> 'flügelnummer','errors'=>[]},
             'ext_id_animal_kn'      => {'type'=>'data','status'=>'1',                        'value'=> $data[1]."-$vyear",'errors'=>[]},
             'ext_animal_kn'         => {'type'=>'data','status'=>'1','origin'=>$data[13],'pos'=>14, 'value'=> $data[13],'errors'=>[]},
 
