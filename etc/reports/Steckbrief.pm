@@ -122,7 +122,7 @@ sub Steckbrief {
     #############################################################################
 
     if ($ext_unit ne 'zuchtstamm') {
-        $sql="select user_get_full_db_animal(db_sire), user_get_full_db_animal(db_dam), user_get_full_db_animal(db_parents), user_get_ext_code(db_sex), user_get_ext_code(b.db_breed), birth_dt, name, user_get_ext_code(db_selection), hb_ein_dt from animal a inner join breedcolor b on a.db_breed=b.db_breedcolor where db_animal=$db_animal";
+        $sql="select user_get_full_db_animal(db_sire), user_get_full_db_animal(db_dam), user_get_full_db_animal(db_parents), user_get_ext_code(db_sex), user_get_ext_code(b.db_breed), birth_dt, name, user_get_ext_code(db_selection), hb_ein_dt from animal a left outer join breedcolor b on a.db_breed=b.db_breedcolor where db_animal=$db_animal";
         
         $sql_ref = $apiis->DataBase->sys_sql( $sql );
         if ( $sql_ref->status and ($sql_ref->status == 1 )) {
