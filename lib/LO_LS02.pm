@@ -120,7 +120,7 @@ sub LO_LS02 {
                     {'type'=>'label',                          'value'=>,'angesetzte Eier', 'z'=>$zeile, 'pos'=>6},
                     {'type'=>'label',                          'value'=>,'unbefruchtete Eier', 'z'=>$zeile, 'pos'=>7},
                     {'type'=>'label',                          'value'=>,'geschlüpft', 'z'=>$zeile, 'pos'=>8},
-                    {'type'=>'label',                          'value'=>,'Brutegg_weights', 'z'=>$zeile, 'pos'=>9},
+                    {'type'=>'label',                          'value'=>,'Bruteigewichte', 'z'=>$zeile, 'pos'=>9},
                     {'type'=>'label',                          'value'=>,'BDRG-Hähne', 'z'=>$zeile, 'pos'=>10},
                     {'type'=>'label',                          'value'=>,'BDRG-Hennen', 'z'=>$zeile, 'pos'=>11},
                     {'type'=>'label',                          'value'=>,'BN-Hähne', 'z'=>$zeile, 'pos'=>12},
@@ -131,7 +131,7 @@ sub LO_LS02 {
             }
             else {
 
-                #-- Datum auf vierstellig ergänzen und auf Trenner '.', wenn erforderling
+                #-- Datum auf vierstellig ergänzen und auf Trenner '.', wenn erforderlich
                 $data[1]=~s/\//./g;
                 $data[1]=~s/\.(\d{2})$/.20$1/g;
             
@@ -142,8 +142,8 @@ sub LO_LS02 {
                 $fields=[
                     {'type'=>'data','name'=>'ext_animal_zst'.$i,            'value' =>$data[0], 'z'=>$zeile, 'pos'=>0},
                     {'type'=>'data','name'=>'opening_dt'.$i,        'value' =>$data[1], 'z'=>$zeile, 'pos'=>1},
-                    {'type'=>'data','name'=>'zst_id_sire'.$i,       'value' =>$data[2], 'z'=>$zeile, 'pos'=>2},
-                    {'type'=>'data','name'=>'zst_id_dam'.$i,        'value' =>$data[3], 'z'=>$zeile, 'pos'=>3},
+                    {'type'=>'data','name'=>'ext_animal_sire'.$i,       'value' =>$data[2], 'z'=>$zeile, 'pos'=>2},
+                    {'type'=>'data','name'=>'ext_animal_dam'.$i,        'value' =>$data[3], 'z'=>$zeile, 'pos'=>3},
                     {'type'=>'data','name'=>'birth_dt'.$i,          'value' =>$data[4], 'z'=>$zeile, 'pos'=>4},
                     {'type'=>'data','name'=>'gelege_id'.$i,         'value' =>$data[5], 'z'=>$zeile, 'pos'=>5},
                     {'type'=>'data','name'=>'set_eggs_no'.$i,   'value' =>$data[6], 'z'=>$zeile, 'pos'=>6},
@@ -176,13 +176,13 @@ sub LO_LS02 {
                 $record->{'egg_weights'.$i}        ={'type'=>'data','status'=>'1','value'=>$data[9],     'errors'=>[],'pos'=>9,'origin'=>$data[9] };
                 
                 $record->{'ext_animal_bdrg_male'.$i}     ={'type'=>'data','status'=>'1','value'=>$data[10],    'errors'=>[],'pos'=>10,'origin'=>$data[10] };
-                $record->{'ext_animal_ext_animal_bdrg_female'.$i}   ={'type'=>'data','status'=>'1','value'=>$data[11],    'errors'=>[],'pos'=>11,'origin'=>$data[11] };
+                $record->{'ext_animal_bdrg_female'.$i}   ={'type'=>'data','status'=>'1','value'=>$data[11],    'errors'=>[],'pos'=>11,'origin'=>$data[11] };
                 
-                $record->{'ext_animal_ext_animal_bn_male'.$i}       ={'type'=>'data','status'=>'1','value'=>$data[12],    'errors'=>[],'pos'=>12,'origin'=>$data[12] };
-                $record->{'ext_animal_ext_animal_bn_female'.$i}     ={'type'=>'data','status'=>'1','value'=>$data[13],    'errors'=>[],'pos'=>13,'origin'=>$data[13] };
+                $record->{'ext_animal_bn_male'.$i}       ={'type'=>'data','status'=>'1','value'=>$data[12],    'errors'=>[],'pos'=>12,'origin'=>$data[12] };
+                $record->{'ext_animal_bn_female'.$i}     ={'type'=>'data','status'=>'1','value'=>$data[13],    'errors'=>[],'pos'=>13,'origin'=>$data[13] };
                 
-                $record->{'ext_animal_ext_animal_fn_male'.$i}       ={'type'=>'data','status'=>'1','value'=>$data[14],    'errors'=>[],'pos'=>14,'origin'=>$data[14] };
-                $record->{'ext_animal_ext_animal_fn_female'.$i}     ={'type'=>'data','status'=>'1','value'=>$data[15],    'errors'=>[],'pos'=>15,'origin'=>$data[15] };
+                $record->{'ext_animal_fn_male'.$i}       ={'type'=>'data','status'=>'1','value'=>$data[14],    'errors'=>[],'pos'=>14,'origin'=>$data[14] };
+                $record->{'ext_animal_fn_female'.$i}     ={'type'=>'data','status'=>'1','value'=>$data[15],    'errors'=>[],'pos'=>15,'origin'=>$data[15] };
                 
             }
             
@@ -285,7 +285,7 @@ sub LO_LS02 {
                         my $err= Apiis::Errors->new(
                                 type       => 'DATA',
                                 severity   => 'CRIT',
-                                from       => 'LS02',
+                                from       => 'LS02_Brut- und Kükenliste',
                                 ext_fields => ['ext_breeder'],
                                 msg_short  =>"Keinen Eintrag für 'Züchter:$args->{'ext_breeder'}' in der Datenbank gefunden."
                             );
@@ -304,7 +304,7 @@ sub LO_LS02 {
                     my $err= Apiis::Errors->new(
                             type       => 'DATA',
                             severity   => 'CRIT',
-                            from       => 'LS02',
+                            from       => 'LS02_LS02_Brut- und Kükenliste',
                             ext_fields => ['ext_breeder'],
                             msg_short  =>"Keine Züchternmmer angegeben."
                         );
@@ -336,16 +336,17 @@ sub LO_LS02 {
 
             if (($args->{$_} eq '')) {
                 
-                $self->status(1);
-                $self->errors(
-                        Apiis::Errors->new(
+                my $err= Apiis::Errors->new(
                                 type       => 'DATA',
                                 severity   => 'CRIT',
-                                from       => 'LS02',
+                                from       => 'LS02_Brut- und Kükenliste',
                                 ext_fields => [$_],
                                 msg_short  => "$nr ist ein Pflichtfeld und muss einen Wert haben"
-                    )
                 );
+                push(@{$record->{'data'}->{$_}->{'errors'}}, $err);
+                push(@allerrors, $err);
+                  
+                $record->{'data'}->{$_}->{'status'}='2';
             }
         }
 
@@ -361,10 +362,10 @@ sub LO_LS02 {
         for (my $t=1; $t <=4; $t++) {
         
             if ($t == 1) {
-                $ext_animal='zst_id_sire'.$i;
+                $ext_animal='ext_animal_sire'.$i;
             }    
             if ($t == 2) {
-                $ext_animal='zst_id_dam'.$i;
+                $ext_animal='ext_animal_dam'.$i;
             }    
             if ($t == 3) {
                 $ext_animal='ext_animal_bdrg_male'.$i;
@@ -381,17 +382,19 @@ sub LO_LS02 {
                 
                 if (($_ ne '') and ($_!~/^[0-9]{2}[a-zA-Z]{1,2}\d{1,5}/)) {
             
-                    $self->status(1);
-                    $self->errors(
-                            Apiis::Errors->new(
+                    my $err=Apiis::Errors->new(
                                     type       => 'DATA',
                                     severity   => 'CRIT',
-                                    from       => 'LS01a_Zuchtstamm',
+                                    from       => 'LS02_Brut- und Kükenliste',
                                     ext_fields => [$ext_animal],
                                     msg_short  => "Die Nummer $_ hat ein ungültiges Format"
-                        )
                     );
+                    
+                    push(@{$record->{'data'}->{$ext_animal}->{'errors'}}, $err);
+                    push(@allerrors, $err);
                     $rollback=1;
+            
+                    $record->{'data'}->{$ext_animal}->{'status'}='2';
                 }
                 else {
                     $animals{$_}=['1','bundesring','BDRG',$_]           if ($t<3);
@@ -520,14 +523,17 @@ sub LO_LS02 {
             my $err= Apiis::Errors->new(
                     type       => 'DATA',
                     severity   => 'CRIT',
-                    from       => 'LS02_Zuchtstamm',
+                    from       => 'LS02_Brut- und Kükenliste',
                     ext_fields => ['ext_animal_sire'.$i, 'ext_animal_dam'.$i],
                     msg_short  =>"Die Rassen der Tiere müssen gleich sein: $vanimal ($vbreed) <> $vanimalold ($vbreedold)."
                 );
             push(@{$record->{'data'}->{'ext_animal_sire'.$i}->{'errors'}}, $err);
             push(@{$record->{'data'}->{'ext_animal_dam'.$i}->{'errors'}}, $err);
             push(@allerrors, $err);
-                
+                  
+            $record->{'data'}->{'ext_animal_sire'.$i}->{'status'}='2';
+            $record->{'data'}->{'ext_animal_dam'.$i}->{'status'}='2';
+            
             $rollback=1;
         }
         else {
@@ -554,12 +560,12 @@ sub LO_LS02 {
                 %hs_animals=%animals_sire;    
 
                 #-- Fehler auf dieses Feld legeen 
-                $lanimal='zst_id_sire'.$i;
+                $lanimal='ext_animal_sire'.$i;
             }
             else {
                 $vsex=2;
                 %hs_animals=%animals_dam;    
-                $lanimal='zst_id_dam'.$i;
+                $lanimal='ext_animal_dam'.$i;
             }
 
             #-- nur, wenn es männliche und weibliche Tiere zu prüfen gibt 
@@ -607,23 +613,25 @@ sub LO_LS02 {
                         my $err= Apiis::Errors->new(
                                 type       => 'DATA',
                                 severity   => 'CRIT',
-                                from       => 'LS02_Zuchtstamm',
-                                ext_fields => [$lanimal.$i],
-                                msg_short  =>"Das angegebene Tier $vanimal hat das falsche Geschlecht. => Nummer kontrollieren"
+                                from       => 'LS02_Brut- und Kükenliste',
+                                ext_fields => [$lanimal],
+                                msg_short  =>"Das angegebene Tier $vanimal hat das falsche Geschlecht => Nummer kontrollieren"
                             );
-                        push(@{$record->{'data'}->{$lanimal.$i}->{'errors'}}, $err);
+                        push(@{$record->{'data'}->{$lanimal}->{'errors'}}, $err);
                         push(@allerrors, $err);
+                    
+                        $record->{'data'}->{$lanimal}->{'status'}='2';
                     }
                     
                     if (!$found) {
                         my $err= Apiis::Errors->new(
                                 type       => 'DATA',
                                 severity   => 'CRIT',
-                                from       => 'LS02_Zuchtstamm',
-                                ext_fields => [$lanimal.$i],
+                                from       => 'LS02_Brut- und Kükenliste',
+                                ext_fields => [$lanimal],
                                 msg_short  =>"Das angegebenen Tier $vanimal existiert nicht in der Datenbank => Tier anlegen/Nummer korrigieren"
                             );
-                        push(@{$record->{'data'}->{$lanimal.$i}->{'errors'}}, $err);
+                        push(@{$record->{'data'}->{$lanimal}->{'errors'}}, $err);
                         push(@allerrors, $err);
                     }
                     
@@ -632,11 +640,11 @@ sub LO_LS02 {
                         my $err= Apiis::Errors->new(
                                 type       => 'DATA',
                                 severity   => 'CRIT',
-                                from       => 'LS02_Zuchtstamm',
-                                ext_fields => [$lanimal.$i],
+                                from       => 'LS02_Brut- und Kükenliste',
+                                ext_fields => [$lanimal],
                                 msg_short  =>"Das Tier $vanimal steht im Bestand des Züchters $checkloc => Tier ummelden"
                             );
-                        push(@{$record->{'data'}->{$lanimal.$i}->{'errors'}}, $err);
+                        push(@{$record->{'data'}->{$lanimal}->{'errors'}}, $err);
                         push(@allerrors, $err);
                     }
                     
@@ -645,11 +653,11 @@ sub LO_LS02 {
                         my $err= Apiis::Errors->new(
                                 type       => 'DATA',
                                 severity   => 'CRIT',
-                                from       => 'LS02_Zuchtstamm',
-                                ext_fields => [$lanimal.$i],
+                                from       => 'LS02_Brut- und Kükenliste',
+                                ext_fields => [$lanimal],
                                 msg_short  =>"Das Tier $vanimal ist noch Teil des aktiven Zuchtstammes $checkzst => Zuchtstamm schließen"
                             );
-                        push(@{$record->{'data'}->{$lanimal.$i}->{'errors'}}, $err);
+                        push(@{$record->{'data'}->{$lanimal}->{'errors'}}, $err);
                         push(@allerrors, $err);
                     }
                 }
@@ -660,11 +668,11 @@ sub LO_LS02 {
             my $err= Apiis::Errors->new(
                     type       => 'DATA',
                     severity   => 'CRIT',
-                    from       => 'LS02_Zuchtstamm',
-                    ext_fields => [$lanimal.$i],
+                    from       => 'LS02_Brut- und Kükenliste',
+                    ext_fields => ['ext_animal_sire'.$i],
                     msg_short  =>"Es gibt keine männlichen Tiere."
                 );
-            push(@{$record->{'data'}->{$lanimal.$i}->{'errors'}}, $err);
+            push(@{$record->{'data'}->{'ext_animal_sire'.$i}->{'errors'}}, $err);
             push(@allerrors, $err);
         }
         
@@ -672,11 +680,11 @@ sub LO_LS02 {
             my $err= Apiis::Errors->new(
                     type       => 'DATA',
                     severity   => 'CRIT',
-                    from       => 'LS02_Zuchtstamm',
-                    ext_fields => [$lanimal.$i],
+                    from       => 'LS02_Brut- und Kükenliste',
+                    ext_fields => ['ext_animal_dam'.$i],
                     msg_short  =>"Es gibt keine weiblichen Tiere."
                 );
-            push(@{$record->{'data'}->{$lanimal.$i}->{'errors'}}, $err);
+            push(@{$record->{'data'}->{'ext_animal_dam'.$i}->{'errors'}}, $err);
             push(@allerrors, $err);
         }
 
@@ -703,7 +711,7 @@ sub LO_LS02 {
             my $err= Apiis::Errors->new(
                     type       => 'DATA',
                     severity   => 'CRIT',
-                    from       => 'LS02_Zuchtstamm',
+                    from       => 'LS02_Brut- und Kükenliste',
                     ext_fields => ['set_eggs_no'.$i, 'unfertilized_no'.$i],
                     msg_short  =>"Mehr unbefruchtete Eier als angesetzte Eier: $args->{'unfertilized_no'.$i}>$args->{'set_eggs_no'.$i}"
                 );
@@ -717,12 +725,12 @@ sub LO_LS02 {
             my $err= Apiis::Errors->new(
                     type       => 'DATA',
                     severity   => 'CRIT',
-                    from       => 'LS02_Zuchtstamm',
+                    from       => 'LS02_Brut- und Kükenliste',
                     ext_fields => ['born_alive_no'.$i, 'set_eggs_no'.$i],
-                    msg_short  =>"Mehr born_alive_noe Küken als angesetzte Eier: $args->{'born_alive_no'.$i}>$args->{'set_eggs_no'.$i}"
+                    msg_short  =>"Mehr geschlüpfte Küken als angesetzte Eier: $args->{'born_alive_no'.$i}>$args->{'set_eggs_no'.$i}"
                 );
             push(@{$record->{'data'}->{'born_alive_no'.$i}->{'errors'}}, $err);
-            push(@{$record->{'data'}->{$args->{'set_eggs_no'.$i}}->{'errors'}}, $err);
+            push(@{$record->{'data'}->{'set_eggs_no'.$i}->{'errors'}}, $err);
             push(@allerrors, $err);
         }
         
@@ -731,7 +739,7 @@ sub LO_LS02 {
             my $err= Apiis::Errors->new(
                     type       => 'DATA',
                     severity   => 'CRIT',
-                    from       => 'LS02',
+                    from       => 'LS02_Brut- und Kükenliste',
                     ext_fields => ['born_alive_no'.$i],
                     msg_short  =>"Mehr Küken mit Nummern, als born_alive_no bzw. angesetzt sind: ".($#nummern+1).">$args->{'born_alive_no'.$i}"
                 );
@@ -841,10 +849,10 @@ sub LO_LS02 {
 
                             my $field;
                             if ($rec->[5] eq '1') {
-                                $field='zst_id_sire'.$i;
+                                $field='ext_animal_sire'.$i;
                             }
                             else {
-                                $field='zst_id_dam'.$i;
+                                $field='ext_animal_dam'.$i;
                             }
 
                             #-- interne Tiernummer
@@ -876,7 +884,7 @@ sub LO_LS02 {
                 my $error= Apiis::Errors->new(
                         type       => 'DATA',
                         severity   => 'CRIT',
-                        from       => 'LS02_Brut-  und Kükenliste',
+                        from       => 'LS02_Brut- und Kükenliste',
                         ext_fields => ['ext_animal_zst'.$i],
                         msg_short  => "Der Zuchtstamm ($ext_breeder|$args->{'ext_animal_zst'.$i}) ist noch aktiv. Tiere können zu aktiven Zuchtstämmen nicht hinzugefügt werden."
                 );
@@ -928,7 +936,7 @@ sub LO_LS02 {
                         my $err=Apiis::Errors->new(
                                 type       => 'DATA',
                                 severity   => 'CRIT',
-                                from       => 'LS021',
+                                from       => 'LS02_Brut- und Kükenliste',
                                 ext_fields => [$ns],
                                 msg_short  =>"Keinen Eintrag für '$ar_animal->[0]:$ar_animal->[1]' in der Datenbank gefunden."
                                 );
@@ -983,7 +991,7 @@ sub LO_LS02 {
             }
             
             if (!$verr) {
-                $record->{'data'}->{$ns}->{'status'}='0';
+                $record->{'data'}->{$ns}->{'status'}='0' if ($record->{'data'}->{$ns}->{'status'}==1);
             }
             else {
                 $record->{'data'}->{$ns}->{'status'}='2';
@@ -1064,18 +1072,14 @@ sub LO_LS02 {
             if (!$db_event) {                    
                 push(@{$record->{'data'}->{ $ext_fielde }->{'errors'}},$apiis->errors); 
                 push(@{$record->{'data'}->{ $ext_field  }->{'errors'}},$apiis->errors); 
+                
+                $record->{'data'}->{ $ext_fielde }->{'status'}='3';
+                $record->{'data'}->{ $ext_field  }->{'status'}='3';
+                
                 $apiis->status(0);
                 $apiis->del_errors;
             }
             elsif ($db_event) {
-                if ($exists) {
-                    $record->{'data'}->{ $ext_fielde }->{'status'}='3';
-                    $record->{'data'}->{ $ext_field  }->{'status'}='3';
-                }
-                else {
-                    $record->{'data'}->{ $ext_fielde }->{'status'}='0';
-                    $record->{'data'}->{ $ext_field  }->{'status'}='0';
-                }    
 
                 my $guid;
                 ($guid,$exists)=GetDbPerformance({
