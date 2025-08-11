@@ -399,8 +399,12 @@ sub LO_LS02 {
                 else {
                     $animals{$_}=['1','bundesring','BDRG',$_]           if ($t<3);
 
-                    $animals_sire{$_}=['1','bundesring','BDRG',$_,$ext_animal]      if ($t==1) ;
-                    $animals_dam{$_} =['2','bundesring','BDRG',$_,$ext_animal]      if ($t==2) ;
+                    if ($t==1) {
+                        $animals_sire{$_}=['1','bundesring','BDRG',$_,$ext_animal];
+                    }   
+                    elsif ($t==2) {
+                        $animals_dam{$_} =['2','bundesring','BDRG',$_,$ext_animal]; ;
+                    }    
                     $animals_prog{$ext_animal}->{$_}=['1','bundesring','BDRG',$_,$ext_animal]      if ($t==3) ;
                     $animals_prog{$ext_animal}->{$_}=['2','bundesring','BDRG',$_,$ext_animal]      if ($t==4) ;
                 }
@@ -548,7 +552,7 @@ sub LO_LS02 {
         my ($ismale, $isfemale);
         my %hs_animals=();
 
-        #-- Schleife über alle Hähne und über alle Hennen
+        #-- Schleife über alle Hähne j=1 und über alle Hennen j=2
         for (my $j=1; $j<=2; $j++) {
 
             #-- Besonderheiten des Geschlechts berücksichtigen bzw. Daten auf allgemeine Variable legen 
@@ -602,8 +606,9 @@ sub LO_LS02 {
                             if ($_->[3] ne $ext_breeder) {
                                 $checkloc=$_->[3];
                             }
-                            
-                            if ($_->[6] ne '') {
+                          
+                            #-- wenn null, dann in keinem Zuchtstamm 
+                            if ($_->[6] and ($_->[6] ne '')) {
                                 $checkzst=$_->[6];
                             }
                         }
@@ -1000,32 +1005,55 @@ sub LO_LS02 {
 
         ######################################################################################################
         #
-        #-- Zuchtstammleistung anlegen
+        #-- Gelegeleistung anlegen
+        #-- entweder auf Zuchtstamm oder auf Mutter 
         #
         ######################################################################################################
 
+        #-- Merkmale in Abhängigkeit von Zuchtstamm oder Tier einstellen 
+        my @ar_traits=('ZSt-Schlupf-Anzahl-Eiablage','ZSt-Schlupf-Anzahl-Absterber','ZSt-Schlupf-Anzahl-Geschlüpft');
+
+        if ($ismalefemale) {
+            @ar_traits=('Anzahl angesetzte Eier','Anzahl unbefruchtete Eier','Anzahl geschlüpfte Eier', 'Vater-Gelege');
+        }
 
         #-- Schleife über alle Merkmale
         #-- animal-event-Verbindung erzeugen und mit Schlüssel die Leistunge wegschreiben
-        foreach my $trait ('ZSt-Schlupf-Anzahl-Eiablage','ZSt-Schlupf-Anzahl-Absterber',
-                           'ZSt-Schlupf-Anzahl-Geschlüpft') {
+        foreach my $trait (@ar_traits) {
             
             my $result      = ''; 
             my $ext_field   = ''; 
             my $ext_fielde  = '';
             my $ext_fieldp  = '';
             my $targs       = {};
-            my $db_animal   = $args->{'db_animal'};
+            my $db_animal   = $args->{'db_parents'};
+            my $vstandard   = 'SN-Schlupf-Zst';
 
-            $targs->{'ext_bezug'}= 'Zuchtstamm';
+            $targs->{'ext_bezug'}   = 'Zuchtstamm';
+            $targs->{'ext_methode'} = 'Anzahl';
+
+            #-- Wenn Einzelanpaarung, dann ist der Bezug Tier 
+            if ($ismalefemale) {
+                $targs->{'ext_bezug'}= 'Tier';
+                $db_animal   = $db_dam;
+                $vstandard='SN-Schlupf';
+                $targs->{'ext_methode'} = 'Zählen';
+            }    
+
+            #-- Zuchtstamm oder Mutter  unbekannt 
+            if ($db_animal<=3) {
+                $db_animal=undef;   
+            }    
+
             $targs->{'variant'}  = '1';
             $targs->{'sample'}   = '1';
             $targs->{'ext_trait'}    = $trait;
-            
+
+            #-- db_animal kann db_dam sein oder ein Zuchtstamm
+            $args->{'db_animal'}=$db_animal; 
             ######################################################################## 
-            if ($trait eq 'ZSt-Schlupf-Anzahl-Eiablage') {
-                $targs->{'ext_methode'}         = 'Anzahl';
-                $targs->{'standard_events_id'}  = 'SN-Schlupf-Zst';    
+            if (($trait eq 'ZSt-Schlupf-Anzahl-Eiablage') or ($trait eq 'Anzahl angesetzte Eier')) {
+                $targs->{'standard_events_id'}  = $vstandard;    
                 $targs->{'event_dt'}            = $args->{'birth_dt'.$i};
                 $result                         = $args->{'set_eggs_no'.$i};
                 $ext_field                      = 'birth_dt'.$i;
@@ -1033,9 +1061,8 @@ sub LO_LS02 {
                 $ext_fieldp                     = 'set_eggs_no'.$i;
             }
 
-            if ($trait eq 'ZSt-Schlupf-Anzahl-Absterber') {
-                $targs->{'ext_methode'}         = 'Anzahl';
-                $targs->{'standard_events_id'}  = 'SN-Schlupf-Zst';    
+            if (($trait eq 'ZSt-Schlupf-Anzahl-Absterber') or ($trait eq 'Anzahl unbefruchtete Eier')) {
+                $targs->{'standard_events_id'}  = $vstandard;    
                 $targs->{'event_dt'}            = $args->{'birth_dt'.$i};
                 $result                         = $args->{'unfertilized_no'.$i};
                 $ext_field                      = 'birth_dt'.$i;
@@ -1043,11 +1070,20 @@ sub LO_LS02 {
                 $ext_fieldp                     = 'unfertilized_no'.$i;
             }
             
-            if ($trait eq 'ZSt-Schlupf-Anzahl-Geschlüpft') {
-                $targs->{'ext_methode'}         = 'Anzahl';
-                $targs->{'standard_events_id'}  = 'SN-Schlupf-Zst';    
+            if (($trait eq 'ZSt-Schlupf-Anzahl-Geschlüpft') or ($trait eq 'Anzahl geschlüpfte Eier'))  {
+                $targs->{'standard_events_id'}  = $vstandard;    
                 $targs->{'event_dt'}            = $args->{'birth_dt'.$i};
                 $result                         = $args->{'born_alive_no'.$i};
+                $ext_field                      = 'birth_dt'.$i;
+                $ext_fielde                     = 'birth_dt'.$i;
+                $ext_fieldp                     = 'born_alive_no'.$i;
+            }
+            
+            if (($trait eq 'Vater-Gelege'))  {
+                $targs->{'ext_methode'}         = 'Klassifizieren';
+                $targs->{'standard_events_id'}  = $vstandard;    
+                $targs->{'event_dt'}            = $args->{'birth_dt'.$i};
+                $result                         = $db_sire;
                 $ext_field                      = 'birth_dt'.$i;
                 $ext_fielde                     = 'birth_dt'.$i;
                 $ext_fieldp                     = 'born_alive_no'.$i;
@@ -1083,7 +1119,7 @@ sub LO_LS02 {
 
                 my $guid;
                 ($guid,$exists)=GetDbPerformance({
-                                    'db_animal' => $args->{'db_parents'},
+                                    'db_animal' => $db_animal,
                                     'db_event'  => $db_event,
                                     'ext_trait' => $trait,
                                     'ext_method'=> $targs->{'ext_methode'},
@@ -1120,14 +1156,22 @@ sub LO_LS02 {
             my $targs       = {};
             
             #-- Eigewichte zerhacken 
+            if ($ismalefemale) {
+                $targs->{'standard_events_id'}  = 'SN-Schlupf';    
+                $targs->{'ext_bezug'}           = 'Tier';
+                $targs->{'ext_trait'}           = 'Eigewicht-Schlupf';
+            }
+            else {
+                $targs->{'standard_events_id'}  = 'SN-Schlupf-Zst';    
+                $targs->{'ext_bezug'}           = 'Zuchtstamm';
+                $targs->{'ext_trait'}           = 'ZSt-Schlupf-Eigewicht';
+            }
+
             $targs->{'ext_methode'}         = 'Wiegen';
-            $targs->{'standard_events_id'}  = 'SN-Schlupf-Zst';    
             $targs->{'event_dt'}            = $args->{'birth_dt'.$i};
-            $targs->{'ext_bezug'}           = 'Zuchtstamm';
             $targs->{'variant'}             = '1';
-            $targs->{'ext_trait'}           = 'ZSt-Schlupf-Eigewicht';
-            my $ext_field                      = 'egg_weights'.$i;
-            my $ext_fielde                     = 'egg_weights'.$i;
+            my $ext_field                   = 'egg_weights'.$i;
+            my $ext_fielde                  = 'egg_weights'.$i;
 
             #-- Schleife über alle Ei-Gewichte 
             foreach (split('[,;\s+]', $args->{'egg_weights'.$i})) {
@@ -1163,9 +1207,12 @@ sub LO_LS02 {
                         $record->{'data'}->{ $ext_field  }->{'status'}='0';
                     }    
 
+                    #-- bei unbekannten Eltern auf undef setzen    
+                    $args->{'db_parents'}=undef if ($args->{'db_parents'}<=3); 
+                    
                     my $guid;
                     ($guid,$exists)=GetDbPerformance({
-                                        'db_animal' => $args->{'db_parents'},
+                                        'db_animal' => $args->{'db_animal'},
                                         'db_event'  => $db_event,
                                         'ext_trait' => $targs->{'ext_trait'},
                                         'ext_method'=> $targs->{'ext_methode'},
