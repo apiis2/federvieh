@@ -20,6 +20,7 @@ sub CheckLO {
         return 'LO_LS01_Zuchtstamm'     if ($v=~/Hähne.+?Kükennummer.+?V(a|ä)ter/);
         return 'LO_LS01_Zuchtstamm'     if ($v=~/RN-Tier.*?Kükennummer.*?RN-Vater.*?RN-Mutter/);
         return 'LO_LS01_Zuchtstamm'     if ($v=~/Hahn.*?Kükennummer.*?ZuchtstammID.*?Hahn.*?Hennen/);
+        return 'LO_LS02'                if ($v=~/Züchter,.+?Bundesringnummern,,Bestandsnummern,,Flügelnummern/);
         return 'LO_LS13_eNest'          if ($v=~/TransponderEPC/);
         return 'LO_LS21_Vorwerkhuehner' if ($v=~/Züchter-Na.*?Züchter-Nr.*?Aufzüchter-Na.*?Aufzüchter-N.*?ZuchtstammID.*?Ring-Nr. Vater.*?Ring-Nr. Mutter.*?Schlupf.*?Ei- Nr.*?Legetag.*?Gew.-gr.*?Schlupf-ergeb.*?Schlupf-datum.*?Küken-marke.*?Schlupfgewicht.*?Geschlecht.*?Ring-Nr.*?Abgangs-ursache.*?Abgangs-datum.*?KG.*?2.Wo.*?KG.*?10.Wo.*?KG.*?20.Wo.*?Eindruck.*?Phänotyp.*?Gesamt.*?Zucht.*?KG.*?Bewertungstag.*?Bewertungsdatum/); 
         return 'LO_LS30_Merkmale'       if ($v=~/Variante.+?Bezug.+?Methode/);
@@ -115,7 +116,7 @@ sub FileUpload {
     
         $LO=CheckLO($args);
     }
-
+    
     #-- wenn keinen güligen Ladestrom gefunden
     if (!$LO) {
         $apiis->errors (Apiis::Errors->new(
