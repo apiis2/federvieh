@@ -219,7 +219,7 @@ sub LO_LS02 {
     my $tbd=[];
     my $n_parent;
     my %reverse;
-    $i=0;
+    $i=-1;
     my (@zuchtstamm, %hs_db,$exists);
 
     #-- globale Fehler zählen
@@ -243,6 +243,8 @@ sub LO_LS02 {
         my $db_parents=3;
         my $iszst=undef;
         my $ismalefemale=undef;
+
+        $i++;
 
         #-- falls es die Felder im Recordsatz noch nicht gibt, dann aus data anlegen 
         if (!exists $record->{ 'fields' }) {
@@ -317,7 +319,6 @@ sub LO_LS02 {
                 }
             }
             $tbd=Federvieh::CreateTBDX($tbd, $json->{'glberrors'}, $record, $i );
-            $i++;
             next;
         }
 
@@ -608,7 +609,7 @@ sub LO_LS02 {
                             }
                           
                             #-- wenn null, dann in keinem Zuchtstamm 
-                            if ($_->[6] and ($_->[6] ne '')) {
+                            if (($_->[6] and ($_->[6] ne '')) and ($ext_breeder.'-'.$args->{'ext_animal_zst'.$i} ne $_->[6]))  {
                                 $checkzst=$_->[6];
                             }
                         }
@@ -791,107 +792,107 @@ sub LO_LS02 {
             #-- wenn db_parents null, dann gibt es zuchtstamm nicht -> neu anlegen
             if (!$db_parents) {
 
-                my $db_unit;
-                
-                #--  Datum in einheitliches Format umändern 
-                #my @vdat=Apiis::Misc::LocalToRawDate('EU', $args->{'opening_dt'.$i});
-                my @vdat=($args->{'opening_dt'.$i});
-
-                #-- Wenn Datum nicht umformatiert werden kann, dann Fehler auslösen
-                if (!$vdat[0]) {
-                    
-                    my $error= Apiis::Errors->new(
-                            type       => 'DATA',
-                            severity   => 'CRIT',
-                            from       => 'LS01a_Zuchtstamm',
-                            ext_fields => ['opening_dt'.$i],
-                            msg_short  => "Ungültiges Datumsformat: $args->{'opening_dt'.$i}"
-                    );
-                    
-                    #-- Wenn Anlegen einen Fehler erzeugt hat, dann wurde keine guid vergeben 
-                    $self->status(1);
-                    $self->errors($apiis->errors);
-                    $rollback=1;
-                    $apiis->status(0);
-                    $apiis->del_errors;
-                }
-                else {
-                    $args->{'opening_dt'.$i}=$vdat[0];
-
-
-                    ($db_unit, $exists)=GetDbUnit({'ext_unit'=>'zuchtstamm','ext_id'=>$ext_breeder},'y');
-                    
-                    #-- neue Tiernummer generieren 
-                    $db_parents=$apiis->DataBase->seq_next_val('seq_transfer__db_animal');
-
-                    #-- Nur neue Nummer in transfer anlegen ('only_transfer'=>'1')
-                    my $guid=CreateTransfer($apiis,
-                                {'db_animal'=>$db_parents,
-                                'ext_unit'=>'zuchtstamm',
-                                'ext_id'=>$ext_breeder,
-                                'ext_animal'=>$args->{'ext_animal_zst'.$i},
-                                'opening_dt'=>$args->{'opening_dt'.$i},
-                                'create'=>1,
-                    });
-
-                    #-- Wenn Anlegen einen Fehler erzeugt hat, dann wurde keine guid vergeben 
-                    if (!$guid) {
-                        $self->status(1);
-                        $self->errors($apiis->errors);
-                        $rollback=1;
-                        $apiis->status(0);
-                        $apiis->del_errors;
-                    }
-                    else {
-        
-                        #-- Schleife über alle Tiere 
-                        foreach my $rec (@result) {
-                            
-                            my $db_animal=$rec->[7];
-
-                            #-- ein neues Tier in parents erzeugen
-                            my $parents = Apiis::DataBase::Record->new( tablename => 'parents' );
-
-                            my $field;
-                            if ($rec->[5] eq '1') {
-                                $field='ext_animal_sire'.$i;
-                            }
-                            else {
-                                $field='ext_animal_dam'.$i;
-                            }
-
-                            #-- interne Tiernummer
-                            $parents->column('db_parents')->intdata($db_parents);
-                            $parents->column('db_parents')->encoded(1);
-                            $parents->column('db_parents')->ext_fields( $field );
-
-                            #-- interne Tiernummer
-                            $parents->column('db_animal')->intdata($db_animal);
-                            $parents->column('db_animal')->encoded(1);
-                            $parents->column('db_animal')->ext_fields( $field );
-
-                            $parents->insert();
-
-                            #-- Fehlerbehandlung 
-                            if ( $parents->status ) {
-                                
-                                $self->status(1);
-                                $self->errors($parents->errors);
-                                $rollback=1;
-                                $apiis->status(0);
-                                $apiis->del_errors;
-                            }
-                        }
-                    }
-                }
-            }
-            else { 
+#                my $db_unit;
+#                
+#                #--  Datum in einheitliches Format umändern 
+#                #my @vdat=Apiis::Misc::LocalToRawDate('EU', $args->{'opening_dt'.$i});
+#                my @vdat=($args->{'opening_dt'.$i});
+#
+#                #-- Wenn Datum nicht umformatiert werden kann, dann Fehler auslösen
+#                if (!$vdat[0]) {
+#                    
+#                    my $error= Apiis::Errors->new(
+#                            type       => 'DATA',
+#                            severity   => 'CRIT',
+#                            from       => 'LS01a_Zuchtstamm',
+#                            ext_fields => ['opening_dt'.$i],
+#                            msg_short  => "Ungültiges Datumsformat: $args->{'opening_dt'.$i}"
+#                    );
+#                    
+#                    #-- Wenn Anlegen einen Fehler erzeugt hat, dann wurde keine guid vergeben 
+#                    $self->status(1);
+#                    $self->errors($apiis->errors);
+#                    $rollback=1;
+#                    $apiis->status(0);
+#                    $apiis->del_errors;
+#                }
+#                else {
+#                    $args->{'opening_dt'.$i}=$vdat[0];
+#
+#
+#                    ($db_unit, $exists)=GetDbUnit({'ext_unit'=>'zuchtstamm','ext_id'=>$ext_breeder},'y');
+#                    
+#                    #-- neue Tiernummer generieren 
+#                    $db_parents=$apiis->DataBase->seq_next_val('seq_transfer__db_animal');
+#
+#                    #-- Nur neue Nummer in transfer anlegen ('only_transfer'=>'1')
+#                    my $guid=CreateTransfer($apiis,
+#                                {'db_animal'=>$db_parents,
+#                                'ext_unit'=>'zuchtstamm',
+#                                'ext_id'=>$ext_breeder,
+#                                'ext_animal'=>$args->{'ext_animal_zst'.$i},
+#                                'opening_dt'=>$args->{'opening_dt'.$i},
+#                                'create'=>1,
+#                    });
+#
+#                    #-- Wenn Anlegen einen Fehler erzeugt hat, dann wurde keine guid vergeben 
+#                    if (!$guid) {
+#                        $self->status(1);
+#                        $self->errors($apiis->errors);
+#                        $rollback=1;
+#                        $apiis->status(0);
+#                        $apiis->del_errors;
+#                    }
+#                    else {
+#        
+#                        #-- Schleife über alle Tiere 
+#                        foreach my $rec (@result) {
+#                            
+#                            my $db_animal=$rec->[7];
+#
+#                            #-- ein neues Tier in parents erzeugen
+#                            my $parents = Apiis::DataBase::Record->new( tablename => 'parents' );
+#
+#                            my $field;
+#                            if ($rec->[5] eq '1') {
+#                                $field='ext_animal_sire'.$i;
+#                            }
+#                            else {
+#                                $field='ext_animal_dam'.$i;
+#                            }
+#
+#                            #-- interne Tiernummer
+#                            $parents->column('db_parents')->intdata($db_parents);
+#                            $parents->column('db_parents')->encoded(1);
+#                            $parents->column('db_parents')->ext_fields( $field );
+#
+#                            #-- interne Tiernummer
+#                            $parents->column('db_animal')->intdata($db_animal);
+#                            $parents->column('db_animal')->encoded(1);
+#                            $parents->column('db_animal')->ext_fields( $field );
+#
+#                            $parents->insert();
+#
+#                            #-- Fehlerbehandlung 
+#                            if ( $parents->status ) {
+#                                
+#                                $self->status(1);
+#                                $self->errors($parents->errors);
+#                                $rollback=1;
+#                                $apiis->status(0);
+#                                $apiis->del_errors;
+#                            }
+#                        }
+#                    }
+#               }
+#            }
+#            else { 
                 my $error= Apiis::Errors->new(
                         type       => 'DATA',
                         severity   => 'CRIT',
                         from       => 'LS02_Brut- und Kükenliste',
                         ext_fields => ['ext_animal_zst'.$i],
-                        msg_short  => "Der Zuchtstamm ($ext_breeder|$args->{'ext_animal_zst'.$i}) ist noch aktiv. Tiere können zu aktiven Zuchtstämmen nicht hinzugefügt werden."
+                        msg_short  => "Kein Zuchtstamm definiert bzw. in der DB unter diesem Namen gefunden ($ext_breeder|$args->{'ext_animal_zst'.$i})."
                 );
                 
                 push(@{$record->{'data'}->{'ext_animal_zst'.$i}->{'errors'}},$error);
@@ -1245,7 +1246,6 @@ sub LO_LS02 {
             }
         }
                 
-        $i++;
 EXIT:
         $tbd=Federvieh::CreateTBD($tbd, $json->{'glberrors'}, $record,$i );
 
