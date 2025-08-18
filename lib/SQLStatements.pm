@@ -245,7 +245,7 @@ sub sql_adressen {
   select distinct address.db_address, ext_address, firma_name,  
          user_get_ext_code(db_title),
          user_get_ext_code(db_salutation), 
-         case when db_salutation notnull then user_get_ext_code(db_salutation) || ' ' else '' end || 
+         case when db_salutation notnull then user_get_ext_code(db_salutation,'l') || ' ' else '' end || 
          case when db_title notnull then user_get_ext_code(db_title) || ' ' else '' end || 
          case when first_name notnull then first_name || ' ' else '' end || 
          case when second_name notnull then second_name else '' end, 
@@ -469,7 +469,7 @@ sub sql_adresse_absender {
   /*---------------------------------------------------------------------------------------------------------*/
   /* Adresse */
   select case when firma_name isnull then
-              case when db_salutation  isnull then '' else user_get_ext_code(db_salutation) || ' ' end 
+              case when db_salutation  isnull then '' else user_get_ext_code(db_salutation,'l') || ' ' end 
          else 
 	      '' 
          end as name1,
@@ -495,7 +495,7 @@ sub sql_adresse_anschreiben {
   /*---------------------------------------------------------------------------------------------------------*/
   /* Adresse */
   select case when firma_name isnull then
-              case when db_salutation  isnull then '' else user_get_ext_code(db_salutation) || ' ' end 
+              case when db_salutation  isnull then '' else user_get_ext_code(db_salutation,'l') || ' ' end 
          else 
 	      case when firma_name isnull then '' else firma_name || ' ' end 
          end as name1,
