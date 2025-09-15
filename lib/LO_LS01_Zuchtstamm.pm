@@ -19,6 +19,7 @@ use CreateTransfer;
 use CreateAnimal;
 use ExitLocation;
 use Federvieh;
+use Apiis::Misc;
 
 our $apiis;
 
@@ -29,7 +30,7 @@ sub _get_animal_number {
     my ($ext_unit_animal, $ext_id_animal, $ext_animal);
 
     if ($data=~/:/) {
-        $ext_unit_animal='züchternummer';
+        $ext_unit_animal='bestandsnummer';
         ($ext_id_animal, $ext_animal) = ($data=~/^(.+):(.+)$/);
     }    
     elsif ($data=~/^\d{2}\D{1,2}\d+$/) { 
@@ -38,7 +39,7 @@ sub _get_animal_number {
         $ext_animal=$data;
     }
     elsif ($ext_breeder) {
-        $ext_unit_animal='züchternummer'; 
+        $ext_unit_animal='bestandsnummer'; 
         $ext_id_animal=$ext_breeder;
         $ext_animal=$data;
     }
@@ -113,7 +114,11 @@ sub LO_LS01_Zuchtstamm {
                 if (exists $vrecodebreeder->{$data[1]}) {
                     $data[1]=$vrecodebreeder->{$data[1]};
                 }
-                
+        
+                if (!$data[1]) {
+                    $data[1]='NULL';
+                }
+
                 $fields=[
                     {'type'=>'label',                     'value'=>$data[0], 'z'=>$zeile, 'pos'=>0},
                     {'type'=>'data','name'=>'ext_breeder','value'=>$data[1], 'z'=>$zeile, 'pos'=>1}
@@ -122,6 +127,8 @@ sub LO_LS01_Zuchtstamm {
             }
             
             if ($data[0]=~/^gültig ab/) {
+                
+                $data[1]=~s/\//./g;
                 
                 $fields=[
                     {'type'=>'label',                    'value'=>$data[0], 'z'=>$zeile, 'pos'=>0},
@@ -321,6 +328,7 @@ sub LO_LS01_Zuchtstamm {
     
     my $tbd=[];
     my $n_parent;
+    my $opening_dt;
     $i=0;
     my @zuchtstamm;
 
@@ -381,26 +389,15 @@ sub LO_LS01_Zuchtstamm {
 #                goto EXIT;
                 $rollback=1;
             }
-
-            #-- Zuchtstamm aus Jahr generierer (ARGV[4] und einer laufenden Nummer  
-            if (!exists $args->{'ext_zuchtstamm'}) {
-                
-                my $sql="select count(a.ext_animal) from transfer a inner join unit b on a.db_unit=b.db_unit where b.ext_unit='zuchtstamm' and b.ext_id='$args->{'ext_breeder'}' and ext_animal like '$vjahr%'";
-
-                my $sql_ref = $apiis->DataBase->sys_sql( $sql);
-                
-                my $vlfdnr=0;
-
-                while ( my $q = $sql_ref->handle->fetch ) {
-                    $vlfdnr=$q->[0];
-                }
-                
-                $vlfdnr++;
-                $args->{'ext_zuchtstamm'}=$vjahr.'-'.$vlfdnr;
-                $ext_zuchtstamm=$args->{'ext_zuchtstamm'};
-            }  
-
         }    
+        ####################################################################################### 
+        #
+        # Check Opening_dt
+        #
+        ####################################################################################### 
+        elsif (exists $args->{'opening_dt'}) {
+            $opening_dt=$args->{'opening_dt'};
+        }
         ####################################################################################### 
         #
         # Check Breed-color
@@ -1002,7 +999,7 @@ sub LO_LS01_Zuchtstamm {
                 $args->{'ext_zuchtstamm'}   = $ext_zuchtstamm;
             }
 
-            $zuchtstammid=['zuchtstamm',$args->{'ext_id_zs'},$args->{'ext_zuchtstamm'},$args->{'opening_dt'}];
+            $zuchtstammid=['zuchtstamm',$args->{'ext_id_zs'},$args->{'ext_zuchtstamm'},$opening_dt];
         }
 
         my  $cnt_parents;
@@ -1054,26 +1051,53 @@ sub LO_LS01_Zuchtstamm {
                 $apiis->del_errors;
             }
 
-            $db_parents=$apiis->DataBase->seq_next_val('seq_transfer__db_animal');
-
             #-- Wenn im LO das Gültigkeitsdatum angegeben ist, dann das als Öffnungsdatum nehmen  
-            my $opening_dt=$apiis->today;
-            if ($zuchtstammid->[3]) {
-                $opening_dt=$zuchtstammid->[3];
-            }
+            #--  Datum in einheitliches Format umändern 
+            my @vdat=Apiis::Misc::LocalToRawDate('EU', $opening_dt);
 
-            #-- Nur neue Nummer in transfer anlegen ('only_transfer'=>'1')
-            my $guid=CreateTransfer($apiis,
-                        {'db_animal'=>$db_parents,
-                        'ext_unit'=>$zuchtstammid->[0],
-                        'ext_id'=>$zuchtstammid->[1],
-                        'ext_animal'=>$zuchtstammid->[2],
-                        'opening_dt'=>$opening_dt
-            });
-
-            if (!$guid) {
-                push(@{$err_zuchtstamm},$apiis->errors);
+            #-- Wenn Datum nicht umformatiert werden kann, dann Fehler auslösen
+            if (!$vdat[0]) {
+                    
+                my $error= Apiis::Errors->new(
+                        type       => 'DATA',
+                        severity   => 'CRIT',
+                        from       => 'LS01a_Zuchtstamm',
+                        ext_fields => ['opening_dt'],
+                        msg_short  => "Ungültiges Datumsformat: $opening_dt"
+                );
+                    
+                #-- Wenn Anlegen einen Fehler erzeugt hat, dann wurde keine guid vergeben 
+                $self->status(1);
+                $self->errors($apiis->errors);
+                $rollback=1;
                 $apiis->del_errors;
+            }   
+            else {
+            
+                $db_parents=$apiis->DataBase->seq_next_val('seq_transfer__db_animal');
+
+#                $opening_dt=$vdat[0];
+                
+                if ($zuchtstammid->[3]) {
+                    $opening_dt=$zuchtstammid->[3];
+                }
+
+                #-- Nur neue Nummer in transfer anlegen ('only_transfer'=>'1')
+                my $guid=CreateTransfer($apiis,
+                            {'db_animal'=>$db_parents,
+                            'ext_unit'=>$zuchtstammid->[0],
+                            'ext_id'=>$zuchtstammid->[1],
+                            'ext_animal'=>$zuchtstammid->[2],
+                            'opening_dt'=>$opening_dt
+                });
+
+                if (!$guid) {
+                    $self->status(1);
+                    $self->errors($apiis->errors);
+                    $rollback=1;
+#push(@{$err_zuchtstamm},$apiis->errors);
+                    $apiis->del_errors;
+                }
             }
         } 
         
