@@ -25,16 +25,16 @@
        <Color BackGround="white" />
        <Format MarginTop="30px"/>
     </Image>
-<!--    
+    
     <Field Name="NeuerNutzer">
       <Button ButtonLabel="Ersterfassung eines neuen Nutzers" URL="Ladestroeme/LS10_NeuerNutzer.frm" Command="do_open_form"/>
       <Position Row="2" Column="1"/>
       <Miscellaneous/>
       <Text FontSize="12px" TextAlign="center"/>
-      <Color BackGround="#ffc600"/>
+      <Color BackGround="#ffff00"/>
       <Format BorderStyle="groove" BorderColor="lightgray"/>
     </Field>
--->
+
     <Image Name="Image_71ca2" Alt="Test" Src="/icons/blank1.gif">
        <Position Column="2" Row="2" Width="1px"/>
        <Color BackGround="white" />
