@@ -69,7 +69,7 @@
 
     <Field Name="user_language_id" FlowOrder="17">
       <DataSource Name="DataSource_F8742">
-        <Sql Statement="select lang_id, iso_lang from languages where iso_lang in ('de','ru','en')"/>
+        <Sql Statement="select lang_id, iso_lang from languages where iso_lang in ('de')"/>
       </DataSource>
       <ScrollingList Size="1"/>
       <Position Column="3" Position="absolute" Row="12"/>
@@ -88,7 +88,7 @@
 
     <Field Name="ext_title" FlowOrder="8" >
       <DataSource Name="DataSource_F874C783">
-        <Sql Statement="SELECT 	ext_code, ext_code || ' - ' || short_name FROM codes WHERE class='TITLE'"/>
+        <Sql Statement="SELECT 	ext_code, ext_code || ' - ' || short_name FROM codes WHERE class='TITLE' order by ext_code"/>
       </DataSource>
       <ScrollingList Size="1"/>
       <Position Column="0" Position="absolute" Row="6"/>
@@ -105,7 +105,7 @@
 
     <Field Name="ext_salutation" FlowOrder="9" >
       <DataSource Name="DataSource_ff1_1">
-        <Sql Statement="SELECT 	db_code, ext_code || ' - ' || short_name FROM codes WHERE class='SALUTATION'"/>
+        <Sql Statement="SELECT 	db_code, ext_code || ' - ' || short_name FROM codes WHERE class='SALUTATION' order by ext_code"/>
       </DataSource>
       <ScrollingList Size="1"/>
       <Position Column="1" Position="absolute" Row="6"/>
@@ -228,20 +228,15 @@
       <Text FontSize="12px"/>
       <Format MarginTop="20px"/>
     </Label>
-    <Label Name="L2" Content="Bezeichner:">
-      <Position Column="1" Position="absolute" Row="23"/>
-      <Text FontSize="12px"/>
-      <Format MarginTop="20px"/>
-    </Label>
     <Label Name="L3" Content="Mitglied in:">
-      <Position Column="2" Position="absolute" Row="23"/>
+      <Position Column="1" Position="absolute" Row="23"/>
       <Text FontSize="12px"/>
       <Format  MarginTop="20px"/>
     </Label>
 
     <Field Name="g10" FlowOrder="45" >
       <DataSource Name="DataSource_1">
-       <Sql Statement="SELECT distinct ext_unit, ext_unit FROM unit where ext_unit in ('owner', 'breeder') order by ext_unit"/>
+       <Sql Statement="SELECT distinct ext_unit, ext_unit FROM unit where ext_unit in ('breeder') order by ext_unit"/>
       </DataSource>
       <ScrollingList Size="1"/>  
       <Position Column="0" Position="absolute" Row="24"/>
@@ -265,7 +260,7 @@
 
     <Field Name="g20" FlowOrder="47" >
       <DataSource Name="DataSource_3">
-       <Sql Statement="SELECT distinct ext_unit, ext_unit FROM unit where ext_unit like ('%buch%rer') order by ext_unit"/>
+       <Sql Statement="SELECT distinct ext_unit, ext_unit FROM unit where ext_unit in ('owner') order by ext_unit"/>
       </DataSource>
       <ScrollingList Size="1"/>  
       <Position Column="0" Position="absolute" Row="25"/>
@@ -274,6 +269,7 @@
       <Color/>
       <Format/>
     </Field>
+
     <Field Name="g21" FlowOrder="48" >
     <DataSource Name="DataSource_5">
        <Sql Statement="SELECT distinct ext_unit || ':::' || ext_id, ext_unit || ':::' || ext_id FROM unit where ext_unit in ('ortsverein', 'kreisverband', 'bezirksverband', 'landesverband', 'sonderzuchtverein') order by ext_unit || ':::' || ext_id"/>
@@ -286,7 +282,7 @@
       <Format/>
     </Field>
     
-    <Field Name="g30" FlowOrder="47" >
+    <Field Name="g30" FlowOrder="49" >
       <DataSource Name="DataSource_6">
        <Sql Statement="SELECT distinct ext_unit, ext_unit FROM unit where ext_unit in ('pruefer') order by ext_unit"/>
       </DataSource>
@@ -295,14 +291,14 @@
       <Miscellaneous/>
       <Text/>
       <Color/>
-      <Format/>
+      <Format MarginBottom="20px"/>
     </Field>
     
 	&NavigationButtons_Fields;
     &StatusLine_Block;
 
     <Color BackGround="#f0f0f0"/>
-    <Format BorderStyle="ridge" BorderColor="#f0f0f0" MarginTop="12px"/>
+    <Format BorderStyle="ridge" BorderColor="#f0f0f0" MarginTop="20px"/>
 
   </Block>
 </Form>
