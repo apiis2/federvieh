@@ -13,7 +13,7 @@
       <Text FontSize="34px" TextAlign="center"/>
     </Label>
  
-    <Label Name="Label_1a2" Content="Eingabe">
+    <Label Name="Label_1a2" Content="Nutzer bearbeiten">
       <Position Column="0-6" Row="1"/>
       <Text FontSize="16px" TextAlign="center"/>
     </Label>
@@ -35,6 +35,15 @@
       <Format BorderStyle="groove" BorderColor="lightgray"/>
     </Field>
 
+    <Field Name="UserZugriffsrechte2">
+      <Button ButtonLabel="Zugriffsrechte &amp;auml;ndern" URL="ar_users.frm" Command="do_open_form"/>
+      <Position Column="3" Row="2"/>
+      <Miscellaneous/>
+      <Text FontSize="12px" TextAlign="center"/>
+      <Color BackGround="#ffc600"/>
+      <Format BorderStyle="groove" BorderColor="lightgray"/>
+    </Field>
+    
     <Image Name="Image_71ca2" Alt="Test" Src="/icons/blank1.gif">
        <Position Column="2" Row="2" Width="1px"/>
        <Color BackGround="white" />
