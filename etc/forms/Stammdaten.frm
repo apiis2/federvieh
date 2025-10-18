@@ -2,7 +2,7 @@
 <!DOCTYPE Form PUBLIC "1" "../form3.dtd">
 
 <Form Name="FP30">
-  <General Name="G177"  Content="__('Stammdaten')"  MenuID="M1" ToolTip="__('Eingabe/Ändern von Stammdaten')" Help="/doc/StammdatenFrm.html" AR="user" Difficulty='basic' StyleSheet="/etc/apiis.css" Description="Stammdaten "/>
+  <General Name="G177"  Content="__('Stammdaten')"  MenuID="M1" ToolTip="__('Eingabe/Ändern von Stammdaten')" Help="/doc/StammdatenFrm.html" AR="3" Difficulty='basic' StyleSheet="/etc/apiis.css" Description="Stammdaten "/>
 
   <Block Name="B178" Description="Update animal">
      
@@ -60,7 +60,7 @@
       <Position Column="0" Position="absolute" Row="1"/>
     </Label>
 
-    <Field Name="F699" AR="user" DSColumn="C82" >
+    <Field Name="F699" AR="3" DSColumn="C82" >
       <TextField Override="no" Size="20"/>
       <Position Column="1" Position="absolute" Row="1"/>
       <Miscellaneous Visibility="hidden" Enabled="no"/>
@@ -68,7 +68,7 @@
       <Color/>
       <Format/>
     </Field>
-    <Field Name="Fanimal_ext_unit" AR="user" DSColumn="C86" FlowOrder="1" >
+    <Field Name="Fanimal_ext_unit" AR="3" DSColumn="C86" FlowOrder="1" >
       <DataSource Name="DataSource_101">
         <Sql Statement="select ext_code, ext_code from codes where class='ID_SET' and ext_code='bundesring'"/>
       </DataSource>
@@ -79,7 +79,7 @@
       <Color/>
       <Format/>
     </Field>
-    <Field Name="Fanimal_ext_id" AR="user" DSColumn="C88" FlowOrder="2" >
+    <Field Name="Fanimal_ext_id" AR="3" DSColumn="C88" FlowOrder="2" >
       <DataSource Name="DataSource_1015aa">
         <Sql Statement="select 'BDRG', 'BDRG'"/>
       </DataSource>
@@ -90,7 +90,7 @@
       <Color/>
       <Format/>
     </Field>
-    <Field Name="Fanimal_ext_animal" AR="user" DSColumn="C90" FlowOrder="3" >
+    <Field Name="Fanimal_ext_animal" AR="3" DSColumn="C90" FlowOrder="3" >
       <TextField Override="no" Size="10"/>
       <Position Column="3" Position="absolute" Row="1"/>
       <Miscellaneous />
@@ -104,7 +104,7 @@
       <Position Column="0" Position="absolute" Row="2"/>
     </Label>
 
-    <Field Name="Fsire" AR="user" DSColumn="C82s" >
+    <Field Name="Fsire" AR="3" DSColumn="C82s" >
       <TextField Override="no" Size="20"/>
       <Position Column="1" Position="absolute" Row="2"/>
       <Miscellaneous Visibility="hidden" Enabled="no"/>
@@ -112,7 +112,7 @@
       <Color/>
       <Format/>
     </Field>
-    <Field Name="Fsire_ext_unit" AR="user" DSColumn="C86s" FlowOrder="1" >
+    <Field Name="Fsire_ext_unit" AR="3" DSColumn="C86s" FlowOrder="1" >
       <DataSource Name="DataSource_101s">
         <Sql Statement="select ext_code, ext_code from codes where class='ID_SET' and ext_code='bundesring'"/>
       </DataSource>
@@ -123,7 +123,7 @@
       <Color/>
       <Format/>
     </Field>
-    <Field Name="Fsire_ext_id" AR="user" DSColumn="C88s" FlowOrder="2" >
+    <Field Name="Fsire_ext_id" AR="3" DSColumn="C88s" FlowOrder="2" >
       <DataSource Name="DataSource_1015aas">
         <Sql Statement="select 'BDRG', 'BDRG'"/>
       </DataSource>
@@ -134,7 +134,7 @@
       <Color/>
       <Format/>
     </Field>
-    <Field Name="Fsire_ext_animal" AR="user" DSColumn="C90s" FlowOrder="3" >
+    <Field Name="Fsire_ext_animal" AR="3" DSColumn="C90s" FlowOrder="3" >
       <TextField Override="no" Size="10"/>
       <Position Column="3" Position="absolute" Row="2"/>
       <Miscellaneous />
@@ -147,7 +147,7 @@
       <Position Column="0" Position="absolute" Row="3"/>
     </Label>
 
-    <Field Name="Fdam" AR="user" DSColumn="C82d" >
+    <Field Name="Fdam" AR="3" DSColumn="C82d" >
       <TextField Override="no" Size="20"/>
       <Position Column="1" Position="absolute" Row="3"/>
       <Miscellaneous Visibility="hidden" Enabled="no"/>
@@ -155,7 +155,7 @@
       <Color/>
       <Format/>
     </Field>
-    <Field Name="Fdam_ext_unit" AR="user" DSColumn="C86d" FlowOrder="1" >
+    <Field Name="Fdam_ext_unit" AR="3" DSColumn="C86d" FlowOrder="1" >
       <DataSource Name="DataSource_101d">
         <Sql Statement="select ext_code, ext_code from codes where class='ID_SET' and ext_code='bundesring'"/>
       </DataSource>
@@ -166,7 +166,7 @@
       <Color/>
       <Format/>
     </Field>
-    <Field Name="Fdam_ext_id" AR="user" DSColumn="C88d" FlowOrder="2" >
+    <Field Name="Fdam_ext_id" AR="3" DSColumn="C88d" FlowOrder="2" >
       <DataSource Name="DataSource_1015aad">
         <Sql Statement="select 'BDRG', 'BDRG'"/>
       </DataSource>
@@ -177,7 +177,7 @@
       <Color/>
       <Format/>
     </Field>
-    <Field Name="Fdam_ext_animal" AR="user" DSColumn="C90d" FlowOrder="3" >
+    <Field Name="Fdam_ext_animal" AR="3" DSColumn="C90d" FlowOrder="3" >
       <TextField Override="no" Size="10"/>
       <Position Column="3" Position="absolute" Row="3"/>
       <Miscellaneous />
@@ -192,7 +192,7 @@
       <Position Column="0" Position="absolute" Row="4"/>
     </Label>
 
-    <Field Name="F108" AR="user" DSColumn="C105" >
+    <Field Name="F108" AR="3" DSColumn="C105" >
       <TextField Override="no" Size="20"/>
       <Position Column="1" Position="absolute" Row="4"/>
       <Miscellaneous Visibility="hidden" Enabled="no"/>
@@ -200,7 +200,7 @@
       <Color/>
       <Format/>
     </Field>
-    <Field Name="F110" AR="user" DSColumn="C109" FlowOrder="4" >
+    <Field Name="F110" AR="3" DSColumn="C109" FlowOrder="4" >
       <DataSource Name="DataSource_103">
         <Sql Statement="select ext_code, ext_code from codes where class='ID_SET' and ext_code='zuchtstamm'"/>
       </DataSource>
@@ -211,7 +211,7 @@
       <Color/>
       <Format/>
     </Field>
-    <Field Name="F112" AR="user" DSColumn="C111" FlowOrder="5" >
+    <Field Name="F112" AR="3" DSColumn="C111" FlowOrder="5" >
       <DataSource Name="DataSource_1017">
         <Sql Statement="select distinct ext_id, ext_id from entry_unit where ext_unit in (select  ext_code from entry_codes where class='ID_SET' and ext_code='zuchtstamm') order by ext_id"/>
       </DataSource>
@@ -222,7 +222,7 @@
       <Color/>
       <Format/>
     </Field>
-    <Field Name="F114" AR="user" DSColumn="C113" FlowOrder="6" >
+    <Field Name="F114" AR="3" DSColumn="C113" FlowOrder="6" >
       <TextField Override="no" Size="20"/>
       <Position Column="3" Position="absolute" Row="4"/>
       <Miscellaneous/>
@@ -236,7 +236,7 @@
       <Position Column="0" Position="absolute" Row="5"/>
     </Label>
 
-    <Field Name="F94" AR="user" DSColumn="C93" FlowOrder="10" InternalData="yes">
+    <Field Name="F94" AR="3" DSColumn="C93" FlowOrder="10" InternalData="yes">
       <DataSource Name="DataSource_1015aa1">
         <Sql Statement="select db_code, ext_code || ' - ' || case when long_name isnull then case when short_name isnull
         then ext_code else short_name end else long_name end from codes where class='SEX' order by ext_code"/>
@@ -254,7 +254,7 @@
       <Position Column="0" Position="absolute" Row="6"/>
     </Label>
 
-    <Field Name="F103" AR="user" DSColumn="C102" FlowOrder="11" >
+    <Field Name="F103" AR="3" DSColumn="C102" FlowOrder="11" >
       <TextField Override="no" Size="10"/>
       <Position Column="1" Position="absolute" Row="6"/>
       <Miscellaneous/>
@@ -267,7 +267,7 @@
       <Position Column="0" Position="absolute" Row="7"/>
     </Label>
 
-    <Field Name="F149" AR="user" DSColumn="C148" FlowOrder="14" >
+    <Field Name="F149" AR="3" DSColumn="C148" FlowOrder="14" >
       <TextField Override="no" Size="10"/>
       <Position Column="1" Position="absolute" Row="7"/>
       <Miscellaneous/>
@@ -281,7 +281,7 @@
       <Position Column="0" Position="absolute" Row="8"/>
     </Label>
 
-    <Field Name="F167" AR="user" DSColumn="C166" FlowOrder="15" InternalData="yes">
+    <Field Name="F167" AR="3" DSColumn="C166" FlowOrder="15" InternalData="yes">
       <DataSource Name="DataSource_1015aa5">
         <Sql Statement="select a.db_breedcolor,b.ext_code || case when a.db_color isnull then '' else ' - ' || c.ext_code end from breedcolor a inner join codes b on a.db_breed=b.db_code left outer join codes c on a.db_color=c.db_code  order by b.ext_code, c.ext_code"/>
       </DataSource>
@@ -297,7 +297,7 @@
       <Position Column="0" Position="absolute" Row="14"/>
     </Label>
 
-    <Field Name="F176" AR="user" DSColumn="C175" >
+    <Field Name="F176" AR="3" DSColumn="C175" >
       <TextField Override="no" Size="20"/>
       <Position Column="1" Position="absolute" Row="14"/>
       <Miscellaneous/>
