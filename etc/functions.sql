@@ -55,8 +55,9 @@ select db_code as key,  concat(ext_code, ' - ', coalesce(long_name,short_name,ex
 ;
 
 create or replace view ScrollinglistGetEventTyp as 
-select db_code as key,  concat(ext_code, ' - ', coalesce(long_name,short_name,ext_code)) as value from codes where class='EVENT' order by value;
+select db_code as key,  concat(ext_code, ' - ', coalesce(long_name,short_name,ext_code)) as value from codes where class='EVENT' order by ext_code::numeric;
 ;
+
 
 create or replace view ScrollinglistGetClass as 
 select distinct class as key , class as value from codes order by class;
