@@ -2,7 +2,7 @@
 <!DOCTYPE Form PUBLIC "1" "../../form2.dtd">  
 
 <Form Name="F11">
-  <General Name="G1246" StyleSheet="/etc/apiis.css" Description="Form"/>
+  <General Name="G1246" StyleSheet="/etc/apiis.css" Description="Form" AR="3"/>
 
   <Block Name="B1247" Description="Update unit">
      

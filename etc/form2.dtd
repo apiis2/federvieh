@@ -27,7 +27,7 @@
 	      Height       CDATA   ""
           Description  CDATA   ""
           DefaultForm  CDATA   ""
-          AR           (admin|coord|user|anon) "user"
+          AR           (1|2|3|4) "3"
           Content      CDATA   ""
           ToolTip      CDATA   ""
           Help         CDATA   ""

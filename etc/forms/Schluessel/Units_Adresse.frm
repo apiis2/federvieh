@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Form PUBLIC "1" "../../form2.dtd">
 <Form Name="F9">
-  <General Name="G1246" StyleSheet="/etc/apiis.css" Description="Units anlegen"/>
+  <General Name="G1246" StyleSheet="/etc/apiis.css" Description="Units anlegen" AR="3"/>
 
   <Block Name="B1247" Description="Update unit">
      

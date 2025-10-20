@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE Form PUBLIC "1" "../form3.dtd">
+<!DOCTYPE Form PUBLIC "1" "../form3.dtd"[
+  <!ENTITY NavigationButtons_Fields SYSTEM "http://federvieh.local/etc/navigationbuttons.xml">
+  <!ENTITY ActionButtons_Fields     SYSTEM "http://federvieh.local/etc/actionbuttons.xml">
+  <!ENTITY StatusLine_Block         SYSTEM "http://federvieh.local/etc/statusbar.xml">
+]>
 <Form Name="FP30">
-  <General Name="G177"  Content="__('Stammdaten')"  MenuID="M1" ToolTip="__('Eingabe/Ändern von Stammdaten')" Help="/doc/StammdatenFrm.html" AR="user" Difficulty='basic' StyleSheet="/etc/apiis.css" Description="Stammdaten"/>
+  <General Name="G177"  Content="__('Stammdaten')"  MenuID="M1" ToolTip="__('Eingabe/Ändern von Stammdaten')" Help="/doc/StammdatenFrm.html" AR="3" Difficulty='basic' StyleSheet="/etc/apiis.css" Description="Stammdaten"/>
 
   <Block Name="B178" Description="Update animal">
      
@@ -31,7 +35,7 @@
       <Position Column="0" Position="absolute" Row="1"/>
     </Label>
 
-    <Field Name="F699" AR="user" DSColumn="C82" InternalData="yes">
+    <Field Name="F699" AR="3" DSColumn="C82" InternalData="yes">
       <TextField Override="no" Size="20"/>
       <Position Column="1" Position="absolute" Row="1"/>
       <Miscellaneous />
@@ -45,7 +49,7 @@
       <Position Column="0" Position="absolute" Row="2"/>
     </Label>
 
-    <Field Name="F108" AR="user" DSColumn="C105" InternalData="yes" >
+    <Field Name="F108" AR="3" DSColumn="C105" InternalData="yes" >
       <TextField Override="no" Size="20"/>
       <Position Column="1" Position="absolute" Row="2"/>
       <Miscellaneous />
@@ -58,7 +62,7 @@
       <Position Column="0" Position="absolute" Row="3"/>
     </Label>
 
-    <Field Name="F119" AR="user" DSColumn="C116" InternalData="yes">
+    <Field Name="F119" AR="3" DSColumn="C116" InternalData="yes">
       <TextField Override="no" Size="20"/>
       <Position Column="1" Position="absolute" Row="3"/>
       <Miscellaneous />
@@ -71,7 +75,7 @@
       <Position Column="0" Position="absolute" Row="4"/>
     </Label>
 
-    <Field Name="F94" AR="user" DSColumn="C93" FlowOrder="10" InternalData="yes">
+    <Field Name="F94" AR="3" DSColumn="C93" FlowOrder="10" InternalData="yes">
       <DataSource Name="DataSource_1015aa1">
         <Sql Statement="select db_code, ext_code || ' - ' || case when long_name isnull then case when short_name isnull
         then ext_code else short_name end else long_name end from codes where class='SEX' order by ext_code"/>
@@ -89,7 +93,7 @@
       <Position Column="0" Position="absolute" Row="5"/>
     </Label>
 
-    <Field Name="F103" AR="user" DSColumn="C102" FlowOrder="11" >
+    <Field Name="F103" AR="3" DSColumn="C102" FlowOrder="11" >
       <TextField Override="no" Size="10"/>
       <Position Column="1" Position="absolute" Row="5"/>
       <Miscellaneous/>
@@ -102,7 +106,7 @@
       <Position Column="0" Position="absolute" Row="7"/>
     </Label>
 
-    <Field Name="F149" AR="user" DSColumn="C148" FlowOrder="14" >
+    <Field Name="F149" AR="3" DSColumn="C148" FlowOrder="14" >
       <TextField Override="no" Size="10"/>
       <Position Column="1" Position="absolute" Row="7"/>
       <Miscellaneous/>
@@ -116,7 +120,7 @@
       <Position Column="0" Position="absolute" Row="8"/>
     </Label>
 
-    <Field Name="F167" AR="user" DSColumn="C166" FlowOrder="15" InternalData="yes">
+    <Field Name="F167" AR="3" DSColumn="C166" FlowOrder="15" InternalData="yes">
       <DataSource Name="DataSource_1015aa5">
         <Sql Statement="select a.db_breedcolor,b.ext_code || ' - ' || c.ext_code from breedcolor a inner join codes b on a.db_breed=b.db_code inner join codes c on a.db_color=c.db_code order by b.ext_code, c.ext_code"/>
       </DataSource>
@@ -132,7 +136,7 @@
       <Position Column="0" Position="absolute" Row="9"/>
     </Label>
 
-    <Field Name="F168" AR="user" DSColumn="C167" FlowOrder="15" InternalData="yes">
+    <Field Name="F168" AR="3" DSColumn="C167" FlowOrder="15" InternalData="yes">
       <DataSource Name="DataSource_1015aa5a">
         <Sql Statement="select a.db_breedcolor,b.ext_code || ' - ' || c.ext_code from breedcolor a inner join codes b on a.db_breed=b.db_code inner join codes c on a.db_color=c.db_code order by b.ext_code, c.ext_code"/>
       </DataSource>
@@ -148,7 +152,7 @@
       <Position Column="0" Position="absolute" Row="10"/>
     </Label>
 
-    <Field Name="F176" AR="user" DSColumn="C175" >
+    <Field Name="F176" AR="3" DSColumn="C175" >
       <TextField Override="no" Size="20"/>
       <Position Column="1" Position="absolute" Row="14"/>
       <Miscellaneous/>

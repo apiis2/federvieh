@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Form PUBLIC "1" "../../form.dtd">
 <Form Name="Umnummerieren">
-  <General Name="Umnummerieren_General" StyleSheet="/etc/apiis.css" Description="LS-Umnummerieren"/>
+  <General Name="Umnummerieren_General" StyleSheet="/etc/apiis.css" Description="LS-Umnummerieren" AR="3"/>
 
   <Block Name="Umnummerieren_B1" >
     <DataSource Name="Umnummerieren_DS_1" >

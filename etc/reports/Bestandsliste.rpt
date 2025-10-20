@@ -4,6 +4,7 @@
   <General
     DataSource="Bestandsliste({tiergruppe},{bestandsliste_von},{bestandsliste_bis},{betrieb},{sort},{farbe},{datum},{zusammenfassung})"
     CreatePDF="pdf()"
+    AR="3"
     StrictParameter="no" 
     UseForm="/etc/forms/Bestandsliste.pfrm"
     Name="Bestandsliste (detailiert)" StyleSheet="etc/apiis.css" PageFooter="All_Pages" PageHeader="All_Pages"/>

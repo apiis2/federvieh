@@ -3,6 +3,7 @@
 <Report>
   <General
     DataSource="Zuchtstamm({_breeder},{_onlyactive})"
+    AR="3"
     CreatePDF="pdf()"
     StrictParameter="no"
     UseForm="/etc/forms/Zuchtstamm.pfrm"

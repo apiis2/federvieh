@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Form PUBLIC "1" "../form2.dtd">
 <Form Name="BrutKükenliste" >
-  <General Name="BrutKükenliste_General" StyleSheet="/etc/apiis.css" Description="Parameter-BrutKükenliste"/>
+  <General Name="BrutKükenliste_General" StyleSheet="/etc/apiis.css" Description="Parameter-BrutKükenliste" AR="3"/>
 
   <Block Name="BrutKükenliste_B1" Description="BrutKükenliste" NavigationBar="no">
     <DataSource Name="BrutKükenliste_DS1"  Connect="no">

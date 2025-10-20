@@ -2,8 +2,8 @@
 <!DOCTYPE Form PUBLIC "1" "../form3.dtd">
 
 <Form Name="performances">
-  <General Name      ="performances_General"  MenuID="M1" AR="user" Content="__('Ergebnisse')" Difficulty="basic" 
-           StyleSheet="/etc/apiis.css" Description="Leistungsergebnisse ändern" 
+  <General Name      ="performances_General"  MenuID="M1" AR="3" Content="__('Ergebnisse')" Difficulty="basic" 
+           StyleSheet="/etc/apiis.css" Description="Leistungsergebnisse &amp;auml;ndern" 
            ToolTip   ="__'(Leistungsergebnisse ändern')" Help="/doc/Performances.html"/>
 
   <Block Name="B282" Description="Update performances_results">
@@ -29,7 +29,7 @@
 
     <Field Name="F0" DSColumn="C0" FlowOrder="0" InternalData="yes">
       <DataSource Name="DS0">
-        <Sql Statement="select standard_performances_id, concat(user_get_ext_id_animal(a.db_animal),' - ', concat(d.label, ' - ', c.event_dt, ' - ', user_get_event_location(c.db_event))) from standard_performances a inner join entry_transfer b  on a.db_animal=b.db_animal inner join event c on a.db_event=c.db_event inner join standard_events d on c.standard_events_id=d.standard_events_id"/>
+        <Sql Statement="select standard_performances_id, concat(user_get_ext_id_animal(a.db_animal),' - ', concat(d.label, ' - ', TO_CHAR(c.event_dt, 'DD.MM.YYYY') , ' - ', user_get_event_location(c.db_event))) from standard_performances a inner join entry_transfer b  on a.db_animal=b.db_animal inner join event c on a.db_event=c.db_event inner join standard_events d on c.standard_events_id=d.standard_events_id"/>
       </DataSource>
       <ScrollingList Size="1"/>
       <Position Column="1" Position="absolute" Row="1"/>

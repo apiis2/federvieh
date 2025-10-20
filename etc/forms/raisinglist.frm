@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Form PUBLIC "1" "../form2.dtd">
 <Form Name="FORM_1600329032">
-  <General Name="G63.frm" StyleSheet="/etc/apiis.css" Description="Form"/>
+  <General Name="G63.frm" StyleSheet="/etc/apiis.css" Description="Form" AR="3"/>
 
   <Block Name="B64" Description="Update raisinglist">
      

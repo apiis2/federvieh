@@ -3,6 +3,7 @@
 <Report>
   <General
     Name="Adressen Export" PageFooter="All_Pages" PageHeader="All_Pages"
+    AR="3"
     UseForm="/etc/forms/MitgliederListeExport.pfrm"
     DataSource="sql({status})"
     StyleSheet="../etc/apiis.css"/>

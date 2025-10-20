@@ -8,7 +8,7 @@
   <!ENTITY CallForm_Block           SYSTEM "http://federvieh.local/etc/callform_button_block.xml">
 ]>
 <Form Name="F8">
-  <General Name="G177" StyleSheet="/etc/apiis.css" Description="Tiere"/>
+  <General Name="G177" StyleSheet="/etc/apiis.css" Description="Tiere" AR="3"/>
 
   <Block Name="B178" Description="Update animal">
     <DataSource Name="DataSource_493"  Connect="no">

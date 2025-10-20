@@ -4,6 +4,7 @@
   <General
     DataSource="FileUpload({filename},{importfilter},{onlycheck},{action},{breed},{db_animal})"
     StyleSheet="../etc/apiis.css"
+    AR="3"
     StrictParameter="no"
     UseForm="/etc/reports/FileUpload.pfrm"
     Name="FileUpload" PageFooter="All_Pages" PageHeader="All_Pages"/>

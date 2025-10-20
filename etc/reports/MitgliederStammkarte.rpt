@@ -3,6 +3,7 @@
 <Report>
   <General
     Name="Adressen Stammkarte" PageFooter="All_Pages" PageHeader="All_Pages"
+    AR="3"
     UseForm="/etc/forms/MitgliederStammkarte.pfrm"
     DataSource="sql({kategorie},{status})"
     StyleSheet="../etc/apiis.css"/>

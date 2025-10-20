@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Form PUBLIC "1" "../form2.dtd">
 <Form Name="Schluessel_m6">
-  <General Name="General_715a6" StyleSheet="/etc/apiis.css" Description="Form"/>
+  <General Name="General_715a6" StyleSheet="/etc/apiis.css" Description="Form" AR="2"/>
 
   <Block Name="Block_674a6" Description="Update unit" NavigationBar="no">
 

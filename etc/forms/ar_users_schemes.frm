@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE Form PUBLIC "1" "../form.dtd">
+<!DOCTYPE Form PUBLIC "1" "../form2.dtd">
 
 <Form Name="FORM_1569957046ar">
-  <General Name="ar_users_schemes.frm" StyleSheet="/etc/apiis.css" Description="Form" AR_Group="admin"/>
+  <General Name="ar_users_schemes.frm" StyleSheet="/etc/apiis.css" Description="Form" AR="1"/>
 
   <Block Name="B519" Description="Update ar_users_schemes">
      

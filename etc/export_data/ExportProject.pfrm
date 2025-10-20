@@ -15,7 +15,7 @@
     </Label>
 
     <Field Name="ExpPjt_Field_514" FlowOrder="2">
-      <Button ButtonLabel="__('Export Datenbank')" URL="/etc/export_data/ExportProject" Command="do_exit"/>
+      <Button ButtonLabel="__('Export Datenbank')" URL="/etc/export_data/ExportProject.rpt" Command="do_exit"/>
       <Position Column="0-1" Position="absolute" Row="7"/>
       <Miscellaneous/>
       <Text/>

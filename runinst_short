@@ -61,11 +61,12 @@ perl lib/test.LO LO_ReorgMenuStructure;
 perl lib/load.DS LO_LS30_Merkmale       load/data/LS30_Merkmale.xlsx                    off;
 perl lib/load.DS LO_LS31_Rasseschemas   load/data/LS31_Rasseschemas.xlsx                off;
 perl lib/load.DS LO_LS32_Eventschemas   load/data/LS32_Eventschemas.xlsx                off;
+perl lib/load.DS LO_LS21_Vorwerkhuehner load/data/Vorwerkhühner/2020/Zuchtbuch_Vorwerk_2020.txt   off;
 perl lib/load.DS LO_LS21_Vorwerkhuehner load/data/Vorwerkhühner/2021/Zuchtbuch_Vorwerk_2021.txt   off;
-#bash load_excel.bsh;
+bash load_excel.bsh;
 
 #perl $FEDERVIEH/lib/load.DS LO_LS01  $FEDERVIEH/doc/Beispiel_LS01.xlsx off ;
 #perl $FEDERVIEH/lib/load.DS LO_LS11  $FEDERVIEH/load/data/LS11_Events_2019.csv off ;
 
-firefox -new-window federvieh.local;
+firefox -new-window http://federvieh.local/index1.html;
 

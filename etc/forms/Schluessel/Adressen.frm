@@ -2,7 +2,7 @@
 <!DOCTYPE Form PUBLIC "1" "../../form3.dtd">
 
 <Form Name="F4">
-  <General Name="Adressen" Content="__('Eingabe/Ändern von Adressdaten')" MenuID="M1" ToolTip="__('Eingabe/Ändern von Adressen')" Help="/doc/AdressenFrm.html" AR="user" Difficulty='basic' StyleSheet="/etc/apiis.css" Description="Form"/>
+  <General Name="Adressen" Content="__('Eingabe/Ändern von Adressdaten')" MenuID="M1" ToolTip="__('Eingabe/Ändern von Adressen')" Help="/doc/AdressenFrm.html" AR="3" Difficulty='basic' StyleSheet="/etc/apiis.css" Description="Form"/>
 
   <Block Name="B984" Description="Update address">
      
@@ -31,7 +31,7 @@
       <Position Column="0" Position="absolute" Row="1"/>
       <Text FontSize="12px"/>
     </Label>
-    <Field Name="F886" AR="coord" DSColumn="C885" FlowOrder="1" ToolTip="__('Vom Zuchtverband ausgegebene Züchteridentifikation BZZZ(B) z.B. G218N')" LabelName="L851" >
+    <Field Name="F886" AR="2" DSColumn="C885" FlowOrder="1" ToolTip="__('Vom Zuchtverband ausgegebene Züchteridentifikation BZZZ(B) z.B. G218N')" LabelName="L851" >
       <TextField Override="no" Size="10"/>
       <Position Column="0" Position="absolute" Row="2"/>
       <Color BackGround="#00ffff"/>

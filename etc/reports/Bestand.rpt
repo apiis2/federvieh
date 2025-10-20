@@ -4,6 +4,7 @@
   <General
     DataSource="Bestand({bestand_von},{bestand_bis},{zu_ab})"
     CreatePDF="pdf()"
+    AR="3"
     UseForm="/etc/forms/Bestand.pfrm"
     StrictParameter="no"
     Name="Bestand (allgemein)" StyleSheet="etc/apiis.css" PageFooter="All_Pages" PageHeader="All_Pages"/>

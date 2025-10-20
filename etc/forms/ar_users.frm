@@ -2,7 +2,7 @@
 <!DOCTYPE Form PUBLIC "1" "../form3.dtd">
 
 <Form Name="FORM_ar_users">
-    <General Name="ar_users" Content="__('Zugriffsrechte ändern')" MenuID="M1" ToolTip="__('Eingabe/Ändern von funktionalen Zugriffsrechten für Nutzer')" Help="/doc/ar_users.html" AR="admin" Difficulty='advanced' StyleSheet="/etc/apiis.css" Description="Form"/>
+    <General Name="ar_users" Content="__('Zugriffsrechte ändern')" MenuID="M1" ToolTip="__('Eingabe/Ändern von funktionalen Zugriffsrechten für Nutzer')" Help="/doc/ar_users.html" AR="1" Difficulty='advanced' StyleSheet="/etc/apiis.css" Description="Form"/>
 
   <Block Name="Bar_users" Description="Update ar_users">
      
@@ -42,7 +42,7 @@
     </Label>
     <Field Name="F503" DSColumn="Car_users3" FlowOrder="2" InternalData="yes" ToolTip="__('Sprache')" LabelName="L499">
       <DataSource Name="DS502">
-        <Sql Statement="select lang_id, iso_lang from languages where iso_lang in ('de','en')"/>
+        <Sql Statement="select lang_id, iso_lang from languages where iso_lang in ('de','en','ru')"/>
       </DataSource>
       <ScrollingList Size="1"/>
       <Position Column="1" Position="absolute" Row="3"/>
@@ -91,7 +91,7 @@
 
     <Field Name="F514" DSColumn="Car_users7" FlowOrder="5" InternalData="yes" ToolTip="__('Funktionale Rechte des Users')" LabelName="L512">
       <DataSource Name="DS514">
-        <Sql Statement="SELECT 'admin', 'Administrator' union select 'coord', 'Koordinator' union select 'user', 'Nutzer'"/>
+        <Sql Statement="SELECT '1', 'Administrator' as ar union select '2', 'Koordinator' union select '3', 'Nutzer' order by ar"/>
       </DataSource>
       <ScrollingList Size="1"/>
       <Position Column="1" Position="absolute" Row="6"/>

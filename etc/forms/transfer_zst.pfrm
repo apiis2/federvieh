@@ -3,8 +3,8 @@
 
 <Form Name="EM_transfer">
 
-  <General Name      ="transfer_General"  MenuID="M1" AR="user" Content="__('Zuchtstämme')" Difficulty="basic" 
-           StyleSheet="/etc/apiis.css" Description="Tiernummern einem Tier zuordnen" 
+  <General Name      ="transfer_General"  MenuID="M1" AR="3" Content="__('Zuchtstämme')" Difficulty="basic" 
+           StyleSheet="/etc/apiis.css" Description="Zuchtstamm schliessen" 
            ToolTip   ="__'(Zuchtstämme schließen')" Help="/doc/Transfer.html"/>
 
   <Block Name="B613" Description="Update Transfer">
@@ -44,7 +44,7 @@
       <Text FontSize="10px"/>
     </Label>
     
-    <Field Name="F1" DSColumn="C1" FlowOrder="0" InternalData="yes"  LabelName="L1">
+    <Field Name="F1" DSColumn="C1" InternalData="yes"  LabelName="L1">
       <TextField Override="no" Size="20"/>
       <Position Column="1" Position="absolute" Row="2"/>
       <Miscellaneous Visibility="hidden" Enabled="no"/>
@@ -52,20 +52,17 @@
       <Color />
       <Format/>
     </Field>
-    <Field Name="F2" DSColumn="C2" FlowOrder="2" InternalData="yes"  LabelName="L2" ToolTip="__('Auswahl des Nummernsystems')">
-      <DataSource Name="EM_Transfer_DS2">
-        <SqlFunction Action="do_execute_sql" View="ScrollinglistGetID_SET"/>
-      </DataSource>
-      <ScrollingList Size="1" DefaultFunction="apiisrc" Default="zuchtstamm" />  
+    <Field Name="F2" DSColumn="C2"  LabelName="L2" ToolTip="__('Auswahl des Nummernsystems')">
+      <TextField Size="8" Default="zuchtstamm"/>
       <Position Column="1" Position="absolute" Row="2"/>
-      <Miscellaneous />
-      <Text />
-      <Color/>
-      <Format/>
+      <Miscellaneous Enabled="no"/>
+      <Text/>
+      <Color BackGround="transparent"/>
+      <Format BorderColor="transparent"/>
     </Field>
-    <Field Name="F3" DSColumn="C3" FlowOrder="3" InternalData="yes"  LabelName="L3" ToolTip="__('Auswahl des Nummernkreises')">
+    <Field Name="F3" DSColumn="C3" FlowOrder="1"   LabelName="L3" ToolTip="__('Auswahl des Nummernkreises')">
       <DataSource Name="EM_Transfer_DS3">
-        <SqlFunction Action="do_execute_sql" View="ScrollinglistGetID_SET_ext_id"/>
+        <Sql Statement="select distinct ext_id from entry_unit where ext_unit='zuchtstamm' order by ext_id"/>
       </DataSource>
       <ScrollingList Size="1" DefaultFunction="apiisrc" Default="ext_id" StartCompareString="right" ReduceEntries="yes" />  
       <Position Column="2" Position="absolute" Row="2"/>
@@ -74,7 +71,7 @@
       <Color/>
       <Format/>
     </Field>
-    <Field Name="F4" DSColumn="C4" FlowOrder="4" InternalData="yes"  LabelName="L4" ToolTip="__('Tiernummer eingeben')">
+    <Field Name="F4" DSColumn="C4" FlowOrder="2"  LabelName="L4" ToolTip="__('Tiernummer eingeben')">
       <TextField Size="8"/>
       <Position Column="3" Position="absolute" Row="2"/>
       <Miscellaneous />
@@ -84,7 +81,7 @@
     </Field>
 
 
-    <Label Name="L5" Content="__('Zuchtstamm aktiv ab')">
+    <Label Name="L5" Content="__('Zuchtstamm aktiv von')">
       <Position Column="0" Position="absolute" Row="3"/>
     </Label>
     <Field Name="F5" DSColumn="C5" FlowOrder="5" InternalData="yes"  LabelName="L5" ToolTip="__('Ab wann ist der Zuchtstamm aktiv? dd.mm.yyyy')">
@@ -96,7 +93,7 @@
       <Format/>
     </Field>
 
-    <Label Name="L6" Content="__('Zuchtstamm deaktivieren ab')">
+    <Label Name="L6" Content="__('Zuchtstamm aktiv bis')">
       <Position Column="0" Position="absolute" Row="4"/>
     </Label>
     <Field Name="F6" DSColumn="C6" FlowOrder="6" InternalData="yes"  LabelName="L6" ToolTip="__('Ab wann ist der Zuchtstamm nicht mehr aktiv? dd.mm.yyyy')">

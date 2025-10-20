@@ -17,7 +17,7 @@ sub GetData {
                     b.sire, b.dams, litter_dt, 
                     laid_id, born_alive_no, unfertilized_no, dead_eggs_no, male_born_no, animals 
              from litter a inner join 
-                (select db_litter, user_get_ext_breed_of(db_breed,'l') as breed, 
+                (select db_litter, user_get_ext_breed_of(db_animal,'l') as breed, 
                         user_get_ext_location_of(a.db_dam) as location,
                         (select  STRING_AGG(user_get_ext_animal(db_animal), ', ')) as animals, 
                         user_get_ext_id_animal(a.db_sire) as sire,

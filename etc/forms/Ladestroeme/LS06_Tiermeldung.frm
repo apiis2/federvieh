@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Form PUBLIC "1" "../../form3.dtd">
 <Form Name="LS06">
-    <General Name="LS06_General"  MenuID="M1" AR="user" Content="__('LS Tier')" Difficulty="basic" StyleSheet="/etc/apiis.css" Description="Tier erstellen" ToolTip="__('Erstellen eines neuen Tieres')" Help="/doc/LO_Tier_erstellen.html"/>
+    <General Name="LS06_General"  MenuID="M1" AR="3" Content="__('LS Tier')" Difficulty="basic" StyleSheet="/etc/apiis.css" Description="Tier erstellen" ToolTip="__('Erstellen eines neuen Tieres')" Help="/doc/LO_Tier_erstellen.html"/>
 
   <Block Name="LS06B" Description="Ladestrom - Tiermeldung" >
     <DataSource Name="LS06D" >

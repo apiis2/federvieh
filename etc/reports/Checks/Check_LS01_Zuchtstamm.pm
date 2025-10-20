@@ -52,7 +52,7 @@ sub Check_LS01_Zuchtstamm {
     #
     #############################################################################
 
-    $sql="select c.db_animal, c.db_sire, c.db_dam, c.db_parents, user_get_ext_id_animal(c.db_animal) as ext_animal, user_get_ext_breedcolor(c.db_breed), user_get_ext_code(c.db_sex) as sex, user_get_ext_breeder_of(c.db_animal), a.opening_dt from transfer a inner join parents b on a.db_animal=b.db_parents inner join animal c on b.db_animal=c.db_animal where ext_animal='CD6019' order by sex, ext_animal";
+    $sql="select c.db_animal, c.db_sire, c.db_dam, c.db_parents, user_get_ext_id_animal(c.db_animal) as ext_animal, user_get_ext_breedcolor(c.db_breed), user_get_ext_code(c.db_sex) as sex, user_get_ext_breeder_of(c.db_animal), a.opening_dt from transfer a inner join parents b on a.db_animal=b.db_parents inner join animal c on b.db_animal=c.db_animal where a.db_animal=$db_animal order by sex, ext_animal";
     
     $sql_ref = $apiis->DataBase->sys_sql( $sql );
     if ( $sql_ref->status and ($sql_ref->status == 1 )) {

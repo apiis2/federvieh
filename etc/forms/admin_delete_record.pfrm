@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE Form PUBLIC "1" "../form.dtd">
+<!DOCTYPE Form PUBLIC "1" "../form2.dtd">
 <Form Name="admin2">
-  <General Name="General_515" StyleSheet="/etc/apiis.css" Description="Administration-Tier"/>
+  <General Name="General_515" StyleSheet="/etc/apiis.css" Description="Administration-Tier" AR="3"/>
 
   <Block Name="Block_488" Description="Administration-Tier" NavigationBar="no">
     <DataSource Name="DataSource_493a">

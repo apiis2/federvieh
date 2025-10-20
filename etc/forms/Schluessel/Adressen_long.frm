@@ -8,7 +8,7 @@
   <!ENTITY CallForm_Block           SYSTEM "http://federvieh.local/etc/callform_button_block.xml">
 ]>
 <Form Name="F4">
-  <General Name="Adressen" Content="__('Eingabe/Ändern von Adressdaten')" ToolTip="__('Eingabe/Ändern von Adressen')" Help="/doc/AdressenFrm.html" AR="coord" Difficulty='basic' StyleSheet="/etc/apiis.css" Description="Form"/>
+  <General Name="Adressen" Content="__('Eingabe/Ändern von Adressdaten')" ToolTip="__('Eingabe/Ändern von Adressen')" Help="/doc/AdressenFrm.html" AR="2" Difficulty='basic' StyleSheet="/etc/apiis.css" Description="Form"/>
 
   <Block Name="B984" Description="Update address">
      
@@ -58,7 +58,7 @@
       <Position Column="0" Position="absolute" Row="1"/>
       <Text FontSize="12px"/>
     </Label>
-    <Field Name="F886" AR="coord" DSColumn="C885" FlowOrder="1" ToolTip="__('Vom Zuchtverband ausgegebene Züchteridentifikation BZZZ(B) z.B. G218N')" LabelName="L851" >
+    <Field Name="F886" AR="2" DSColumn="C885" FlowOrder="1" ToolTip="__('Vom Zuchtverband ausgegebene Züchteridentifikation BZZZ(B) z.B. G218N')" LabelName="L851" >
       <TextField Override="no" Size="10"/>
       <Position Column="0" Position="absolute" Row="2"/>
       <Color BackGround="#00ffff"/>
@@ -70,7 +70,7 @@
       <Position Column="1" Position="absolute" Row="1"/>
       <Text FontSize="12px"/>
     </Label>
-    <Field Name="F931" AR="coord" DSColumn="C930" FlowOrder="2" >
+    <Field Name="F931" AR="2" DSColumn="C930" FlowOrder="2" >
       <TextField Override="no" Size="10"/>
       <Position Column="1" Position="absolute" Row="2"/>
       <Miscellaneous/>
@@ -93,7 +93,7 @@
       <Position Column="2" Position="absolute" Row="3"/>
       <Text FontSize="12px"/>
     </Label>
-    <Field Name="F859" AR="coord" DSColumn="C858" FlowOrder="5" LabelName="L857" >
+    <Field Name="F859" AR="2" DSColumn="C858" FlowOrder="5" LabelName="L857" >
       <TextField Override="no" Size="25"/>
       <Position Column="1" Position="absolute" Row="4"/>
     </Field>
@@ -337,7 +337,7 @@
       <Position Column="0" Position="absolute" Row="17"/>
       <Text FontSize="12px"/>
     </Label>
-    <Field Name="F937" AR="coord" DSColumn="C936" FlowOrder="26" ToolTip="__('Name der Bank')" LabelName="L935">
+    <Field Name="F937" AR="2" DSColumn="C936" FlowOrder="26" ToolTip="__('Name der Bank')" LabelName="L935">
       <TextField Override="no" Size="25"/>
       <Position Column="0" Position="absolute" Row="18"/>
     </Field>
@@ -347,7 +347,7 @@
       <Position Column="1" Position="absolute" Row="17"/>
       <Text FontSize="12px"/>
     </Label>
-    <Field Name="F940" AR="coord" DSColumn="C939" FlowOrder="27" ToolTip="__('International Bank Identifikation')" LabelName="L938">
+    <Field Name="F940" AR="2" DSColumn="C939" FlowOrder="27" ToolTip="__('International Bank Identifikation')" LabelName="L938">
       <TextField Override="no" Size="10"/>
       <Position Column="1" Position="absolute" Row="18"/>
     </Field>
@@ -356,7 +356,7 @@
       <Position Column="2" Position="absolute" Row="17"/>
       <Text FontSize="12px"/>
     </Label>
-    <Field Name="F943" AR="coord" DSColumn="C942" FlowOrder="28" ToolTip="__('BIC')" LabelName="L941">
+    <Field Name="F943" AR="2" DSColumn="C942" FlowOrder="28" ToolTip="__('BIC')" LabelName="L941">
       <TextField Override="no" Size="10"/>
       <Position Column="2" Position="absolute" Row="18"/>
     </Field>
@@ -397,7 +397,7 @@
       <Position Column="1" Position="absolute" Row="19"/>
       <Text FontSize="12px"/>
     </Label>
-    <Field Name="F949" AR="coord" DSColumn="C948" FlowOrder="31" ToolTip="__('Mitglied seit (dd.mm.yyyy)')" LabelName="L947" >
+    <Field Name="F949" AR="2" DSColumn="C948" FlowOrder="31" ToolTip="__('Mitglied seit (dd.mm.yyyy)')" LabelName="L947" >
       <TextField Override="no" Size="10"/>
       <Position Column="1" Position="absolute" Row="20"/>
     </Field>
@@ -407,7 +407,7 @@
       <Position Column="2" Position="absolute" Row="19"/>
       <Text FontSize="12px"/>
     </Label>
-    <Field Name="F952" AR="coord" DSColumn="C951" FlowOrder="32" ToolTip="__('Mitglied bis (dd.mm.yyyy)')" LabelName="L950">
+    <Field Name="F952" AR="2" DSColumn="C951" FlowOrder="32" ToolTip="__('Mitglied bis (dd.mm.yyyy)')" LabelName="L950">
       <TextField Override="no" Size="10"/>
       <Position Column="2" Position="absolute" Row="20"/>
     </Field>
@@ -417,7 +417,7 @@
       <Text FontSize="12px"/>
     </Label>
 
-    <Field Name="F928" AR="coord" DSColumn="C927" FlowOrder="33" ToolTip="__('Bemerkungen')" LabelName="L926" >
+    <Field Name="F928" AR="2" DSColumn="C927" FlowOrder="33" ToolTip="__('Bemerkungen')" LabelName="L926" >
       <TextField Override="no" Size="110"/>
       <Position Column="0" Columnspan="4" Position="absolute" Row="22"/>
     </Field>

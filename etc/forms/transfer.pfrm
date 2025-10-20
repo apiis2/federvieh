@@ -3,7 +3,7 @@
 
 <Form Name="EM_transfer">
 
-  <General Name      ="transfer_General"  MenuID="M1" AR="user" Content="__('Tiernummern/Zuchtstämme')" Difficulty="basic" 
+  <General Name      ="transfer_General"  MenuID="M1" AR="3" Content="__('Tiernummern/Zuchtstämme')" Difficulty="basic" 
            StyleSheet="/etc/apiis.css" Description="Tiernummern einem Tier zuordnen" 
            ToolTip   ="__'(Zuordnung einer Nummer zu einem Tier/Zuchtstamm')" Help="/doc/Transfer.html"/>
 

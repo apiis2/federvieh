@@ -8,7 +8,7 @@
   <!ENTITY CallForm_Block           SYSTEM "http://federvieh.local/etc/callform_button_block.xml">
 ]>
 <Form Name="F4">
-  <General Name="Adressen" Content="__('Eingabe/Ändern von Adressdaten')" ToolTip="__('Eingabe/Ändern von Adressen')" Help="/doc/AdressenFrm.html" AR="coord" Difficulty='basic' StyleSheet="/etc/apiis.css" Description="Form"/>
+  <General Name="Adressen" Content="__('Eingabe/Ändern von Adressdaten')" ToolTip="__('Eingabe/Ändern von Adressen')" Help="/doc/AdressenFrm.html" AR="2" Difficulty='basic' StyleSheet="/etc/apiis.css" Description="Form"/>
 
   <Block Name="B984" Description="Update address">
      

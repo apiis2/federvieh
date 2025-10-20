@@ -3,7 +3,7 @@
 
 <Form Name="standard_events">
   
-    <General Name="standard_events_General"  MenuID="M1" AR="user" Content="__('Standard Events')" Difficulty="advanced" StyleSheet="/etc/apiis.css" Description="Definition von Standards für Events" ToolTip="__'(Definition von Standards für Events')" Help="/doc/Standard_Events.html"/>
+    <General Name="standard_events_General"  MenuID="M1" AR="1" Content="__('Standard Events')" Difficulty="advanced" StyleSheet="/etc/apiis.css" Description="Definition von Standards f&amp;uuml;r Events" ToolTip="__'(Definition von Standards für Events')" Help="/doc/Standard_Events.html"/>
 
   <Block Name="standard_events_Block" Description="Update standard_events">
      
@@ -41,7 +41,10 @@
     </Label>
 
     <Field Name="F2" DSColumn="C2" FlowOrder="2" LabelName="se_L2" ToolTip="__('Eindeutiger Name des Event-Schemas')">
-      <TextField Override="no" Size="20"/>
+      <DataSource Name="standard_events_DSF2">
+        <Sql Statement="SELECT label, label from standard_events order by label"/>
+      </DataSource>
+      <ScrollingList Size="1"/>
       <Position Column="1" Position="absolute" Row="2"/>
       <Miscellaneous />
       <Text/>

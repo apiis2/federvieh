@@ -6,7 +6,8 @@
     ToolTip="__('Erzeugt eine Liste aller in der Datenbank genutzen Schlüssel')"
     Help="/doc/CodesPdf.html"
     DataSource="GetData()"
-    AR="coord" Content="__('Liste Codes')" Difficulty="advanced" 
+    AR="2" 
+    Content="__('Liste Codes')" Difficulty="advanced" 
     CreatePDF="pdf()"
     PageFooter="All_Pages" PageHeader="All_Pages"/>
   <Detail Name="Detail_0">

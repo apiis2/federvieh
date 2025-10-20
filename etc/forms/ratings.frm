@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Form PUBLIC "1" "../form2.dtd">
 <Form Name="FORM_1621885243">
-  <General Name="G53.frm" StyleSheet="/etc/apiis.css" Description="Form"/>
+  <General Name="G53.frm" StyleSheet="/etc/apiis.css" Description="Form" AR="3"/>
 
   <Block Name="B54" Description="ÄÄUpdate ratings">
      

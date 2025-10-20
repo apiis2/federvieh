@@ -3,7 +3,7 @@
 
 <Form Name="standard_breeds">
   
-    <General Name="standard_breeds_General"  MenuID="M1" AR="user" Content="__('Standard Rassen')" Difficulty="advanced" StyleSheet="/etc/apiis.css" Description="Definition von Standards für Rasse" ToolTip="__'(Definition von Standards für Rassen')" Help="/doc/Standard_Rassen.html"/>
+    <General Name="standard_breeds_General"  MenuID="M1" AR="1" Content="__('Standard Rassen')" Difficulty="advanced" StyleSheet="/etc/apiis.css" Description="Definition von Standards f&amp;uuml;r Rasse" ToolTip="__'(Definition von Standards für Rassen')" Help="/doc/Standard_Rassen.html"/>
 
   <Block Name="standard_breeds_Block" Description="Update standard_breeds">
      
@@ -37,7 +37,10 @@
     </Label>
 
     <Field Name="F2" DSColumn="C2" FlowOrder="2" LabelName="st_L2" ToolTip="__('Eindeutiger Name des Rasse-Schemas')">
-      <TextField Override="no" Size="20"/>
+      <DataSource Name="standard_breeds_DSF2">
+        <Sql Statement="SELECT label, label from standard_breeds order by label"/>
+      </DataSource>
+      <ScrollingList Size="1"/>
       <Position Column="1" Position="absolute" Row="2"/>
       <Miscellaneous />
       <Text/>

@@ -3,7 +3,7 @@
 
 <Form Name="standard_traits">
   
-    <General Name="standard_traits_General"  MenuID="M1" AR="user" Content="__('Standard Merkmale')" Difficulty="advanced" StyleSheet="/etc/apiis.css" Description="Definition von Standards für Merkmale" ToolTip="__'(Definition von Standards für Merkmale')" Help="/doc/Standard_Merkmale.html"/>
+    <General Name="standard_traits_General"  MenuID="M1" AR="1" Content="__('Standard Merkmale')" Difficulty="advanced" StyleSheet="/etc/apiis.css" Description="Definition von Standards f&amp;uuml;r Merkmale" ToolTip="__'(Definition von Standards für Merkmale')" Help="/doc/Standard_Merkmale.html"/>
 
   <Block Name="standard_traits_Block" Description="Update standard_traits">
      
@@ -37,7 +37,10 @@
     </Label>
 
     <Field Name="F2" DSColumn="C2" FlowOrder="2" LabelName="st_L2" ToolTip="__('Eindeutiger Name des Merkmal-Schemas')">
-      <TextField Override="no" Size="20"/>
+      <DataSource Name="DSF2">
+        <Sql Statement="SELECT label, label from standard_traits order by label"/>
+      </DataSource>
+      <ScrollingList Size="1"/>
       <Position Column="1" Position="absolute" Row="2"/>
       <Miscellaneous />
       <Text/>

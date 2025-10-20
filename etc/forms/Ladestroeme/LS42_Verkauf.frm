@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE Form PUBLIC "1" "../../form.dtd">
+<!DOCTYPE Form PUBLIC "1" "../../form2.dtd">
 <Form Name="FP34">
-  <General Name="General_515" StyleSheet="/etc/apiis.css" Description="LS-Verkauf"/>
+  <General Name="General_515" StyleSheet="/etc/apiis.css" Description="LS-Verkauf" AR="3"/>
 
   <Block Name="Block_488" >
     <DataSource Name="DataSource_493" >

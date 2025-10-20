@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE Form PUBLIC "1" "../../form3.dtd">
+<!DOCTYPE Form PUBLIC "1" "../form3.dtd">
 <Form Name="FORM_1597660573">
-  <General Name="G130.frm" StyleSheet="/etc/apiis.css" Description="Form"/>
+  <General Name="G130.frm" StyleSheet="/etc/apiis.css" Description="Form" AR="3"/>
 
   <Block Name="B131" Description="Update layinglist">
      

@@ -294,5 +294,8 @@ msgstr "Formulare"
 msgid "Liste Codes"
 msgstr "Liste Codes"
 
+msgid "locations"
+msgstr "Standort"
+
 msgid "Erzeugt eine Liste aller in der Datenbank genutzen Schlüssel"
 msgstr "Erzeugt eine Liste aller in der Datenbank genutzen Schlüssel"

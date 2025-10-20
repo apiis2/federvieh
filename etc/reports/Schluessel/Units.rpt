@@ -3,6 +3,7 @@
 <Report>
   <General
     DataSource="GetData()"
+    AR="3"
     CreatePDF="pdf()"
     Name="Liste Units" PageFooter="All_Pages" PageHeader="All_Pages"/>
   <Detail Name="Detail_0">

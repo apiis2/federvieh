@@ -4,6 +4,7 @@
   <General
     DataSource="ExportProject()"
     StyleSheet="../etc/apiis.css"
+    AR="3"
     StrictParameter="no"
     UseForm="/etc/export_data/ExportProject.pfrm"
     Name="General_0" PageFooter="All_Pages" PageHeader="All_Pages" CharSet="UTF-8"/>

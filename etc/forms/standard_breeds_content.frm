@@ -3,7 +3,7 @@
 
 <Form Name="standard_breeds_content">
   
-    <General Name="standard_breeds_content_General"  MenuID="M1" AR="user" Content="__('Standard Rassen')" Difficulty="advanced" StyleSheet="/etc/apiis.css" Description="Zuordnung der Rassen zu Schemas" ToolTip="__'(Zuordnung der Rassen zu Schemas')" Help="/doc/Standard_Rasse_Zuordnung.html"/>
+    <General Name="standard_breeds_content_General"  MenuID="M1" AR="1" Content="__('Standard Rassen')" Difficulty="advanced" StyleSheet="/etc/apiis.css" Description="Zuordnung der Rassen zu Schemas" ToolTip="__'(Zuordnung der Rassen zu Schemas')" Help="/doc/Standard_Rasse_Zuordnung.html"/>
 
   <Block Name="standard_breeds_content_Block" Description="Update standard_contentbreeds">
      

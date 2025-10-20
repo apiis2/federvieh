@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Form PUBLIC "1" "../../form2.dtd">
 <Form Name="F4LS10">
-  <General Name="G983" StyleSheet="/etc/apiis.css" Description="Neuer Nutzer"/>
+  <General Name="G983" StyleSheet="/etc/apiis.css" Description="Neuer Nutzer" AR="3"/>
 
   <Block Name="B984" Description="Update address">
     <DataSource Name="DataSource_493" >
       <none/>
-      <Parameter Name="Parameter1" Key="LO" Value="LO_LS10"/>
+      <Parameter Name="Parameter1" Key="LO" Value="LO_LS10_NeuerNutzer"/>
     </DataSource>
      
     <Label Name="Label_490" Content="Ladestrom - LS10_NeuerNutzer">
@@ -105,7 +105,7 @@
 
     <Field Name="ext_salutation" FlowOrder="9" >
       <DataSource Name="DataSource_ff1_1">
-        <Sql Statement="SELECT 	db_code, ext_code || ' - ' || short_name FROM codes WHERE class='SALUTATION' order by ext_code"/>
+        <Sql Statement="SELECT 	ext_code, ext_code || ' - ' || short_name FROM codes WHERE class='SALUTATION' order by ext_code"/>
       </DataSource>
       <ScrollingList Size="1"/>
       <Position Column="1" Position="absolute" Row="6"/>

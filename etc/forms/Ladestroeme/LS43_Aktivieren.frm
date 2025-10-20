@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE Form PUBLIC "1" "../../form.dtd">
+<!DOCTYPE Form PUBLIC "1" "../../form2.dtd">
 <Form Name="Aktivieren">
-  <General Name="Aktivieren_General_515" StyleSheet="/etc/apiis.css" Description="Aktivieren"/>
+  <General Name="Aktivieren_General_515" StyleSheet="/etc/apiis.css" Description="Aktivieren" AR="3"/>
 
   <Block Name="Aktivieren_Block_488" >
     <DataSource Name="DataSource_493" >

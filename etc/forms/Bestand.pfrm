@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE Form PUBLIC "1" "../form.dtd">
+<!DOCTYPE Form PUBLIC "1" "../form2.dtd">
 <Form Name="Bestand_1129e">
-  <General Name="General_515" StyleSheet="/etc/apiis.css" Description="Bestand"/>
+  <General Name="General_515" StyleSheet="/etc/apiis.css" Description="Bestand" AR="3"/>
 
   <Block Name="Block_488" Description="Bestandsliste" NavigationBar="no">
     <DataSource Name="DataSource_493" >

@@ -3,6 +3,6 @@
 # order of records is order in menu
 # __('*') is for internationalization  
 # ID;Path;__('Name')
-M1;etc/forms;__('Formulare')
-M2;etc/reports;__('Berichte')
-M3;etc/admin;__('Administration')
+M1;etc/forms_pub;__('Formulare')
+M2;etc/reports_pub;__('Berichte')
+M3;etc/admin_pub;__('Administration')

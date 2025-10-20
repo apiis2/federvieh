@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Form PUBLIC "1" "../../form2.dtd">
 <Form Name="F23a">
-  <General Name="General_515" StyleSheet="/etc/apiis.css" Description="LS02-Federvieh"/>
+  <General Name="General_515" StyleSheet="/etc/apiis.css" Description="LS02-Federvieh" AR="3"/>
 
   <Block Name="Block_488" Description="Ladestrom - Brut- und K&amp;uum;kenliste" >
     <DataSource Name="DataSource_493" >

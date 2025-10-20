@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Form PUBLIC "1" "../../form2.dtd">
 <Form Name="F4LO">
-  <General Name="G983" StyleSheet="/etc/apiis.css" Description="Adressen"/>
+  <General Name="G983" StyleSheet="/etc/apiis.css" Description="Adressen" AR="3"/>
 
   <Block Name="B984" Description="Update address">
     <DataSource Name="DataSource_493" >

@@ -1,33 +1,39 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE Form PUBLIC "1" "../form3.dtd">
-<Form Name="FORM_1600370927">
-  <General Name="G97.frm" StyleSheet="/etc/apiis.css" Description="Form"/>
+<!DOCTYPE Form PUBLIC "1" "http://federvieh.local/etc/form2.dtd"[  <!ENTITY NavigationButtons_Fields SYSTEM "http://federvieh.local/etc/navigationbuttons.xml">
+  <!ENTITY ActionButtons_Fields     SYSTEM "http://federvieh.local/etc/actionbuttons.xml">
+  <!ENTITY StatusLine_Block         SYSTEM "http://federvieh.local/etc/statusbar.xml">
+  <!ENTITY DumpButton_Block         SYSTEM "http://federvieh.local/etc/dumpbutton_block.xml">
+  <!ENTITY StatusLine2_Block        SYSTEM "http://federvieh.local/etc/statusbar.xml">
+  <!ENTITY CallForm_Block           SYSTEM "http://federvieh.local/etc/callform_button_block.xml">
+]>
+<Form Name="FORM_1759776744">
+  <General Name="G800.frm" StyleSheet="/etc/apiis.css" Description="Form" AR="3"/>
 
-  <Block Name="B98" Description="Update stickers">
+  <Block Name="B801" Description="Update stickers">
      
-    <DataSource Name="DS99" Connect="no">
+    <DataSource Name="DS802" Connect="no">
       <Record TableName="stickers"/>
-      <Column DBName="fontsize" Name="C74" Order="0" Type="DB"/>
-      <Column DBName="guid" Name="C77" Order="1" Type="DB"/>
-      <Column DBName="height" Name="C80" Order="2" Type="DB"/>
-      <Column DBName="marginright" Name="C83" Order="3" Type="DB"/>
-      <Column DBName="margintop" Name="C86" Order="4" Type="DB"/>
-      <Column DBName="name" Name="C89" Order="5" Type="DB"/>
-      <Column DBName="sticker_id" Name="C92" Order="6" Type="DB"/>
-      <Column DBName="width" Name="C95" Order="7" Type="DB"/>
+      <Column DBName="fontsize" Name="C777" Order="0" Type="DB"/>
+      <Column DBName="guid" Name="C780" Order="1" Type="DB"/>
+      <Column DBName="height" Name="C783" Order="2" Type="DB"/>
+      <Column DBName="label" Name="C786" Order="3" Type="DB"/>
+      <Column DBName="marginright" Name="C789" Order="4" Type="DB"/>
+      <Column DBName="margintop" Name="C792" Order="5" Type="DB"/>
+      <Column DBName="sticker_id" Name="C795" Order="6" Type="DB"/>
+      <Column DBName="width" Name="C798" Order="7" Type="DB"/>
     </DataSource>
       
 
-    <Label Name="L72" Content="__('stickers'): ">
+    <Label Name="L775" Content="__('stickers'): ">
       <Position Column="0" Columnspan="10" Position="absolute" Row="0"/>
       <Text FontSize="24px" TextDecoration="underline"/>
     </Label>
 
-    <Label Name="L73" Content="__('fontsize'): ">
+    <Label Name="L776" Content="__('fontsize'): ">
       <Position Column="0" Position="absolute" Row="1"/>
     </Label>
 
-    <Field Name="F75" DSColumn="C74" FlowOrder="0" >
+    <Field Name="F778" DSColumn="C777" FlowOrder="0" >
       <TextField Override="no" Size="1"/>
       <Position Column="1" Position="absolute" Row="1"/>
       <Miscellaneous />
@@ -37,11 +43,11 @@
     </Field>
 
 
-    <Label Name="L76" Content="__('guid'): ">
+    <Label Name="L779" Content="__('guid'): ">
       <Position Column="0" Position="absolute" Row="2"/>
     </Label>
 
-    <Field Name="F78" DSColumn="C77" FlowOrder="1" >
+    <Field Name="F781" DSColumn="C780" FlowOrder="1" >
       <TextField Override="no" Size="20"/>
       <Position Column="1" Position="absolute" Row="2"/>
       <Miscellaneous Enabled="no"/>
@@ -51,11 +57,11 @@
     </Field>
 
 
-    <Label Name="L79" Content="__('height'): ">
+    <Label Name="L782" Content="__('height'): ">
       <Position Column="0" Position="absolute" Row="3"/>
     </Label>
 
-    <Field Name="F81" DSColumn="C80" FlowOrder="2" >
+    <Field Name="F784" DSColumn="C783" FlowOrder="2" >
       <TextField Override="no" Size="5"/>
       <Position Column="1" Position="absolute" Row="3"/>
       <Miscellaneous />
@@ -65,12 +71,12 @@
     </Field>
 
 
-    <Label Name="L82" Content="__('marginright'): ">
+    <Label Name="L785" Content="__('label'): ">
       <Position Column="0" Position="absolute" Row="4"/>
     </Label>
 
-    <Field Name="F84" DSColumn="C83" FlowOrder="3" >
-      <TextField Override="no" Size="5"/>
+    <Field Name="F787" DSColumn="C786" FlowOrder="3" >
+      <TextField Override="no" Size="100"/>
       <Position Column="1" Position="absolute" Row="4"/>
       <Miscellaneous />
       <Text/>
@@ -79,11 +85,11 @@
     </Field>
 
 
-    <Label Name="L85" Content="__('margintop'): ">
+    <Label Name="L788" Content="__('marginright'): ">
       <Position Column="0" Position="absolute" Row="5"/>
     </Label>
 
-    <Field Name="F87" DSColumn="C86" FlowOrder="4" >
+    <Field Name="F790" DSColumn="C789" FlowOrder="4" >
       <TextField Override="no" Size="5"/>
       <Position Column="1" Position="absolute" Row="5"/>
       <Miscellaneous />
@@ -93,12 +99,12 @@
     </Field>
 
 
-    <Label Name="L88" Content="__('name'): ">
+    <Label Name="L791" Content="__('margintop'): ">
       <Position Column="0" Position="absolute" Row="6"/>
     </Label>
 
-    <Field Name="F90" DSColumn="C89" FlowOrder="5" >
-      <TextField Override="no" Size="100"/>
+    <Field Name="F793" DSColumn="C792" FlowOrder="5" >
+      <TextField Override="no" Size="5"/>
       <Position Column="1" Position="absolute" Row="6"/>
       <Miscellaneous />
       <Text/>
@@ -107,11 +113,11 @@
     </Field>
 
 
-    <Label Name="L91" Content="__('sticker_id'): ">
+    <Label Name="L794" Content="__('sticker_id'): ">
       <Position Column="0" Position="absolute" Row="7"/>
     </Label>
 
-    <Field Name="F93" DSColumn="C92" FlowOrder="6" >
+    <Field Name="F796" DSColumn="C795" FlowOrder="6" >
       <TextField Override="no" Size="20"/>
       <Position Column="1" Position="absolute" Row="7"/>
       <Miscellaneous />
@@ -121,11 +127,11 @@
     </Field>
 
 
-    <Label Name="L94" Content="__('width'): ">
+    <Label Name="L797" Content="__('width'): ">
       <Position Column="0" Position="absolute" Row="8"/>
     </Label>
 
-    <Field Name="F96" DSColumn="C95" FlowOrder="7" >
+    <Field Name="F799" DSColumn="C798" FlowOrder="7" >
       <TextField Override="no" Size="5"/>
       <Position Column="1" Position="absolute" Row="8"/>
       <Miscellaneous />

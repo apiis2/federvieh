@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE Form PUBLIC "1" "form.dtd">
+<!DOCTYPE Form PUBLIC "1" "form3.dtd">
 <Form Name="LO_verwaltung_m">
-  <General Description="Menu" Name="General_0a2" StyleSheet="/etc/apiis.css"/>
+  <General Description="Menu" Name="General_0a2" StyleSheet="/etc/apiis.css" AR="3"/>
   <Block Description="LO_verwaltung" Name="Block_0a2" NavigationBar="no">
     
     <DataSource Name="DataSource_0a2">
@@ -26,7 +26,7 @@
        <Format MarginTop="30px"/>
     </Image>
     
-    <Field Name="LOVLO2">
+    <Field Name="LOVLO2" AR="1">
       <Button ButtonLabel="Tier anlegen" URL="Ladestroeme/LS06_Tiermeldung.frm" Command="do_open_form"/>
       <Position Row="2" Column="1"/>
       <Miscellaneous/>
@@ -35,17 +35,8 @@
       <Format BorderStyle="groove" BorderColor="lightgray"/>
     </Field>
 
-    <Field Name="LOVLO1">
-      <Button ButtonLabel="Zuchtstamm anlegen (nur Bundesring-Nummern)" URL="Ladestroeme/LS01_Zuchtstammmeldung_nur_BDRG.frm" Command="do_open_form"/>
-      <Position Row="3" Column="1"/>
-      <Miscellaneous/>
-      <Text FontSize="12px" TextAlign="center"/>
-      <Color BackGround="#ffc600"/>
-      <Format BorderStyle="groove" BorderColor="lightgray"/>
-    </Field>
-
     <Field Name="LOVLO1a">
-      <Button ButtonLabel="Zuchtstamm anlegen (alle Nummernsysteme)" URL="Ladestroeme/LS01_Zuchtstammmeldung.frm" Command="do_open_form"/>
+      <Button ButtonLabel="Zuchtstamm anlegen" URL="Ladestroeme/LS01_Zuchtstammmeldung.frm" Command="do_open_form"/>
       <Position Row="4" Column="1"/>
       <Miscellaneous/>
       <Text FontSize="12px" TextAlign="center"/>

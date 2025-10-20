@@ -2,7 +2,7 @@
 <!DOCTYPE Form PUBLIC "1" "../form3.dtd">
 
 <Form Name="FP2">
-  <General Name="General_515" StyleSheet="/etc/apiis.css" Description="Zuchstamm"/>
+  <General Name="General_515" StyleSheet="/etc/apiis.css" Description="Zuchstamm" AR="3"/>
 
   <Block Name="Block_488" Description="Zuchstamm" NavigationBar="no">
     <DataSource Name="DataSource_493" >

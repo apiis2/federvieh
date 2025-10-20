@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Form PUBLIC "1" "../form3.dtd">
 <Form Name="FPSteckbrief">
-  <General Name="General_515" StyleSheet="/etc/apiis.css" Description="Steckbrief"/>
+  <General Name="General_515" StyleSheet="/etc/apiis.css" Description="Steckbrief" AR="3" />
 
   <Block Name="Block_488" Description="Steckbrief" NavigationBar="no">
     <DataSource Name="DataSource_493a">

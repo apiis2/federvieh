@@ -5,7 +5,7 @@
     Name="Check_LS01_Zuchtstamm" 
     UseForm="/etc/reports/Checks/Check_LS01_Zuchtstamm.pfrm"
     StrictParameter="no"
-    AR="user" Content="__('Check_LS01_Zuchtstamm')" Difficulty="basic" 
+    AR="3" Content="__('Check_LS01_Zuchtstamm')" Difficulty="basic" 
     DataSource="Check_LS01_Zuchtstamm({animal_ext_unit},{animal_ext_id},{animal_ext_animal})"
     StyleSheet="/etc/apiis.css" 
     PageFooter="All_Pages" PageHeader="All_Pages"/>

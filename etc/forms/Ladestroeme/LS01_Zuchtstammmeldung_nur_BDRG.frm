@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Form PUBLIC "1" "../../form3.dtd">
 <Form Name="LS01">
-    <General Name="LS01_General"  MenuID="M1" AR="user" Content="__('LS Zuchtstamm')" Difficulty="basic" StyleSheet="/etc/apiis.css" Description="Zuchtstamm erstellen" ToolTip="__('Erstellen eines neuen Zuchtstammes')" Help="/doc/LO_Zuchtstamm_erstellen.html"/>
+    <General Name="LS01_General"  MenuID="M1" AR="3" Content="__('LS Zuchtstamm')" Difficulty="basic" StyleSheet="/etc/apiis.css" Description="Zuchtstamm erstellen" ToolTip="__('Erstellen eines neuen Zuchtstammes')" Help="/doc/LO_Zuchtstamm_erstellen.html"/>
 
   <Block Name="Block_488" Description="Ladestrom -Zuchtstammmeldung" >
     <DataSource Name="DataSource_493" >

@@ -13,6 +13,8 @@ sub LO_LS10_NeuerNutzer {
     my ($json, $record, $fileimport,$block, $i, $action);
 
     my $onlycheck='off';
+    my $variante='form';
+
     $fileimport=1                           if (exists $args->{ 'fileimport'});
     $onlycheck=lc($args->{ 'onlycheck' })   if (exists $args->{ 'onlycheck' });
 
@@ -27,6 +29,7 @@ sub LO_LS10_NeuerNutzer {
         
         my $counter=1;
         my $record = {};
+        $variante='excel';
 
         foreach my $dd (@{$args->{'data'}} ) {
             my @data=@$dd;
@@ -131,20 +134,16 @@ sub LO_LS10_NeuerNutzer {
         }
     }
     else {
-
-        $args->{'user_marker'}=$apiis->node_name;     
-        $args->{'user_disabled'}='false';
-        $args->{'user_status'}='false';
-        $args->{'ext_address'}=$args->{'user_login'};
-
         #-- String in einen Hash umwandeln
-        if (exists $args->{ 'JSON' }) {
-            $json = from_json( $args->{ 'JSON' } );
+        if (exists $args->{ 'json' }) {
+            $json = from_json( $args->{ 'json' } );
+            $variante='json';
         }
         else {
-            $json={ 'recordset' => [{Info=>[],'Data'=>{}}]};
-            map { $json->{ 'recordset'}->[0]->{ 'Data' }->{$_}=[];
-                  $json->{ 'recordset'}->[0]->{ 'Data' }->{$_}[0]=$args->{$_}} keys %$args;
+            $json={ 'recordset' => [{infos=>[],'errors'=>[],'data'=>{}}]};
+            $json->{ 'glberrors'}   = {} ;
+            map { $json->{ 'recordset'}->[0]->{ 'data' }->{$_}=[];
+                  $json->{ 'recordset'}->[0]->{ 'data' }->{$_}[0]=$args->{$_}} keys %$args;
         }
     }
 
@@ -161,12 +160,34 @@ sub LO_LS10_NeuerNutzer {
         #Zähler für debugging 
         $z++;
 
-        #-- Daten aus Hash holen
-        foreach (keys %{ $record->{ 'data' } }) {
-            $args->{$_}=$record->{ 'data' }->{$_}->{'value'};
+        #-- falls es die Felder im Recordsatz noch nicht gibt, dann aus data anlegen 
+        if (!exists $record->{ 'fields' }) {
+            if (ref($record->{'data'}) eq 'ARRAY') {
+                foreach (keys %{$record->{'data'}[0]}) {
+                    $args->{$_}=$record->{'data'}[0]->{$_}[0];
+                }    
+            }
+            else {
+                foreach (keys %{$record->{'data'}}) {
+                    $args->{$_}=$record->{'data'}->{$_}[0];
+                }    
+            }
         }
+        else {
+            #-- Daten aus Hash holen
+            foreach (@{ $record->{ 'fields' } }) {
 
+                if ($_->{'type'} eq 'data') {
+                    $args->{$_->{'name'}}=$_->{'value'};
+                }
+            }
+        }
+        
         $args->{'user_password'}=md5_base64($args->{'user_password'});
+        $args->{'user_marker'}=$apiis->node_name;     
+        $args->{'user_disabled'}='false';
+        $args->{'user_status'}='false';
+        $args->{'ext_address'}=$args->{'user_login'};
 
         ################################# ---  ar_users  --- #################################################
 
@@ -178,10 +199,19 @@ sub LO_LS10_NeuerNutzer {
             while ( my $q = $sql_ref->handle->fetch ) {
                 $args->{'guid_ar_users'}=$q->[0];
             }
-            
-            #-- Fehlerbehandlung 
-            if (Federvieh::Fehlerbehandlung($apiis,$args->{'guid_ar_users'}, $record, ['user_login'] , $sql_ref->errors)) {
-                goto EXIT;
+
+            if ($sql_ref->status) {
+                
+                if ($variante eq 'form') {
+                    $self->status(1);
+                    $self->errors($sql_ref->errors);
+                }
+                else {
+                    #-- Fehlerbehandlung 
+                    if (Federvieh::Fehlerbehandlung($apiis,$args->{'guid_ar_users'}, $record, ['user_login'] , $sql_ref->errors)) {
+                        goto EXIT;
+                    }
+                }    
             }
         }
         
@@ -200,34 +230,34 @@ sub LO_LS10_NeuerNutzer {
 
         #-- neuen DS anlegen
         if (lc($action) eq 'insert') {
-        
             $ar_users->insert;
-
-            #-- Fehlerbehandlung 
-            if (Federvieh::Fehlerbehandlung($apiis,undef, $record, ['user_login','user_password','user_category',
-                        'user_language_id', 'user_marker', 'user_disabled', 'user_status'] , $ar_users->errors)) {
-                goto EXIT;
-            }
-            else {
-                $args->{'user_id'} = $ar_users->column('user_id')->intdata;
-            }
         }
         else {
-
             #-- guid
             $ar_users->column( 'guid' )->extdata( $args->{ 'guid_ar_users' } );
 
             #-- DS modifizieren
             $ar_users->update;
-            
-            #-- Fehlerbehandlung 
-            if (Federvieh::Fehlerbehandlung($apiis,undef, $record, ['user_login','user_password','user_category',
-                        'user_language_id', 'user_marker', 'user_disabled', 'user_status'] , $ar_users->errors)) {
-                goto EXIT;
+        }   
+
+        #-- wenn Fehler
+        if ($ar_users->status) {
+
+            if ($variante eq 'form') {
+                $self->status(1);
+                $self->errors($ar_users->errors);
             }
             else {
-                $args->{'user_id'} = $ar_users->column('user_id')->intdata;
+                #-- Fehlerbehandlung 
+                if (Federvieh::Fehlerbehandlung($apiis,undef, $record, ['user_login','user_password','user_category',
+                        'user_language_id', 'user_marker', 'user_disabled', 'user_status'] , $ar_users->errors)) {
+                }
             }
+            
+            goto EXIT;
+        }
+        else {
+            $args->{'user_id'} = $ar_users->column('user_id')->intdata;
         }
         
         ################################# ---  address  --- #################################################
@@ -241,9 +271,17 @@ sub LO_LS10_NeuerNutzer {
                 $args->{'guid_address'}=$q->[0];
             }
             
-            #-- Fehlerbehandlung 
-            if (Federvieh::Fehlerbehandlung($apiis,$args->{'guid_address'}, $record, ['user_login'] , $sql_ref->errors)) {
-                goto EXIT;
+            if ($sql_ref->status) {
+                if ($variante eq 'form') {
+                    $self->status(1);
+                    $self->errors($sql_ref->errors);
+                }
+                else {
+                    #-- Fehlerbehandlung 
+                    if (Federvieh::Fehlerbehandlung($apiis,$args->{'guid_address'}, $record, ['user_login'] , $sql_ref->errors)) {
+                        goto EXIT;
+                    }
+                }    
             }
         }
         
@@ -274,35 +312,34 @@ sub LO_LS10_NeuerNutzer {
 
         #-- neuen DS anlegen
         if (lc($action) eq 'insert') {
-        
             #-- neuen DS anlegen
             $address->insert;
-
-            #-- Fehlerbehandlung 
-            if (Federvieh::Fehlerbehandlung($apiis,undef, $record,['ext_address', 'ext_salutation', 'ext_title', 'first_name',
-                        'second_name','street','zip','town','email', 'phone_mobil'] , $address->errors)) {
-                goto EXIT;
-            }
-            else {
-                $args->{'db_address'} = $address->column('db_address')->intdata;
-            }
         }
         else {
-
             #-- guid
             $address->column( 'guid' )->extdata( $args->{ 'guid_address' } );
 
             #-- DS modifizieren
             $address->update;
+        }    
+        
+        #-- wenn Fehler
+        if ($address->status) {
             
-            #-- Fehlerbehandlung 
-            if (Federvieh::Fehlerbehandlung($apiis,undef, $record,['ext_address', 'ext_salutation', 'ext_title', 'first_name',
-                        'second_name','street','zip','town','email', 'phone_mobil'] , $address->errors)) {
-                goto EXIT;
+            if ($variante eq 'form') {
+                $self->status(1);
+                $self->errors($address->errors);
             }
             else {
-                $args->{'db_address'} = $address->column('db_address')->intdata;
+                #-- Fehlerbehandlung 
+                if (Federvieh::Fehlerbehandlung($apiis,undef, $record,['ext_address', 'ext_salutation', 'ext_title', 'first_name',
+                            'second_name','street','zip','town','email', 'phone_mobil'] , $address->errors)) {
+                    goto EXIT;
+                }
             }
+        }
+        else {
+            $args->{'db_address'} = $address->column('db_address')->intdata;
         }
 
         #-- ################  unit   ###########################################################################        
@@ -322,12 +359,21 @@ sub LO_LS10_NeuerNutzer {
                     $args->{'guid_unit'}=$q->[0];
                 }
                 
-                #-- Fehlerbehandlung 
-                if (Federvieh::Fehlerbehandlung($apiis,$args->{'guid_unit'}, $record, ['user_login', 'g'.$i.'1' ] , $sql_ref->errors)) {
-                    goto EXIT;
+                if ($sql_ref->status) {
+                    
+                    if ($variante eq 'form') {
+                        $self->status(1);
+                        $self->errors($sql_ref->errors);
+                    }
+                    else {
+                        #-- Fehlerbehandlung 
+                        if (Federvieh::Fehlerbehandlung($apiis,$args->{'guid_unit'}, $record, ['user_login', 'g'.$i.'1' ] , $sql_ref->errors)) {
+                            goto EXIT;
+                        }
+                    }
                 }
             }
-            
+
             $action='insert';
             $action='update'    if ($args->{'guid_unit'});
             
@@ -346,8 +392,19 @@ sub LO_LS10_NeuerNutzer {
                     $dbm[1]=$args->{'g'.$i.'1'};
                 }
                 
-                #-- Fehlerbehandlung 
-                if (Federvieh::Fehlerbehandlung($apiis,undef, $record, ['g'.$i.'1' ] , $sql_ref->errors)) {
+                if ($sql_ref->status) {
+                    
+                    if ($variante eq 'form') {
+                        $self->status(1);
+                        $self->errors($sql_ref->errors);
+                    }
+                    else {
+                        #-- Fehlerbehandlung 
+                        if (Federvieh::Fehlerbehandlung($apiis,undef, $record, ['g'.$i.'1' ] , $sql_ref->errors)) {
+                            goto EXIT;
+                        }
+                    } 
+                    
                     goto EXIT;
                 }
             }
@@ -360,12 +417,18 @@ sub LO_LS10_NeuerNutzer {
                                    'db_address'=>$args->{'db_address'},
                                    'user_id'=>$args->{'user_id'}
                                    },
-                                   'update');
+                                   'insert');
 
-            #-- Fehlerbehandlung 
-            if (Federvieh::Fehlerbehandlung($apiis,$exists, $record, ['g'.$i.'0'] , $apiis->errors)) {
-                $apiis->del_errors;
-                goto EXIT;
+            if ($variante eq 'form') {
+                $self->status(1);
+                $self->errors($apiis->errors);
+            }
+            else {
+                #-- Fehlerbehandlung 
+                if (Federvieh::Fehlerbehandlung($apiis,$exists, $record, ['g'.$i.'0'] , $apiis->errors)) {
+                    $apiis->del_errors;
+                    goto EXIT;
+                }
             }
         }
 EXIT:
@@ -384,10 +447,10 @@ EXIT:
     }
      
     ###### tr #######################################################################################
-    my $tr  =Federvieh::CreateTr( $json, $json->{'glberrors'} );
-    my $data=Federvieh::CreateBody( $tbd, $tr, 'Ladestrom: LS10_NeueNutzer');
-
     if ($fileimport) {
+        my $tr  =Federvieh::CreateTr( $json, $json->{'glberrors'} );
+        my $data=Federvieh::CreateBody( $tbd, $tr, 'Ladestrom: LS10_NeueNutzer');
+
         return JSON::to_json({'data'=>$data, 'tag'=>'body'});
     }
     else {

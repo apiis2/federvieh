@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE Form PUBLIC "1" "../../form2.dtd">
+<!DOCTYPE Form PUBLIC "1" "../../form3.dtd">
 <Form Name="F23a">
-  <General Name="General_515" StyleSheet="/etc/apiis.css" Description="Tier"/>
+  <General Name="General_515" StyleSheet="/etc/apiis.css" Description="Tier" AR="3"/>
 
   <Block Name="Block_488" Description="Ladestrom -Zuchtstammmeldung" >
     <DataSource Name="DataSource_493" >
@@ -19,7 +19,7 @@
       <Position Column="1" Position="absolute" Row="3"/>
       <Text FontSize="10px"/>
     </Label>
-    <Field Name="ext_breed" FlowOrder="3" Check="NotNull">
+    <Field Name="ext_breed" FlowOrder="3" Check="NotNull" >
       <DataSource Name="DataSource_1015b7">
         <Sql Statement="SELECT ext_code, ext_code || ' - ' || short_name FROM codes WHERE class='BREED' order by ext_code"/>
       </DataSource>

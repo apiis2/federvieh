@@ -2,7 +2,7 @@
 <!DOCTYPE Form PUBLIC "1" "../form3.dtd">
 
 <Form Name="FPZuchtbuch">
-  <General Name="General_515"  Content="__('Zuchtbuch')"  MenuID="M2" ToolTip="__('Ausdruck Zuchtbuch')" Help="/doc/ZuchtbuchFrm.html" AR="user" Difficulty='basic' StyleSheet="/etc/apiis.css" Description="Zuchtbuch"/>
+  <General Name="General_515"  Content="__('Zuchtbuch')"  MenuID="M2" ToolTip="__('Ausdruck Zuchtbuch')" Help="/doc/ZuchtbuchFrm.html" AR='3' Difficulty='basic' StyleSheet="/etc/apiis.css" Description="Zuchtbuch"/>
 
   <Block Name="Block_488" Description="Zuchtbuch" NavigationBar="no">
     <DataSource Name="DataSource_493a">
@@ -19,7 +19,7 @@
     <Label Name="Label_1491c" Content="Jahr:">
       <Position Column="0" Position="absolute" Row="2"/>
     </Label>
-    <Field Name="jahr" Check="NotNull" AR="user" FlowOrder="1" ToolTip="__('Jahr')" LabelName="Label_1491c" >
+    <Field Name="jahr" Check="NotNull" AR="3" FlowOrder="1" ToolTip="__('Jahr')" LabelName="Label_1491c" >
       <DataSource Name="DataSource_493c">
         <SqlFunction Action="do_execute_sql" View="ScrollinglistChooseJahr"/>  
       </DataSource>
@@ -34,7 +34,7 @@
     <Label Name="Label_1491b" Content="Ausgabe als:">
       <Position Column="0" Position="absolute" Row="3"/>
     </Label>
-    <Field Name="_exportfilter" Check="NotNull" AR="user" FlowOrder="2" ToolTip="__('Ausgabeformat des Zuchtbuches')" LabelName="Label_1491b" >
+    <Field Name="_exportfilter" Check="NotNull" AR="3" FlowOrder="2" ToolTip="__('Ausgabeformat des Zuchtbuches')" LabelName="Label_1491b" >
       <DataSource Name="DataSource_493b">
         <SqlFunction Action="do_execute_sql" View="ScrollinglistChooseHTMLPDF"/>  
 <!--         <Sql Statement="select 'json2html','HTML' union select 'json2pdf','PDF'"/>  -->
@@ -47,7 +47,7 @@
       <Format/>
     </Field>
     
-    <Field Name="g" AR="user" FlowOrder="1" ToolTip="__('Zuchtbuch wird erstellt')" >
+    <Field Name="g" AR="3" FlowOrder="1" ToolTip="__('Zuchtbuch wird erstellt')" >
       <Button ButtonLabel="__('Zuchtbuch erstellen')" URL="/etc/reports/Zuchtbuch.rpt" Command="do_exit"/>
       <Position Column="0-3" Position="absolute" Row="4"/>
       <Miscellaneous/>

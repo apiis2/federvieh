@@ -6,6 +6,7 @@
 # This is only a test file to help during development. You can see how to
 # use the different methods of the Form object.
 #-- Aufruf: perl test.LO LO_DS06 ~/datastuff/chick/load/data/DS06_2014.csv off 2014
+#perl -d load.DS LO_LS01a_Zuchtstamm /tmp/Sachsenhuhn24_4xlsx.xlsx 1
 BEGIN {
    use Env qw( APIIS_HOME );
    die "\n\tAPIIS_HOME is not set!\n\n" unless $APIIS_HOME;
@@ -41,10 +42,12 @@ if ($@) {
   print $@;
 }
 my %data_hash;
-my ( $json,$stru ) = &$LO($apiis,$ARGV[1],$ARGV[0],$ARGV[2]);
+my ( $json,$stru ) = &$LO($apiis,$ARGV[0],$ARGV[1],$ARGV[2] ,$ARGV[3], $ARGV[4]);
 #my ($json,$stru ) = &$LO($apiis, {'FILE'=>$ARGV[1],'fileimport'=>$ARGV[0], '_importfilter'=>$ARGV[0], 'onlycheck'=>$ARGV[2]},'action'=>'insert' , $ARGV[3] );
 
 print "\n -----Result for $ARGV[1] ----\n\n";
+
+$json=JSON::from_json($json);
 
 if ($json->{'Error'}) {
     foreach my $record (@{$json->{'Error'}} ) {

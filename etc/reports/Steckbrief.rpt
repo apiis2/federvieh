@@ -5,7 +5,8 @@
     Name="Steckbrief" 
     UseForm="/etc/reports/Steckbrief.pfrm"
     StrictParameter="no"
-    AR="user" Content="__('Steckbrief')" Difficulty="basic" 
+    AR="3" 
+    Content="__('Steckbrief')" Difficulty="basic" 
     DataSource="Steckbrief({animal_ext_unit},{animal_ext_id},{animal_ext_animal})"
     StyleSheet="/etc/apiis.css" 
     PageFooter="All_Pages" PageHeader="All_Pages"/>

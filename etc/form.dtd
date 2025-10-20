@@ -27,7 +27,7 @@
 	      Height       CDATA   ""
           Description  CDATA   ""
           DefaultForm  CDATA   ""
-          AR           (admin|coord|user|anon)   "user"
+          AR           (1|2|3|4) "3"
           Content      CDATA   ""
           Difficulty   (basic|advanced) "basic"
           Cvs          CDATA   "$Id: form2.dtd,v 1.3 2014/12/08 14:08:47 ulm Exp $"

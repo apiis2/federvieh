@@ -41,7 +41,8 @@ if ($@) {
   print $@;
 }
 my %data_hash;
-my ( $data,$stru ) = &$LO($apiis, {'FILE'=>$ARGV[1], 'importfilter'=>$ARGV[0], 'onlycheck'=>$ARGV[2],'action'=>'insert' }, $ARGV[3] );
+my ( $data,$stru ) = &$LO($apiis, {'json'=>$ARGV[1]});
+#my ( $data,$stru ) = &$LO($apiis, $ARGV[1], $ARGV[2], $ARGV[3] );
 #my ( $data,$stru ) = &$LO($apiis, undef );
 #my ( $data,$stru ) = &$LO($apiis, {'FILE'=>"$ENV{'HOME'}/database_stuff/chick/load/testdata/kroppsvekt_20_uker_2015-2016.csv", 'importfilter'=>'LO_DS07', 'onlycheck'=>'on','event_date'=>'16.06.2014' }, '2013' );
 #my ( $data,$stru ) = &$LO($apiis, undef ,'2013' );

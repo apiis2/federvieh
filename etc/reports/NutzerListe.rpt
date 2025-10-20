@@ -5,7 +5,7 @@
     ToolTip="__('Erzeugt eine Liste aller in der Datenbank angemeldeten Nutzer')"
     Help="/doc/NutzerListe.html"
     DataSource="NutzerListe()"
-    AR="coord" Content="__('Liste Nutzer')" Difficulty="advanced" 
+    AR="3" Content="__('Liste Nutzer')" Difficulty="advanced" 
     CreatePDF="pdf()"
     PageFooter="All_Pages" PageHeader="All_Pages"/>
   <Detail Name="Detail_0">

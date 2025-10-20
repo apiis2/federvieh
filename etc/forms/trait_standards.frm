@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE Form PUBLIC "1" "../form3.dtd">
+<!DOCTYPE Form PUBLIC "1" "../form3.dtd"[
+  <!ENTITY NavigationButtons_Fields SYSTEM "http://federvieh.local/etc/navigationbuttons.xml">
+  <!ENTITY ActionButtons_Fields     SYSTEM "http://federvieh.local/etc/actionbuttons.xml">
+]>
+
 <Form Name="trait_standards">
-  <General Name="trait_standards_General" StyleSheet="/etc/apiis.css" Description="Definition von Merkmals-Standards" MenuID="M1" AR="coord" Difficulty="advanced" ToolTip="__('')" Help="/doc/trait_standards.html"/>
+  <General Name="trait_standards_General" StyleSheet="/etc/apiis.css" Description="Definition von Merkmals-Standards" MenuID="M1" AR="2" Difficulty="advanced" ToolTip="__('')" Help="/doc/trait_standards.html"/>
 
   <Block Name="B171" Description="Update trait_standards">
      

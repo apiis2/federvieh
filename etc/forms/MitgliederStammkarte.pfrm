@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Form PUBLIC "1" "../form2.dtd">
 <Form Name="FP11">
-  <General Name="General_515" AR="coord" Content="__('Stammdaten Adressen')" Difficulty="basic" StyleSheet="/etc/apiis.css" Description="Adressen Stammkarte"/>
+  <General Name="General_515" AR="2" Content="__('Stammdaten Adressen')" Difficulty="basic" StyleSheet="/etc/apiis.css" Description="Adressen Stammkarte"/>
 
   <Block Name="Block_488" Description="Adressen Stammkarte" NavigationBar="no">
     <DataSource Name="DataSource_493">

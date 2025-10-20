@@ -2,7 +2,7 @@
 <!DOCTYPE Form PUBLIC "1" "../../form3.dtd">
 
 <Form Name="frm_abgangsmeldung">
-  <General Name="frm_abgangsmeldung1"  Content="__('Abgangsmeldung')"  MenuID="M1" ToolTip="__('Abgangsmeldung')" Help="/doc/AbgangsmeldungFrm.html" AR="user" Difficulty='basic' StyleSheet="/etc/apiis.css" Description="Abgangsmeldung"/>
+  <General Name="frm_abgangsmeldung1"  Content="__('Abgangsmeldung')"  MenuID="M1" ToolTip="__('Abgangsmeldung')" Help="/doc/AbgangsmeldungFrm.html" AR="3" Difficulty='basic' StyleSheet="/etc/apiis.css" Description="Abgangsmeldung"/>
 
   <Block Name="Block_488" >
     <DataSource Name="DataSource_493" >
@@ -20,7 +20,7 @@
     <Label Name="Label_4911" Content="Tiernummer:">
       <Position Column="0" Position="absolute" Row="1"/>
     </Label>
-    <Field Name="Tanimal_ext_unit" FlowOrder="5" Check="NotNull" AR="user">
+    <Field Name="Tanimal_ext_unit" FlowOrder="5" Check="NotNull" AR="3">
       <DataSource Name="DataSource_1015">
        <Sql Statement="SELECT short_name,short_name FROM codes WHERE class='ID_SET'"/>
       </DataSource>
@@ -32,7 +32,7 @@
       <Format/>    
     </Field>
 
-    <Field Name="Tanimal_ext_id" FlowOrder="6" Check="NotNull"  AR="user">
+    <Field Name="Tanimal_ext_id" FlowOrder="6" Check="NotNull"  AR="3">
       <DataSource Name="DataSource_1015aa">
         <Sql Statement="select distinct ext_id, ext_id from entry_unit where ext_unit in (select  ext_code from entry_codes where class='ID_SET' ) order by ext_id"/>
       </DataSource>
@@ -44,7 +44,7 @@
       <Format/> 
     </Field>
     
-    <Field Name="Tanimal_ext_animal" FlowOrder="1" Check="NotNull"  AR="user">
+    <Field Name="Tanimal_ext_animal" FlowOrder="1" Check="NotNull"  AR="3">
      <TextField Override="no" Size="15"/>
       <Position Column="3" Position="absolute" Row="1"/>
       <Miscellaneous />
@@ -57,7 +57,7 @@
     <Label Name="Label_4911z2" Content="oder alle: ">
       <Position Column="4" Position="absolute" Row="1"/>
     </Label>
-    <Field Name="verkaeufer" FlowOrder="2"  AR="user">
+    <Field Name="verkaeufer" FlowOrder="2"  AR="3">
       <DataSource Name="DataSource_1015aab">
         <Sql Statement="select distinct ext_id, ext_id from unit where
         (unit.ext_unit='owner' or  unit.ext_unit='breeder') 
@@ -75,7 +75,7 @@
     <Label Name="Label_49111a" Content="Abgangsdatum: ">
       <Position Column="0" Position="absolute" Row="2"/>
     </Label>
-    <Field Name="exit_dt" FlowOrder="2"  AR="user">
+    <Field Name="exit_dt" FlowOrder="2"  AR="3">
       <TextField Size="10" MaxLength="10" InputType="date" DefaultFunction="today"/>  
       <Position Column="1" Position="absolute" Row="2"/>
       <Miscellaneous/>
@@ -87,7 +87,7 @@
     <Label Name="Label_49111" Content="Abgangsgrund: ">
       <Position Column="0" Position="absolute" Row="3"/>
     </Label>
-    <Field Name="ext_culling" FlowOrder="3" Check="NotNull"  AR="user">
+    <Field Name="ext_culling" FlowOrder="3" Check="NotNull"  AR="3">
       <DataSource Name="DataSource_1015c">
        <Sql Statement="SELECT ext_code,ext_code || ' - ' || long_name FROM codes WHERE class='ABGANGSURSACHE'"/>
       </DataSource>
@@ -102,7 +102,7 @@
     <Label Name="Label_4911y" Content="Sollen noch Daten eingegeben werden k&amp;ouml;nnen: ">
       <Position Column="0" Columnspan="3" Position="absolute" Row="4"/>
     </Label>
-    <Field Name="ext_closing" FlowOrder="4" Check="NotNull"  AR="user">
+    <Field Name="ext_closing" FlowOrder="4" Check="NotNull"  AR="3">
       <DataSource Name="DataSource_1015b">
        <Sql Statement="SELECT '2' as a , 'Nein' as b union 
                        select '1' as a , 'Nicht mehr &amp;uuml;ber diese Nummer' as c union 

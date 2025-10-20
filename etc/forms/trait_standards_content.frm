@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE Form PUBLIC "1" "../form3.dtd">
+<!DOCTYPE Form PUBLIC "1" "../form3.dtd"[
+  <!ENTITY NavigationButtons_Fields SYSTEM "http://federvieh.local/etc/navigationbuttons.xml">
+  <!ENTITY ActionButtons_Fields     SYSTEM "http://federvieh.local/etc/actionbuttons.xml">
+  <!ENTITY StatusLine_Block         SYSTEM "http://federvieh.local/etc/statusbar.xml">
+]>
 <Form Name="FORM_1642411718">
-  <General Name="G154.frm" StyleSheet="/etc/apiis.css" Description="Form"/>
+  <General Name="G154.frm" StyleSheet="/etc/apiis.css" Description="Form" AR="3"/>
 
   <Block Name="B155" Description="Update trait_standards_content">
      

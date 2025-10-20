@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE Form PUBLIC "1" "form.dtd">
+<!DOCTYPE Form PUBLIC "1" "form3.dtd">
 <Form Name="TM_Tier_m7">
-  <General Name="TM_General_715a7" StyleSheet="/etc/apiis.css" Description="Form"/>
+  <General Name="TM_General_715a7" StyleSheet="/etc/apiis.css" Description="Form" AR="3"/>
 
   <Block Name="TM_Block_674a7" Description="Update unit" NavigationBar="no">
 
@@ -15,7 +15,7 @@
       <Text FontSize="24px" TextDecoration="underline"/>
     </Label>
     
-    <Field Name="TM_Field_95aa7">
+    <Field Name="TM_Field_95aa7" AR="1">
       <Button ButtonLabel="Verkauf" URL="Ladestroeme/LS42_Verkauf.frm"  Command="do_open_form"/>
       <Position Row="1" Column="1"/>
       <Miscellaneous/>

@@ -28,7 +28,7 @@
           Description  CDATA   ""
           DefaultForm  CDATA   ""
           MenuID       CDATA   ""    
-          AR           (admin|coord|user|anon) "user"
+          AR           (1|2|3|4) "3"
           Content      CDATA   ""
           ToolTip      CDATA   ""
           DestForm     CDATA   ""
@@ -181,7 +181,7 @@
    ToolTip      CDATA   ""
    Help         CDATA   ""
    LabelName    CDATA   ""
-   AR           (admin|coord|user|anon) "user"
+   AR           (1|2|3|4) "3"
 >
 
 <!ELEMENT FileField EMPTY >

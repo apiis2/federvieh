@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Form PUBLIC "1" "../form2.dtd">
 <Form Name="FORM_1597609174">
-  <General Name="G29.frm" StyleSheet="/etc/apiis.css" Description="Breedcolor-Federvieh"/>
+  <General Name="G29.frm" StyleSheet="/etc/apiis.css" Description="Breedcolor-Federvieh" AR="3"/>
 
   <Block Name="B30" Description="Update breedcolor">
      

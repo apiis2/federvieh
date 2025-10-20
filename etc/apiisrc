@@ -122,7 +122,7 @@ node_name = Mariensee
 #         auth - old authentication/authorisation scheme
 #         AR   - new scheme as from December 2005
 #         none - switch off every access rights control
-access_rights = none
+access_rights = AR
 
 ##############################################################################
 #Name of File with the structure of menu

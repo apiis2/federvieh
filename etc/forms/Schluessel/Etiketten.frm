@@ -8,7 +8,7 @@
   <!ENTITY CallForm_Block           SYSTEM "http://federvieh.local/etc/callform_button_block.xml">
 ]>
 <Form Name="F7">
-  <General Name="G239" StyleSheet="/etc/apiis.css" Description="Form"/>
+  <General Name="G239" StyleSheet="/etc/apiis.css" Description="Form" AR="3"/>
 
   <Block Name="B240" Description="Update stickers">
      

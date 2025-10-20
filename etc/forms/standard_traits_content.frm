@@ -6,7 +6,7 @@
 
 <Form Name="standard_traits_content">
   
-    <General Name="standard_traits_content_General"  MenuID="M1" AR="user" Content="__('Standard Merkmale')" Difficulty="advanced" StyleSheet="/etc/apiis.css" Description="Zuordnung der Merkmale zu Schemas" ToolTip="__('Zuordnung der Merkmale zu Schemas')" Help="/doc/Standard_Merkmale_Zuordnung.html"/>
+    <General Name="standard_traits_content_General"  MenuID="M1" AR="1" Content="__('Standard Merkmale')" Difficulty="advanced" StyleSheet="/etc/apiis.css" Description="Zuordnung der Merkmale zu Schemas" ToolTip="__('Zuordnung der Merkmale zu Schemas')" Help="/doc/Standard_Merkmale_Zuordnung.html"/>
 
   <Block Name="standard_traits_content_Block" Description="Update standard_contenttraits">
      

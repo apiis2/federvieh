@@ -4,6 +4,7 @@
   <General
     DataSource="GetData({unit})"
     CreatePDF="pdf()"
+    AR="3"
     UseForm="/etc/forms/Adressen.pfrm"
     Name="Adressliste" PageFooter="All_Pages" PageHeader="All_Pages"/>
   <Detail Name="Detail_0">

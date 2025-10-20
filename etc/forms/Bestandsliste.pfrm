@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE Form PUBLIC "1" "../form3.dtd">
 <Form Name="FORM_Bestandsliste">
-  <General Name="General_515" StyleSheet="/etc/apiis.css" Description="PM-Bestandsliste" MenuID="M1" AR="user" Difficulty="basic"
+  <General Name="General_515" StyleSheet="/etc/apiis.css" Description="PM-Bestandsliste" MenuID="M1" AR="3" Difficulty="basic"
            ToolTip="__('Parametrisierung zur Erzeugung einer Bestandsübersicht')" Help="/doc/Bestandsliste.html"/>
 
   <Block Name="Block_488" Description="Bestandsliste" NavigationBar="no">
