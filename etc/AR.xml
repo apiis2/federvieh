@@ -8,7 +8,7 @@
        DATATYPE="CHAR" 
       DESCRIPTION="login name"  LENGTH="20" 
       ar_check="1" form_type="editable" name="user_login" struct_type="optional"/>
-    <column CHECK="NotNull"
+    <column CHECK="NoCheck"
        DATATYPE="CHAR" 
       DESCRIPTION="user password"  LENGTH="20" 
       ar_check="1" form_type="editable" name="user_password" struct_type="optional"/>
@@ -27,7 +27,7 @@
       DESCRIPTION="checking if the user can login to the system"
        LENGTH="1"  ar_check="1" form_type="editable"
       name="user_disabled" struct_type="optional"/>
-    <column CHECK="NotNull"
+    <column CHECK="NoCheck"
        DATATYPE="BOOL" DEFAULT="FALSE"
       DESCRIPTION="current login status of the user (is logged or not)  "
        LENGTH="1"  ar_check="1" form_type="editable"
