@@ -41,10 +41,7 @@
     </Label>
 
     <Field Name="F2" DSColumn="C2" FlowOrder="2" LabelName="se_L2" ToolTip="__('Eindeutiger Name des Event-Schemas')">
-      <DataSource Name="standard_events_DSF2">
-        <Sql Statement="SELECT label, label from standard_events order by label"/>
-      </DataSource>
-      <ScrollingList Size="1"/>
+      <TextField Override="no" Size="30"/>
       <Position Column="1" Position="absolute" Row="2"/>
       <Miscellaneous />
       <Text/>

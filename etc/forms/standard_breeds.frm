@@ -37,10 +37,7 @@
     </Label>
 
     <Field Name="F2" DSColumn="C2" FlowOrder="2" LabelName="st_L2" ToolTip="__('Eindeutiger Name des Rasse-Schemas')">
-      <DataSource Name="standard_breeds_DSF2">
-        <Sql Statement="SELECT label, label from standard_breeds order by label"/>
-      </DataSource>
-      <ScrollingList Size="1"/>
+      <TextField Override="no" Size="30"/>
       <Position Column="1" Position="absolute" Row="2"/>
       <Miscellaneous />
       <Text/>
