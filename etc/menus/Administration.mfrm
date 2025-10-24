@@ -61,7 +61,7 @@
     </Image>
     <Field Name="Field_82ea2">
       <Button ButtonLabel="Nutzerliste" URL="/etc/reports/NutzerListe.rpt" Command="do_open_report"/>
-      <Position Column="6" Row="2"/>
+      <Position Column="7" Row="2"/>
       <Miscellaneous/>
       <Text FontSize="12px" TextAlign="center"/>
       <Color BackGround="#c5ffff"/>
@@ -93,6 +93,14 @@
       <Position Column="1" Row="6"/>
       <Miscellaneous/>
       <Text FontSize="12px" TextAlign="center"/>
+      <Color BackGround="#48D1CC"/>
+      <Format BorderStyle="groove" BorderColor="lightgray"/>
+    </Field>
+    <Field Name="Field_s82ba2edit">
+      <Button ButtonLabel="Merkmalschema &amp;auml;ndern" URL="standard_traits_edit.frm" Command="do_open_form"/>
+      <Position Column="2" Row="6"/>
+      <Miscellaneous/>
+      <Text FontSize="12px" TextAlign="center"/>
       <Color BackGround="#ffc600"/>
       <Format BorderStyle="groove" BorderColor="lightgray"/>
     </Field>
@@ -109,12 +117,20 @@
       <Position Column="5" Row="6"/>
       <Miscellaneous/>
       <Text FontSize="12px" TextAlign="center"/>
+      <Color BackGround="#48D1CC"/>
+      <Format BorderStyle="groove" BorderColor="lightgray"/>
+    </Field>
+    <Field Name="Field_s282ba2e">
+      <Button ButtonLabel="Merkmal &amp;auml;ndern" URL="traits_edit.frm" Command="do_open_form"/>
+      <Position Column="6" Row="6"/>
+      <Miscellaneous/>
+      <Text FontSize="12px" TextAlign="center"/>
       <Color BackGround="#ffc600"/>
       <Format BorderStyle="groove" BorderColor="lightgray"/>
     </Field>
-    <Field Name="Field_82ea2a">
+    <Field Name="Field_82ea2ae">
       <Button ButtonLabel="Merkmalsschemaliste" URL="/etc/reports/Merkmalsschemas.rpt" Command="do_open_report"/>
-      <Position Column="6" Row="6"/>
+      <Position Column="7" Row="6"/>
       <Miscellaneous/>
       <Text FontSize="12px" TextAlign="center"/>
       <Color BackGround="#c5ffff"/>
@@ -124,6 +140,14 @@
     <Field Name="Field_b82ba2">
       <Button ButtonLabel="Rasseschema anlegen" URL="standard_breeds.frm" Command="do_open_form"/>
       <Position Column="1" Row="7"/>
+      <Miscellaneous/>
+      <Text FontSize="12px" TextAlign="center"/>
+      <Color BackGround="#48D1CC"/>
+      <Format BorderStyle="groove" BorderColor="lightgray"/>
+    </Field>
+    <Field Name="Field_b82ba2edit">
+      <Button ButtonLabel="Rasseschema &amp;auml;ndern" URL="standard_breeds_edit.frm" Command="do_open_form"/>
+      <Position Column="2" Row="7"/>
       <Miscellaneous/>
       <Text FontSize="12px" TextAlign="center"/>
       <Color BackGround="#ffc600"/>
@@ -142,12 +166,12 @@
       <Position Column="5" Row="7"/>
       <Miscellaneous/>
       <Text FontSize="12px" TextAlign="center"/>
-      <Color BackGround="#ffc600"/>
+      <Color BackGround="#48D1CC"/>
       <Format BorderStyle="groove" BorderColor="lightgray"/>
     </Field>
     <Field Name="Field_82ea2ar">
       <Button ButtonLabel="Rasseschemaliste" URL="/etc/reports/Rasseschemas.rpt" Command="do_open_report"/>
-      <Position Column="6" Row="7"/>
+      <Position Column="7" Row="7"/>
       <Miscellaneous/>
       <Text FontSize="12px" TextAlign="center"/>
       <Color BackGround="#c5ffff"/>
@@ -157,6 +181,14 @@
     <Field Name="Field_e82ba2">
       <Button ButtonLabel="Eventschemas anlegen" URL="standard_events.frm" Command="do_open_form"/>
       <Position Column="1" Row="8"/>
+      <Miscellaneous/>
+      <Text FontSize="12px" TextAlign="center"/>
+      <Color BackGround="#48D1CC"/>
+      <Format BorderStyle="groove" BorderColor="lightgray"/>
+    </Field>
+    <Field Name="Field_e82ba2edit">
+      <Button ButtonLabel="Eventschemas &amp;auml;ndern" URL="standard_events_edit.frm" Command="do_open_form"/>
+      <Position Column="2" Row="8"/>
       <Miscellaneous/>
       <Text FontSize="12px" TextAlign="center"/>
       <Color BackGround="#ffc600"/>
