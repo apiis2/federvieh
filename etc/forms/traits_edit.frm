@@ -48,7 +48,10 @@
       <Position Column="0" Position="absolute" Row="2"/>
     </Label>
     <Field Name="F12" DSColumn="C12" FlowOrder="1" LabelName="Llabel" ToolTip="__('Eindeutige Bezeichnung des Merkmals.')" >
-      <TextField Override="no" Size="50"/>
+      <DataSource Name="traits_DSF12">
+        <Sql Statement="SELECT label, label from traits order by label"/>
+      </DataSource>
+      <ScrollingList Size="1"/>
       <Position Column="1" Position="absolute" Row="2"/>
       <Miscellaneous />
       <Text/>
@@ -60,7 +63,10 @@
       <Position Column="0" Position="absolute" Row="3"/>
     </Label>
     <Field Name="F13" DSColumn="C13" FlowOrder="2" LabelName="Llabelk" ToolTip="__('Abkürzung für das Merkmal (1-4 Zeichen)')" >
-      <TextField Override="no" Size="4"/>
+      <DataSource Name="traits_DSF13">
+        <Sql Statement="SELECT label_short, label_short from traits order by label_short"/>
+      </DataSource>
+      <ScrollingList Size="1"/>
       <Position Column="1" Position="absolute" Row="3"/>
       <Miscellaneous />
       <Text/>
@@ -72,7 +78,10 @@
       <Position Column="0" Position="absolute" Row="4"/>
     </Label>
     <Field Name="F14" DSColumn="C14" FlowOrder="4" LabelName="Llabelm" ToolTip="__('Abkürzung für das Merkmal (5-15 Zeichen)')" >
-      <TextField Override="no" Size="15"/>
+      <DataSource Name="traits_DSF14">
+        <Sql Statement="SELECT label_medium, label_medium from traits order by label_medium"/>
+      </DataSource>
+      <ScrollingList Size="1"/>
       <Position Column="1" Position="absolute" Row="4"/>
       <Miscellaneous />
       <Text/>
