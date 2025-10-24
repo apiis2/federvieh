@@ -25,7 +25,7 @@
       <Position Row="4" Column="1"/>
       <Miscellaneous/>
       <Text FontSize="12px" TextAlign="center"/>
-      <Color BackGround="#ff6600"/>
+      <Color BackGround="#ffc600"/>
       <Format />
     </Field>
     <Image Name="Image_10a6" Alt="Test" Src="/icons/blank1.gif">
@@ -48,7 +48,7 @@
       <Position Row="4" Column="5"/>
       <Miscellaneous/>
       <Text FontSize="12px" TextAlign="center"/>
-      <Color BackGround="#ff6600"/>
+      <Color BackGround="#c5ffff"/>
       <Format BorderStyle="groove" BorderColor="lightgray" />
     </Field>
     
@@ -57,7 +57,7 @@
       <Position Row="6" Column="1"/>
       <Miscellaneous/>
       <Text FontSize="12px" TextAlign="center"/>
-      <Color BackGround="#ff6600"/>
+      <Color BackGround="#ffc600"/>
       <Format BorderStyle="groove" BorderColor="lightgray" MarginBottom="10px"/>
     </Field>
     
@@ -66,7 +66,7 @@
       <Position Row="7" Column="1"/>
       <Miscellaneous/>
       <Text FontSize="12px" TextAlign="center"/>
-      <Color BackGround="#ffff00"/>
+      <Color BackGround="#ffc600"/>
       <Format BorderStyle="groove" BorderColor="lightgray"/>
     </Field>
     <Image Name="Image_70a6" Alt="Test" Src="/icons/strich_16s.png">
@@ -79,7 +79,7 @@
       <Position Row="7" Column="5"/>
       <Miscellaneous/>
       <Text FontSize="12px" TextAlign="center"/>
-      <Color BackGround="#ffff00"/>
+      <Color BackGround="#c5ffff"/>
       <Format BorderStyle="groove" BorderColor="lightgray"/>
     </Field>
     
@@ -88,7 +88,7 @@
       <Position Row="8" Column="1"/>
       <Miscellaneous/>
       <Text FontSize="12px" TextAlign="center"/>
-      <Color BackGround="#ffff00"/>
+      <Color BackGround="#ffc600"/>
       <Format BorderStyle="groove" BorderColor="lightgray"/>
     </Field>
     
@@ -97,7 +97,7 @@
       <Position Row="10" Column="1"/>
       <Miscellaneous/>
       <Text FontSize="12px" TextAlign="center"/>
-      <Color BackGround="#ffff00"/>
+      <Color BackGround="#ffc600"/>
       <Format BorderStyle="groove" BorderColor="lightgray" MarginBottom="10px"/>
     </Field>
 <!-- 
@@ -128,7 +128,7 @@
       <Position Row="12" Column="1"/>
       <Miscellaneous/>
       <Text FontSize="12px" TextAlign="center"/>
-      <Color BackGround="#00ffff"/>
+      <Color BackGround="#ffc600"/>
       <Format BorderStyle="groove" BorderColor="lightgray" MarginBottom="10px"/>
     </Field>
     <Image Name="Image_90a6" Alt="Test" Src="/icons/strich_16s.png">
@@ -142,7 +142,7 @@
       <Position Row="12" Column="5"/>
       <Miscellaneous/>
       <Text FontSize="12px" TextAlign="center"/>
-      <Color BackGround="#00ffff"/>
+      <Color BackGround="#c5ffff"/>
       <Format BorderStyle="groove" BorderColor="lightgray" MarginBottom="10px"/>
     </Field>
 <!--    
