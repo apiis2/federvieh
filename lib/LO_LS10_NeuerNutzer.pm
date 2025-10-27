@@ -432,8 +432,10 @@ sub LO_LS10_NeuerNutzer {
             }
         }
 EXIT:
-        $tbd=Federvieh::CreateTBD($tbd, $json->{'glberrors'}, $record,$z );
-        
+        if ($fileimport) {
+            $tbd=Federvieh::CreateTBD($tbd, $json->{'glberrors'}, $record,$z );
+        }
+
         if ((!$apiis->status) and ($onlycheck eq 'off')) {
             $apiis->DataBase->commit;
         }
