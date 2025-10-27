@@ -419,15 +419,17 @@ sub LO_LS10_NeuerNutzer {
                                    },
                                    'insert');
 
-            if ($variante eq 'form') {
-                $self->status(1);
-                $self->errors($apiis->errors);
-            }
-            else {
-                #-- Fehlerbehandlung 
-                if (Federvieh::Fehlerbehandlung($apiis,$exists, $record, ['g'.$i.'0'] , $apiis->errors)) {
-                    $apiis->del_errors;
-                    goto EXIT;
+            if ($apiis->status) { 
+                if ($variante eq 'form') {
+                    $self->status(1);
+                    $self->errors($apiis->errors);
+                }
+                else {
+                    #-- Fehlerbehandlung 
+                    if (Federvieh::Fehlerbehandlung($apiis,$exists, $record, ['g'.$i.'0'] , $apiis->errors)) {
+                        $apiis->del_errors;
+                        goto EXIT;
+                    }
                 }
             }
         }
