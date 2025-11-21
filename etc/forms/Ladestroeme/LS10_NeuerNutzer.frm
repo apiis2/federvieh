@@ -52,7 +52,7 @@
 
     <Field Name="user_category" FlowOrder="3" >
       <DataSource Name="DataSource_F8742a">
-        <Sql Statement="SELECT 	'admin' as rg, 'Administrator' as trg union select 'coord' as rg, 'Coordinator' as trg union select 'user' as rg, 'Nutzer' as trg order by rg"/>
+        <Sql Statement="SELECT 	'1' as rg, 'Administrator' as trg union select '2' as rg, 'Coordinator' as trg union select '3' as rg, 'Nutzer' as trg order by rg"/>
       </DataSource>
       <ScrollingList Size="1"/>
       <Position Column="2" Position="absolute" Row="2"/>
