@@ -562,7 +562,7 @@
        where class='ID_SET') Order by ext_unit"/>
       </DataSource>
       <ScrollingList Size="1"/>  
-      <Position Column="0" Position="absolute" Row="24"/>
+      <Position Column="0" Position="absolute" Row="25"/>
       <Miscellaneous/>
       <Text/>
       <Color/>
@@ -574,7 +574,7 @@
        where class='ID_SET') Order by ext_unit"/>
       </DataSource>
       <ScrollingList Size="1"/>  
-      <Position Column="0" Position="absolute" Row="24"/>
+      <Position Column="0" Position="absolute" Row="26"/>
       <Miscellaneous/>
       <Text/>
       <Color/>
@@ -586,7 +586,7 @@
        where class='ID_SET') Order by ext_unit"/>
       </DataSource>
       <ScrollingList Size="1"/>  
-      <Position Column="0" Position="absolute" Row="24"/>
+      <Position Column="0" Position="absolute" Row="27"/>
       <Miscellaneous/>
       <Text/>
       <Color/>
@@ -598,7 +598,7 @@
        where class='ID_SET') Order by ext_unit"/>
       </DataSource>
       <ScrollingList Size="1"/>  
-      <Position Column="0" Position="absolute" Row="24"/>
+      <Position Column="0" Position="absolute" Row="28"/>
       <Miscellaneous/>
       <Text/>
       <Color/>
@@ -611,7 +611,7 @@
        where class='ID_SET') Order by ext_unit"/>
       </DataSource>
       <ScrollingList Size="1"/>  
-      <Position Column="0" Position="absolute" Row="24"/>
+      <Position Column="0" Position="absolute" Row="29"/>
       <Miscellaneous/>
       <Text/>
       <Color/>
@@ -624,7 +624,7 @@
        where class='ID_SET') Order by ext_unit"/>
       </DataSource>
       <ScrollingList Size="1"/>  
-      <Position Column="0" Position="absolute" Row="24"/>
+      <Position Column="0" Position="absolute" Row="30"/>
       <Miscellaneous/>
       <Text/>
       <Color/>
