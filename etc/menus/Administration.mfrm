@@ -43,6 +43,15 @@
       <Color BackGround="#ffc600"/>
       <Format BorderStyle="groove" BorderColor="lightgray"/>
     </Field>
+    <Field Name="pwaendern">
+      <Button ButtonLabel="Passwort &amp;auml;ndern" URL="Ladestroeme/LS14_PasswordAendern.frm" Command="do_open_form"/>
+      <Position Row="3" Column="3"/>
+      <Miscellaneous/>
+      <Text FontSize="12px" TextAlign="center"/>
+      <Color BackGround="#ffc600"/>
+      <Format BorderStyle="groove" BorderColor="lightgray"/>
+    </Field>
+
     
     <Image Name="Image_71ca2" Alt="Test" Src="/icons/blank1.gif">
        <Position Column="2" Row="2" Width="1px"/>
