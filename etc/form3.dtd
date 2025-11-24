@@ -489,6 +489,7 @@
    Anchor   (n|ne|e|se|s|sw|w|nw|center)      "center"
    Justify  (left|center|right)               "right"
    Relief   (flat|groove|raised|ridge|sunken) "flat"
+   AR           (1|2|3|4) "3"
 >
 
 <!ELEMENT Image  (Position, Miscellaneous?, Color?, Format?) >
