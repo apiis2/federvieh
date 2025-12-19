@@ -181,7 +181,7 @@ sub Steckbrief {
         #############################################################################
 
         #-- Events-Einmalig holen
-        $sql="select user_get_event_location(c.db_location) as ext_location, user_get_ext_code(e.db_event_type,'s') as event_type,c.event_dt as edate,d.label,case when d.class isnull then a.result else user_get_ext_code(a.result::integer,'s') end, d.unit from performances a inner join standard_performances b on a.standard_performances_id=b.standard_performances_id inner join event c on b.db_event=c.db_event inner join traits d on a.traits_id=d.traits_id inner join standard_events e on c.standard_events_id=e.standard_events_id where b.db_animal=$db_animal";
+        $sql="select user_get_event_location(c.db_event) as ext_location, user_get_ext_code(e.db_event_type,'s') as event_type,c.event_dt as edate,d.label,case when d.class isnull then a.result else user_get_ext_code(a.result::integer,'s') end, d.unit from performances a inner join standard_performances b on a.standard_performances_id=b.standard_performances_id inner join event c on b.db_event=c.db_event inner join traits d on a.traits_id=d.traits_id inner join standard_events e on c.standard_events_id=e.standard_events_id where b.db_animal=$db_animal";
         
         $sql_ref = $apiis->DataBase->sys_sql( $sql );
         if ( $sql_ref->status and ($sql_ref->status == 1 )) {
