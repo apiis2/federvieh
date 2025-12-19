@@ -325,9 +325,17 @@ sub LO_LS03_Bewertungen {
 
                 
                 if ($apiis->status) {                    
-                    push(@{$record->{'data'}->{ $ext_fielde }->{'errors'}},$apiis->errors); 
-                    push(@{$record->{'data'}->{ $ext_field  }->{'errors'}},$apiis->errors); 
+                    
                     $self->status(1);
+                    
+                    if ($fileimport) {
+                        push(@{$record->{'data'}->{ $ext_field }->{'errors'}},$apiis->errors); 
+                        $record->{'data'}->{$ext_field}->{'status'}='2';
+                    }
+                    else {
+                        $self->errors( $apiis->errors);
+                    }
+                    
                     $apiis->del_errors;
                 }
                 elsif ($db_event) {
