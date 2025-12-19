@@ -43,7 +43,7 @@ sub SplitAnimalInputField {
       
            if ($vt->{'ext_animal'}=~/^\d{2}\w{1,2}\d+$/) {
                $vt->{'ext_unit'}='bundesring';
-               $vt->{'ext_id'}='ID';
+               $vt->{'ext_id'}='BDRG';
                $vt->{'ext_animal'}=$vt->{'ext_animal'};
            }
            else {
