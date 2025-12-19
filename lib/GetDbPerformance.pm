@@ -217,7 +217,7 @@ sub GetDbPerformance {
                 $args->{'result'} = $q->[0];
             }
             #-- Fehler auslösen, wenn es Merkmal nicht gibt. 
-            if ($args->{'result'} eq '') {
+            if (!$args->{'result'}) {
                 $apiis->status(1);
                 $apiis->errors(
                                     Apiis::Errors->new(
