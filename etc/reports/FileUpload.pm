@@ -27,6 +27,7 @@ sub CheckLO {
         return 'LO_LS31_Rasseschemas'   if ($v=~/Schemaname.+?Rassen/);
         return 'LO_LS32_Eventschemas'   if ($v=~/Merkmalsschema.+?Rasseschema/);
         return 'LO_LS10_NeuerNutzer'    if ($v=~/Login.+?Username.+?Passwort.+?Rechtegruppe.+?Sprache/);
+        return 'LO_LS03_Bewertungen'    if ($v=~/Ringnummer.+Preis/);
     }
     
     return undef;
