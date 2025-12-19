@@ -44,11 +44,22 @@
       <Format BorderStyle="groove" BorderColor="lightgray"/>
     </Field>
 
+    <Field Name="LOVLO2a">
+      <Button ButtonLabel="Bewertungen erfassen" URL="Ladestroeme/LS03_Bewertungsliste.frm" Command="do_open_form"/>
+      <Position Row="5" Column="1"/>
+      <Miscellaneous/>
+      <Text FontSize="12px" TextAlign="center"/>
+      <Color BackGround="#ffff00"/>
+      <Format BorderStyle="groove" BorderColor="lightgray"/>
+    </Field>
+
     <Image Name="Image_71ca2" Alt="Test" Src="/icons/blank1.gif">
-       <Position Column="2" Row="5" Width="1px"/>
+       <Position Column="2" Row="6" Width="1px"/>
        <Color BackGround="white" />
        <Format MarginTop="30px"/>
     </Image>
+
+
 <!--
 <Field Name="LOVField_901a6">
 	    <Button ButtonLabel="LO_-&amp;Uuml;bersicht drucken" URL="/etc/reports/LO_en.rpt" Command="do_open_report"/>
