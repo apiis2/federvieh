@@ -15,7 +15,7 @@
     <Format PaddingBottom="14px" />
     </Label>
 
-    <Label Name="L851" Content="Login">
+    <Label Name="L851" Content="Login (*)">
       <Position Column="0" Position="absolute" Row="1"/>
       <Text FontSize="10px"/>
     </Label>
@@ -30,7 +30,7 @@
 
 
 
-    <Label Name="L854" Content="Password">
+    <Label Name="L854" Content="Password (*)">
       <Position Column="1" Position="absolute" Row="1"/>
       <Text FontSize="10px"/>
     </Label>
@@ -45,7 +45,7 @@
     </Field>
 
 
-    <Label Name="L857" Content="Rechtegruppe">
+    <Label Name="L857" Content="Rechtegruppe (*)">
       <Position Column="2" Position="absolute" Row="1"/>
       <Text FontSize="12px"/>
     </Label>
@@ -62,8 +62,8 @@
       <Format/>
     </Field>
 
-    <Label Name="L905" Content="Sprache">
-      <Position Column="3" Position="absolute" Row="11"/>
+    <Label Name="L905" Content="Sprache (*)">
+      <Position Column="3" Position="absolute" Row="1"/>
                   <Text FontSize="12px"/>
     </Label>
 
@@ -72,7 +72,7 @@
         <Sql Statement="select lang_id, iso_lang from languages where iso_lang in ('de')"/>
       </DataSource>
       <ScrollingList Size="1"/>
-      <Position Column="3" Position="absolute" Row="12"/>
+      <Position Column="3" Position="absolute" Row="2"/>
       <Miscellaneous/>
       <Text/>
       <Color/>
@@ -223,12 +223,12 @@
 
 <!-- ######################################################################################## -->
 
-    <Label Name="L1" Content="Gruppen:">
+    <Label Name="L1" Content="Gruppen (*)">
       <Position Column="0" Position="absolute" Row="23"/>
       <Text FontSize="12px"/>
       <Format MarginTop="20px"/>
     </Label>
-    <Label Name="L3" Content="Mitglied in:">
+    <Label Name="L3" Content="Mitglied in (*)">
       <Position Column="1" Position="absolute" Row="23"/>
       <Text FontSize="12px"/>
       <Format  MarginTop="20px"/>
