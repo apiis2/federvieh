@@ -91,6 +91,7 @@
       <Format MarginRight="10px"/>    
     </Field>
 
+<!--    
     <Label Name="Label_49_5f" Content="Bewertung:">
       <Position Column="1" Position="absolute" Row="8"/>
     </Label>
@@ -102,7 +103,8 @@
       <Color/>
       <Format MarginRight="10px"/>    
     </Field>
-    
+-->    
+
     <Image Name="Image_1" Alt="Test" Src="/icons/blank1.gif">
       <Position Column="5" Columnspan="6" Row="9"/>
       <Format PaddingTop="20px"/>
