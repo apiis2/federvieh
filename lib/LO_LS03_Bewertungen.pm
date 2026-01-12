@@ -107,7 +107,7 @@ sub LO_LS03_Bewertungen {
             }
 
             #-- Schlüsselword muss sein 
-            elsif (($match=~/^Ringnummer.+Preis$/)) {
+            elsif (($match=~/^Ringnummer.+Punkte$/)) {
                 $fields=[
                     {'type'=>'label',    'value' =>$data[0], 'z'=>$zeile, 'pos'=>0},
                     {'type'=>'label',    'value' =>$data[1], 'z'=>$zeile, 'pos'=>1},
@@ -276,7 +276,7 @@ sub LO_LS03_Bewertungen {
 
             #-- Schleife über alle Merkmale
             #-- animal-event-Verbindung erzeugen und mit Schlüssel die Leistunge wegschreiben
-            foreach my $trait ('Einstufung','Punkte') {
+            foreach my $trait ('Punkte') {
                 
                 my $result      = ''; 
                 my $ext_field   = ''; 
@@ -287,16 +287,6 @@ sub LO_LS03_Bewertungen {
                 $targs->{'variant'}  = '1';
                 $targs->{'sample'}   = '1';
                 $targs->{'ext_trait'}    = $trait;
-                
-                ######################################################################## 
-                if ($trait eq 'Einstufung') {
-                    $targs->{'ext_methode'}         = 'Klassifizieren';
-                    $targs->{'standard_events_id'}  = 'SN-Bewertung';    
-                    $targs->{'event_dt'}            = $args->{'event_dt'.$i};
-                    $result                         = $args->{$trait.$i};
-                    $ext_field                      = $trait.$i;
-                    $ext_fielde                     = $trait.$i;
-                }
                 
                 ######################################################################## 
                 if ($trait eq 'Punkte') {
