@@ -21,6 +21,7 @@ sub CreatePedigreeArray {
     my $j=0;
     my %hs_pedigree;
     my @liste;
+    my $t='';
     
 #    if ($lanimal->[0] ne 'Dummy') {
         my $sql="SELECT user_get_db_animal($ext_unit_animal, $ext_id_animal, $ext_animal)";
@@ -55,14 +56,6 @@ sub CreatePedigreeArray {
     #--- Pedigree aufbauen
     foreach my $vanimal (@liste) {
 
-        if ( $vanimal eq "Dummy" ) {
-            
-            $hs_pedigree{$vanimal} = [ $liste[1], $liste[2], '', '0000000000' ];
-            
-            $j++;
-            next;
-        }
-
         #-- if there are no further parents or animal is a genetic group 
         if (   ( $vanimal eq "-")
             or ( $vanimal =~ /\s+/ )
@@ -77,19 +70,19 @@ sub CreatePedigreeArray {
             next;
         }
         
+        #-- store information
+        my ($row_ref, $vm_p, $vf_p);
+
         #-- Create SQL
         my $sql="SELECT db_animal ,db_sire, db_dam FROM animal WHERE db_animal='$vanimal'";
         my $sql_ref = $apiis->DataBase->sys_sql( $sql);
 
-        #-- store information
-        my ($row_ref, $vm_p, $vf_p);
-
-        foreach my $data (@$ar_fields) {
+        while ( my $data = $sql_ref->handle->fetch ) {
             $row_ref= $data->[0] if (!defined $row_ref);
             $vm_p   = $data->[1] if (!defined $vm_p);
             $vf_p   = $data->[2] if (!defined $vf_p);
         }
-
+        
         if ( defined $row_ref ) {
             if (   ( ! defined $vm_p )
                 or ( $vm_p =~ /$t/ )
@@ -133,8 +126,10 @@ sub CreatePedigreeArray {
 sub Pedigree {
     my $self        = shift;
     my $args        = shift;
+    
     #-- set defaults. 
-    $vgeneration=7 if (!$vgeneration);
+    my $vgeneration=$args->{'vgeneration'};
+    $vgeneration=7 if (!$args->{'vgeneration'});
 
     my %hs_pedigree;
     my $liste;
@@ -147,6 +142,8 @@ sub Pedigree {
     our $tablecontent;
 
     tie %hs_pedigree, 'Tie::IxHash';
+
+    my $vanimal=$args->{'ext_animal'};
 
     if ($vanimal eq '')  {
         print '<div class="ctable">'.main::__('No animal-id was given').'</div>';
@@ -397,7 +394,7 @@ sub Pedigree {
 
     }
 
-    print $cgi->table( $tablecontent );
+    print $tablecontent ;
 
     print '</div>';
 
