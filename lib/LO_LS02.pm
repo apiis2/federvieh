@@ -3,16 +3,15 @@
 # $Id: LO_LS02.pm,v 1.10 2021/11/11 19:40:10 ulf Exp $
 #####################################################################
 # Mit dem Ladeobjekt werden Gelege mit Küken in die  DB geschrieben
+# Brut- und Kükenliste
 #
 #####################################################################
 use strict;
 use warnings;
 use Federvieh;
-use Spreadsheet::Read;
-use Encode;
-our $apiis;
 use Apiis::Misc;
 use CreateTransfer;
+our $apiis;
 
 sub LO_LS02 {
     my $self     = shift;
