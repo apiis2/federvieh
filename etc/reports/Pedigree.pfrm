@@ -17,7 +17,7 @@
     <Label Name="Label_4911" Content="__('Tiernummer').:">
       <Position Column="0" Position="absolute" Row="1"/>
     </Label>
-    <Field Name="animal_ext_unit">
+    <Field Name="ext_unit_animal">
       <DataSource Name="DataSource_1015a">
        <Sql Statement="SELECT ext_code,short_name FROM codes WHERE class='ID_SET'"/>
       </DataSource>
@@ -29,7 +29,7 @@
       <Format/>    
     </Field>
 
-    <Field Name="animal_ext_id" >
+    <Field Name="ext_id_animal" >
      <TextField Override="no" Size="12"/>
       <Position Column="2" Position="absolute" Row="1"/>
       <Miscellaneous/>
@@ -38,7 +38,7 @@
       <Format/> 
     </Field>
     
-    <Field Name="animal_ext_animal" >
+    <Field Name="ext_animal" >
      <TextField Override="no" Size="12"/>
       <Position Column="3" Position="absolute" Row="1"/>
       <Miscellaneous/>

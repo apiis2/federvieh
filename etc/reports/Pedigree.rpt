@@ -7,8 +7,8 @@
     StrictParameter="no"
     AR="3" 
     Content="__('Pedigree')" Difficulty="basic" 
-    DataSource="Pedigree({animal_ext_unit},{animal_ext_id},{animal_ext_animal})"
-    StyleSheet="/etc/apiis.css" 
+    DataSource="Pedigree({ext_unit_animal},{ext_id_animal},{ext_animal})"
+    StyleSheet="/etc/zwisss.css" 
     PageFooter="All_Pages" PageHeader="All_Pages"/>
   <Detail Name="Detail_0">
     <Hidden Content="[db_animal]" Name="Data_00"/>

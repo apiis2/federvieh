@@ -24,7 +24,7 @@ sub CreatePedigreeArray {
     my $t='';
     
 #    if ($lanimal->[0] ne 'Dummy') {
-        my $sql="SELECT user_get_db_animal($ext_unit_animal, $ext_id_animal, $ext_animal)";
+        my $sql="SELECT user_get_db_animal('$ext_unit_animal', '$ext_id_animal', '$ext_animal')";
         my $sql_ref = $apiis->DataBase->sys_sql( $sql);
 
         while ( my $q = $sql_ref->handle->fetch ) {
@@ -125,11 +125,13 @@ sub CreatePedigreeArray {
 
 sub Pedigree {
     my $self        = shift;
-    my $args        = shift;
+    my $ext_unit_animal = shift;#$args->{'ext_unit_animal'};
+    my $ext_id_animal = shift;# $args->{'ext_id_animal'};
+    my $ext_animal =  shift;# $args->{'ext_animal'};;
+    my $vgeneration=shift; 
     
     #-- set defaults. 
-    my $vgeneration=$args->{'vgeneration'};
-    $vgeneration=7 if (!$args->{'vgeneration'});
+    $vgeneration=4 if (!$vgeneration);
 
     my %hs_pedigree;
     my $liste;
@@ -143,26 +145,52 @@ sub Pedigree {
 
     tie %hs_pedigree, 'Tie::IxHash';
 
-    my $vanimal=$args->{'ext_animal'};
+    my $vanimal=$ext_unit_animal;
 
     if ($vanimal eq '')  {
         print '<div class="ctable">'.main::__('No animal-id was given').'</div>';
         return;
     }
 
+    my $cgi=CGI->new();
+#    print $cgi->header(-type=>'application/pdf');
+#    print $cgi->start_html(
+#        {
+#            -style => { -src => '/css/zwisss.css' },
+#            -head  => [Link({-rel=>"icon", -href=>"/images/favicon.gif", -type=>"image/gif"})],
+#            -class => "menu",
+#            -encoding=>"UTF-8",
+#            -title =>main::__('Catalog')
+#        }    
+#    );
+
     my $sql      = "Set datestyle to 'german'";
     my $sql_ref  = $apiis->DataBase->sys_sql( $sql );
 
     push( @$liste, $vanimal );
         
-    ($hs_pedigree, $liste)=$self->CreatePedigreeArray($args->{'ext_unit_animal'}, $args->{'ext_id_animal'}, $args->{'ext_animal'}, $vgeneration);
-   
+    ($hs_pedigree, $liste)=CreatePedigreeArray($self, $ext_unit_animal, $ext_id_animal, $ext_animal, $vgeneration);
+
+    #-- Schleife über liste der interne Nummern und auslösen der Nummern in externe
+    my @pedigree=();
+
+    foreach my $vv (@$liste) {
+        
+        next if ($vv eq '-');
+
+        my $sql      = "Select user_get_ext_animal($vv) ";
+        my $sql_ref  = $apiis->DataBase->sys_sql( $sql );
+
+        while ( my $q = $sql_ref->handle->fetch ) {
+            push(@pedigree, $q->[0]);
+        }
+    }
+
     my $hs_pedigree1;
     #-- calculate inbreeding
     $hs_pedigree1 = inbreed::inbreed( $hs_pedigree,undef, 's' ) ;
 
     #-- Leistungen suchen 
-    my @pedigree;
     my $hs_sql;
     my $order;
     my $l=0;
@@ -241,8 +269,9 @@ sub Pedigree {
 
     my $zid='exportsp';
     
-    my $vhtml = '<div class="ctable"><h3>'.main::__( 'Pedigree for animal: [_1]', $args->{'ext_animal'});
-    $vhtml.=' <img align="top" id="plus" src="/images/silk/icons/information.png" onmouseover="'."document.getElementById('".$zid."').style.display='block';".'" onmouseout="'."document.getElementById('".$zid."').style.display='none';".'"></img></h3>';
+    my $vhtml;
+    $vhtml = '<div class="ctable"><h3>'.main::__( 'Pedigree for animal: [_1]', $ext_animal);
+    $vhtml.=' <img align="top" id="plus" src="/etc/information.png" onmouseover="'."document.getElementById('".$zid."').style.display='block';".'" onmouseout="'."document.getElementById('".$zid."').style.display='none';".'"></img></h3>';
 
     $vhtml.='<div class="info" width="600" id="'.$zid.'" style="display:none">'.main::__('Produce a pedigree with all relative breedings values. The count of generations can be defined in the menu. The inbreeding coefficient is calculated with the displayed count of generations+1.').'</div>';
     
@@ -298,29 +327,29 @@ sub Pedigree {
                     
             my $link;
             
-            my $vanimal1=$_->[0];
+            my $vanimal1=$_;
             $vanimal1='<nobr>'.$vanimal1."</nobr> ";
             
-            if ((!$_->[0] ) or ($_->[0]  eq 'Unknown')) {
+            if ((!$_ ) or ($_  eq 'Unknown')) {
                 $link=main::__('Unknown');
             }
             else {
                 $link=$vanimal1.br();
             }
 
-            if ( $_->[0] =~ /($mess|Dummy)/ ) {
-                $rowcontent .= td(
-                    {
-                        -class   => 'pedigree',
-                        -width   => $vwidth,
-                        -height  => $vheight,
-                        -rowspan => ( 2**$z )
-                    },
-                    ' '.
-                    strong($_->[0])
-                );
-            }
-            else {
+#            if (  $_ and ( $_ =~ /($mess|Dummy)/ )) {
+#                $rowcontent .= td(
+#                    {
+#                        -class   => 'pedigree',
+#                        -width   => $vwidth,
+#                        -height  => $vheight,
+#                        -rowspan => ( 2**$z )
+#                    },
+#                    ' '.
+#                    strong($_)
+#                );
+#            }
+#            else {
                 $rowcontent .= td(
                     {
                         -class   => 'pedigree',
@@ -330,7 +359,7 @@ sub Pedigree {
                     },
                     $link
                 );
-            };
+#            };
         }
         
         $tablecontent .= TR($rowcontent);
@@ -345,11 +374,11 @@ sub Pedigree {
         my $mess = main::__( 'Unknown' );
         
         my $link;
-        if (!$pedigree[ $lpos_in_generation[$pos] ]->[1]) {
+        if (!$pedigree[ $lpos_in_generation[$pos] ]) {
             $link=main::__('Unknown');
         }
         else {
-            my $vanimal1=$pedigree[ $lpos_in_generation[$pos] ]->[0];
+            my $vanimal1=$pedigree[ $lpos_in_generation[$pos] ];
             $vanimal1='<nobr>'.$vanimal1."</nobr> ";
             
             $link=$vanimal1.br();
@@ -394,10 +423,7 @@ sub Pedigree {
 
     }
 
-    print $tablecontent ;
-
-    print '</div>';
-
+    print $cgi->table($tablecontent) ;
 }
 1;
 __END__
