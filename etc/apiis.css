@@ -76,6 +76,7 @@ td.menufeet{border-top:groove darkgrey;
             text-align:center;
             padding:4pt}
 
+/* 	      
 table.report {border-top: solid #AD3942 thin;
               border-bottom: solid #AD3942 thin;
               border-spacing:0pt}
@@ -84,6 +85,17 @@ td.reporthead {background-color:lightgray}
 td.report {padding:2pt}
 td.reporthell {padding:2pt;background-color:white}
 td.reportdunkel {padding:2pt;background-color:lightgray}
+*/
+table.report { border-collapse:collapse; border-bottom:1px solid darkgray; border-top:1px solid darkgray;}
+thead.report {  border-bottom:0px solid darkgray; text-align:left}
+td.report    { background-color:white;padding-right:10px}
+td.reporthell { border-bottom:1px solid darkgray; padding-right:10px; background-color:white}
+td.reportdunkel { border-bottom:1px solid darkgray; padding-right:10px; background-color:lightgray}
+td.reportcolored { border-bottom:1px solid darkgray; padding-right:10px; background-color:coral}
+td.reporthead {border-top: 1px solid #505050; border-bottom: 1px solid #505050; padding-right:4px; background-color:#B0B0B0;}
+th.report {border-top: 1px solid #505050; border-bottom: 1px solid #505050; padding-right:4px; background-color:#B0B0B0;}
+td        { padding-right:5px}
+
 
 
 table.katalog {border-top: solid #AD3942 thin;
@@ -252,3 +264,35 @@ note:
 	border : 1px solid #A52A2A;
 	background: #5AE55A;
 }
+
+div.ctable       { padding: 20px; margin-top:28px; background-color:lightgray }
+a.info:hover { z-index:2;}
+a.info span { display: none;}
+
+a.info:hover span
+{
+display:block;
+position:absolute;
+top:2em;
+left:2em;
+width:50em;
+border:1px solid #12127D;
+       background-color:#fc0;
+color:#000;
+      text-align: center;
+padding: 5px;
+         font-size: 0.8em;
+}
+/* Pedigree*/
+td.pedigree { border-top:solid thin gray;
+              border-spacing: 0px;
+              background-color:white;
+              padding:4px;
+              text-align:left}
+td.pedigree_sire { border-top:solid thin gray;
+              border-spacing: 0px;
+              background-color:gray;
+              padding:4px;
+              text-align:left}
+
+
