@@ -438,7 +438,7 @@ EXIT:
             $tbd=Federvieh::CreateTBD($tbd, $json->{'glberrors'}, $record,$z );
         }
 
-        if ((!$apiis->status) and ($onlycheck eq 'off')) {
+        if ((!$self->status) and ($onlycheck eq 'off')) {
             $apiis->DataBase->commit;
         }
         else {
