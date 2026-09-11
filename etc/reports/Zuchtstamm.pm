@@ -16,14 +16,16 @@ sub Zuchtstamm {
 
     my $sql="select distinct user_get_ext_id_animal(a.db_parents),b.opening_dt, 1,b.closing_dt from parents a 
              inner join transfer  b on b.db_animal=a.db_parents 
-             inner join locations c on a.db_animal=c.db_animal where 1=1";
+             inner join locations c on a.db_animal=c.db_animal 
+             inner join unit d on c.db_location=d.db_unit 
+             where 1=1";
 
     if ($ext_unit) {
-        $sql.=" and c.db_location in (select a.db_location from locations a inner join unit b on a.db_location=b.db_unit where b.ext_id $like '$ext_unit')";
+        $sql.=" and d.ext_id $like '$ext_unit'";
     }
 
     if ($onlyactive) {
-        $sql.=" and b.closing_dt isnull "
+        $sql.=" and b.closing_dt isnull and c.exit_dt isnull "
     }
     
     $sql.=" order by b.opening_dt desc;";
