@@ -22,39 +22,19 @@ sub CreatePedigreeArray {
     my %hs_pedigree;
     my @liste;
     my $t='';
-    
-#    if ($lanimal->[0] ne 'Dummy') {
-        my $sql="SELECT user_get_db_animal('$ext_unit_animal', '$ext_id_animal', '$ext_animal')";
-        my $sql_ref = $apiis->DataBase->sys_sql( $sql);
 
-        while ( my $q = $sql_ref->handle->fetch ) {
-            push(@liste, $q->[0]);
-            $t= $q->[0];
-        }
-#    }
-#    else {
-#        push(@liste, $lanimal->[0]);
-#
-#        my $sql="SELECT user_get_db_animal($ext_unit_sire, $ext_id_sire, $ext_sire)";
-#        my $sql_ref = $apiis->DataBase->sys_sql( $sql);
-#
-#        while ( my $q = $sql_ref->handle->fetch ) {
-#            push(@liste, $q->[0]);
-#            $t= $q->[0];
-#        }
-#
-#        my $sql="SELECT user_get_db_animal($ext_unit_dam, $ext_id_dam, $ext_dam)";
-#        my $sql_ref = $apiis->DataBase->sys_sql( $sql);
-#
-#        while ( my $q = $sql_ref->handle->fetch ) {
-#            push(@liste, $q->[0]);
-#            $t= $q->[0];
-#        }
-#    }
+    my $sql="SELECT user_get_db_animal('$ext_unit_animal', '$ext_id_animal', '$ext_animal')";
+    my $sql_ref = $apiis->DataBase->sys_sql( $sql);
 
+    while ( my $q = $sql_ref->handle->fetch ) {
+        push(@liste, $q->[0]);
+        $t= $q->[0];
+    }
 
     #--- Pedigree aufbauen
     foreach my $vanimal (@liste) {
+
+        my $yt='';
 
         #-- if there are no further parents or animal is a genetic group 
         if (   ( $vanimal eq "-")
@@ -71,16 +51,17 @@ sub CreatePedigreeArray {
         }
         
         #-- store information
-        my ($row_ref, $vm_p, $vf_p);
+        my ($row_ref, $vm_p, $vf_p, $vparents);
 
         #-- Create SQL
-        my $sql="SELECT db_animal ,db_sire, db_dam FROM animal WHERE db_animal='$vanimal'";
+        my $sql="SELECT db_animal ,db_sire, db_dam, db_parents FROM animal WHERE db_animal='$vanimal'";
         my $sql_ref = $apiis->DataBase->sys_sql( $sql);
 
         while ( my $data = $sql_ref->handle->fetch ) {
             $row_ref= $data->[0] if (!defined $row_ref);
             $vm_p   = $data->[1] if (!defined $vm_p);
             $vf_p   = $data->[2] if (!defined $vf_p);
+            $vparents=$data->[3] if (!defined $vparents);
         }
         
         if ( defined $row_ref ) {
@@ -107,13 +88,13 @@ sub CreatePedigreeArray {
                 push (@liste, $vf_p);
             }
             
-            $hs_pedigree{$vanimal} = [ $vm_p, $vf_p, '' ];
+            $hs_pedigree{$vanimal} = [ $vm_p, $vf_p, $vparents ];
 
         }
         else {
             push( @liste, "-" );
             push( @liste, "-" );
-            $hs_pedigree{$vanimal} = [ 1, 2, '', '0000000000' ];
+            $hs_pedigree{$vanimal} = [ 1, 2, '' ];
         }
         $j++;
         last if ( $j == ( 2**( $vgeneration + 1 ) ) - 2 );
@@ -176,13 +157,16 @@ sub Pedigree {
 
     foreach my $vv (@$liste) {
         
-        next if ($vv eq '-');
+        if ($vv eq '-') {
+            push(@pedigree, '-');
+        }
+        else {
+            my $sql      = "Select user_get_ext_animal($vv) ";
+            my $sql_ref  = $apiis->DataBase->sys_sql( $sql );
 
-        my $sql      = "Select user_get_ext_animal($vv) ";
-        my $sql_ref  = $apiis->DataBase->sys_sql( $sql );
-
-        while ( my $q = $sql_ref->handle->fetch ) {
-            push(@pedigree, $q->[0]);
+            while ( my $q = $sql_ref->handle->fetch ) {
+                push(@pedigree, $q->[0]);
+            }
         }
     }
 
