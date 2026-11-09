@@ -28,26 +28,25 @@ function show(id) {
     <p> 
 Über diesen Ladestrom werden Zuchtstämme an das Herdbuch gemeldet. Dazu wird eine Datei je Zuchtstamm in der nachfolgend beschriebenen Form erstellt. Neben der Erfassung in Excel können die Daten auch über einen Ladestrom erfaßt werden.
 <h3>Meldung eines Zuchtstammes</h3>
-Das nachfolgende Beispiel ist wie folgt zu interpretieren: Der Züchter mit der Züchternummer C361H hat einen Zuchtstamm mit der Bezeichnung 2022-1 erstellt. Der Zuchtstamm enthält Tiere der Rasse Perlhuhn im Farschlag blau mit Perlung. Der Zuchtstamm ist ab 01.06.2022 gültig. Der Zuchtstamm besteht aus einem Hahn und zwei Hennen. Der Hahn hat die Bundesringnummer 20AP3. Der Hahn entstammt aus einer Verpaarung in der Vater (Bundesring 19K2) und Mutter (Bundesring 18LO243) direkt miteinander gepaart wurden. Von den beiden Hennen des Zuchtstammes ist eine Henne ein Zukauf und hat keinen Bundesring, sondern eine Züchternummer. Der Züchter ist C34H, die Nummer 223. Die Eltern des Tieres sind im Zuchtstamm des Herkunftszüchters registriert. Der Zuchtstamm heißt C34H-20:Stall2. Die andere der beiden Hennen hat einen Bundesring 20C28 und entstammt einem Zuchtstamm des oben angegebenen Züchters C361H. Der Zuchtstamm heißt vollständig C361H-20:12. Der Zuchtstamm der Henne bestand aus den beiden Hähnen mit den Bundesringnummern 19LW23 und 19K12 sowie den beiden Hennen mit den Bundesringnummern 19L01 und 19K15.
+Das nachfolgende Beispiel ist wie folgt zu interpretieren: Der Züchter mit der Züchternummer C361H hat einen Zuchtstamm mit der Bezeichnung 2022-1 erstellt. Der Zuchtstamm enthält Tiere der Rasse Perlhühner. Der Zuchtstamm ist ab 01.06.2022 gültig. Der Zuchtstamm besteht aus einem Hahn und zwei Hennen. Der Hahn hat die Bundesringnummer 20AP3. Der Hahn entstammt aus einer Verpaarung in der der Vater (Bundesring 19K2) und Mutter (Bundesring 18LO243) direkt miteinander gepaart wurden. Von den beiden Hennen des Zuchtstammes ist eine Henne ein Zukauf und hat keinen Bundesring, sondern eine Züchternummer. Der Züchter ist C34H, die Nummer 223. Die Eltern des Tieres sind im Zuchtstamm des Herkunftszüchters registriert. Der Zuchtstamm heißt C34H:20-Stall2. Die andere der beiden Hennen hat einen Bundesring 20C28 und entstammt einem Zuchtstamm des oben angegebenen Züchters C361H. Der Zuchtstamm heißt vollständig C361H:20-12. Der Zuchtstamm der Henne bestand aus den beiden Hähnen mit den Bundesringnummern 19LW23 und 19K12 sowie den beiden Hennen mit den Bundesringnummern 19L01 und 19K15.
     <img width="1000" src="/doc/LS01_excel.png">
 Hinweis: Die grauen Bereiche dürfen nicht überschrieben werden.<p>
     <h4>Züchter</h4>Züchternummer (nicht den Namen). Wenn nicht bekannt, dann beim Zuchtverband zu erfragen. 
     <h4>gültig ab</h4>Ab dem Zeitpunkt werden Leistungen des Zuchtstammes wie z.B. Anzahl Eier diesem Zuchtstamm zugeordnet.  
     <h4>Rasse</h4>Rassebezeichnung. Nur die in der Liste aufgeführten Rassen sind gültig. 
-    <h4>Farbe</h4>Farbschlag. Nur die in der Liste aufgeführten Farbschläge sind gültig. Hat eine Rasse keine Farbschläge, bleibt das Feld leer. 
-    <h4>ZuchtstammID</h4>Die Bezeichnung des Zuchtstammes muss in Verbindung mit der Züchternummer und dem Jahr eindeutig sein. Achtung: Enthält der Zuchtstamm Tiere, die bereits in einem anderen Zuchtstamm aufgeführt sind, dann wird der andere Zuchtstamm geschlossen.  <p>
+    <h4>ZuchtstammID</h4>Die Bezeichnung des Zuchtstammes muss in Verbindung mit der oben angegebenen Züchternummer und dem Jahr eindeutig sein. Achtung: Enthält der Zuchtstamm Tiere, die bereits in einem anderen Zuchtstamm aufgeführt sind, dann wird der andere Zuchtstamm geschlossen.  <p>
     Wie die Tiernummer besteht auch die ZuchtstammID aus drei Teilen
     <ul>Nummernsystems: Hier immer "zuchtstamm" </ul>
-    <ul>Nummernkreis: Hier immer Züchternummer-Jahr z.B. C385H-22</ul>
-    <ul>Nummer: eine beliebige Bezeichnung z.B: 1 oder Stall5 oder ...</ul>
-    Die vollständige Zuchtstammnummer des Beispiels lautet: zuchtstamm:C285H-22:Stall5. Das es sich um eine Zuchtstammnummer handelt, ergibt sich aus dem Kontext der Spaltte, daher muss "zuchtstamm" nicht aufgeführt sein und wird durch das System ergänzt.  
-    <h4>Hahn</h4>In der Spalte werden die Hähne des Zuchtstammes aufgeführt. Sie können mit der Bundesringnummer oder mit einer gültigen Züchternummer bezeichnet sein. Die Ringnummer hat das Format <p>Format: JJBBZZZ (JahrJahr-BuchstabeBuchstabe-ZahlZahlZahl)(z.B. 20G10 oder 15AB347). Die Züchternummer kann beliebig sein. Muss aber die Züchternummer vorangestellt haben (z.B: C361H:223). Der Doppelpunkt dient der Abgrenzung zwischen Züchternummer und Tiernummer. 
-    <h4>Kükennummer</h4>Her kann gegebenenfalls die Flügelnummer angegeben werden. Das ist nur sinnvoll, wenn es Leistungen gibt, die nur über die Flügelnummer abgerufen werden können. Sofern es eine Züchter- oder Bundesringnummer gibt, kann das Feld leer bleiben.
+    <ul>Nummernkreis: Hier immer Züchternummer z.B. C385H</ul>
+    <ul>Jahr + Nummer: eine beliebige Bezeichnung z.B: 2022-1 oder 2022-Stall5 oder ...</ul>
+    Die vollständige Zuchtstammnummer des Beispiels lautet: zuchtstamm:C285H:2022-Stall5. Das es sich um eine Zuchtstammnummer handelt, ergibt sich aus dem Kontext der Spalte, daher muss "zuchtstamm" nicht aufgeführt sein und wird durch das System ergänzt. Auch der Züchter muss hier nicht angegeben werden, die Züchternummer wird aus dem Züchterfeld entnommen.
+    <h4>Hahn</h4>In der Spalte wird der des Zuchtstammes aufgeführt. Er kann mit der Bundesringnummer oder mit einer gültigen Züchternummer bezeichnet sein. Die Ringnummer hat das Format <p>Format: JJBBZZZ (JahrJahr-BuchstabeBuchstabe-ZahlZahlZahl)(z.B. 20G10 oder 15AB347). Die Züchternummer kann beliebig sein. Muss aber die Züchternummer vorangestellt haben (z.B: C361H:223). Der Doppelpunkt dient der Abgrenzung zwischen Züchternummer und Tiernummer. 
+    <h4>Farbschlag</h4>Eingabe des entsprechenden Farbschlages (s. Liste), Feld bleibt leer, wenn es keinen Farbschlag gibt
     <h4>ZuchtstammID</h4>Abstammung des Hahnes. Unter dieser ID sind in der Datenbank die Eltern des Hahnes hinterlegt. 
-    <h4>Hahn (Ring-/Züchternummer)</h4>Vater des Hahnes. S.u. "Hahn"
-    <h4>Hennen (Ring-/Züchternummer)</h4>Mutter des Hahnes. S.u. "Hahn
+    <h4>Vater (Ring-/Züchternummer)</h4>Vater des Hahnes. S.u. "Hahn"
+    <h4>Mütter (Ring-/Züchternummer)</h4>Mütter des Hahnes. S.u. "Hahn
 
-    <h4>Hennen</h4>In den nächsten Zeilen werden alle Hennen des Zuchtstammes aufgeführt. Die Angaben zur Nummer, Kükennumer und Abstammung sind analog der Angaben beim Hahn.
+    <h4>Hennen</h4>In den nächsten Zeilen werden alle Hennen des Zuchtstammes aufgeführt. Die Angaben zur Nummer, zum Farbschlag und zur Abstammung sind analog der Angaben beim Hahn.
     <h4>Hinweise für den Koordinator</h4>
     <h4>Züchter</h4>Die Nummer muss in der Klasse "breeder" definiert sein<p>
     <img width="400" src="/doc/LS05_unit.png">
