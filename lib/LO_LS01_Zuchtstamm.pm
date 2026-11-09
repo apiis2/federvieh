@@ -204,8 +204,7 @@ sub LO_LS01_Zuchtstamm {
             }
 
 #            #-- Tiernummern einsammeln   
-            elsif (($match=~/HähneKükennummerZuchtstammIDVäterMütter/) or 
-		   ($match=~/H.hn.*KükennummerZuchtstammIDHahn.*?Hennen.*?/)) {
+            elsif ($match=~/H.hn.*ZuchtstammIDVater.*?M?tter.*?/) {
   
                 $fields=[
                     {'type'=>'label',                          'value'=>$data[0], 'z'=>$zeile, 'pos'=>0},
@@ -216,8 +215,7 @@ sub LO_LS01_Zuchtstamm {
                 ];
                 $sex='1';
             }
-            elsif (($match=~/HennenKükennummerZuchtstammIDVäterMütter/) or
-		   ($match=~/HennenKükennummerZuchtstammIDHahn.*?Hennen.*?/)) {
+            elsif (($match=~/Hennen.*ZuchtstammIDVater.*?M?tter.*?/)) {
   
                 $fields=[
                     {'type'=>'label',                          'value'=>$data[0], 'z'=>$zeile, 'pos'=>0},
@@ -255,7 +253,7 @@ sub LO_LS01_Zuchtstamm {
                     
                     $fields=[
                         {'type'=>'data','name'=>'ext_animal'.$i,    'value' =>$data[0], 'z'=>$zeile, 'pos'=>0},
-                        {'type'=>'data','name'=>'ext_animal_kn'.$i, 'value' =>$data[1], 'z'=>$zeile, 'pos'=>1},
+                        {'type'=>'data','name'=>'ext_color'.$i,     'value' =>$data[1], 'z'=>$zeile, 'pos'=>1},
                         {'type'=>'data','name'=>'ext_zuchtstamm'.$i,'value' =>$data[2], 'z'=>$zeile, 'pos'=>2},
                         {'type'=>'data','name'=>'ext_sires'.$i,     'value' =>$data[3], 'z'=>$zeile, 'pos'=>3},
                         {'type'=>'data','name'=>'ext_dams'.$i,      'value' =>$data[4], 'z'=>$zeile, 'pos'=>4},
@@ -265,7 +263,7 @@ sub LO_LS01_Zuchtstamm {
                 else {
                     $fields=[
                         {'type'=>'data','name'=>'ext_animal'.$i,    'value' =>$data[0], 'z'=>$zeile, 'pos'=>0},
-                        {'type'=>'data','name'=>'ext_animal_kn'.$i, 'value' =>$data[1], 'z'=>$zeile, 'pos'=>1},
+                        {'type'=>'data','name'=>'ext_color'.$i,     'value' =>$data[1], 'z'=>$zeile, 'pos'=>1},
                         {'type'=>'data','name'=>'ext_zuchtstamm'.$i,'value' =>$vjahr},
                         {'type'=>'data','name'=>'ext_sires'.$i,     'value' =>$data[2], 'z'=>$zeile, 'pos'=>2},
                         {'type'=>'data','name'=>'ext_dams'.$i,      'value' =>$data[3], 'z'=>$zeile, 'pos'=>3},
@@ -279,7 +277,7 @@ sub LO_LS01_Zuchtstamm {
 
                 $record->{'ext_animal'.$i}      ={'value'=>$data[0],'errors'=>[],'status'=>'0','origin'=>$data[0] };
                 $record->{'ext_sex'.$i}         ={'value'=>$sex,    'errors'=>[],'status'=>'0' };
-                $record->{'ext_animal_kn'.$i}   ={'value'=>$data[1],'errors'=>[],'status'=>'0' };
+                $record->{'ext_color'.$i}       ={'value'=>$data[1],'errors'=>[],'status'=>'0' };
 
                 if ($xlsx_format eq 'new') {
                     $record->{'ext_zuchtstamm'.$i}  ={'value'=>$data[2],'errors'=>[],'status'=>'0','origin'=>$data[2] };
@@ -359,6 +357,11 @@ sub LO_LS01_Zuchtstamm {
 #                $ext_sex='2' if ($_->{'value'}=~/Henne/);
 #
 #            }
+
+            #-- führende und schließende Leerzeichen entfernen
+            $_->{'value'}=~s/^\s+//g;
+            $_->{'value'}=~s/\s+$//g;
+
             if ($_->{'type'} eq 'data') {
                 $args->{$_->{'name'}}=$_->{'value'};
             }
@@ -499,6 +502,50 @@ sub LO_LS01_Zuchtstamm {
             # Tiere des Zuchtstammes erstellen
             #
             ####################################################################################### 
+
+            ##########
+            #
+            # Rasse/Farbschlag-DB-ID bestimmen
+            #     
+            ##########
+        
+            if ($args->{'ext_color'.$i} ne '') {
+                $sql1="
+                select db_breedcolor from breedcolor 
+                        where db_breed=(select db_code from codes where class='BREED' and ext_code='".$ext_breed."') 
+                        and db_color=(select db_code from codes where class='FARBSCHLAG' and ext_code='".$args->{'ext_color'.$i}."')
+                    ";
+                $msg='Kombination '.$ext_breed.':::'.$args->{'ext_color'.$i}.' in der Datenbank nicht definiert => Abbruch';
+
+            } else {    
+                $sql1="select db_breedcolor from breedcolor
+                    where db_breed=(select db_code from codes where class='BREED' and ext_code='".$ext_breed."')";
+                $msg='Rasse '.$ext_breed.' in der Datenbank nicht definiert => Abbruch';
+            }
+
+            my $sql_ref = $apiis->DataBase->sys_sql( $sql1);
+
+            while ( my $q = $sql_ref->handle->fetch ) {
+                $db_breed=$q->[0];
+            }
+
+            if (!$db_breed) {
+            
+                my $err=Apiis::Errors->new(
+                        type       => 'DATA',
+                        severity   => 'CRIT',
+                        from       => 'LS01_Zuchtstamm',
+                        ext_fields => ['ext_breed'],
+                        msg_short  => $msg
+                    );
+                push(@{$record->{'data'}->{'ext_breed'}->{'errors'}}, $err);
+                push(@allerrors, $err);
+
+#                $apiis->status(1);    
+#                goto EXIT;
+                $rollback=1;
+            }
+
             #-- Schleife über alle Elterntiere
             #-- für diese werden die Herkunftszuchtstämme angelegt, sowie die Eltern 
             #-- Default für unbekannte Eltern
